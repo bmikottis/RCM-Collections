@@ -1,0 +1,9 @@
+node_modules
+__lwr_cache__
+dist
+
+.vscode
+.DS_Store
+
+package-lock.json
+.env
