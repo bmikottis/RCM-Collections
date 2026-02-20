@@ -1,0 +1,144 @@
+/* Collection Tree Item Styling */
+
+.slds-tree__item-container {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.slds-tree__item-container:last-child {
+    margin-bottom: 0;
+}
+
+.tree-item-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+}
+
+.tree-item-row:hover {
+    background-color: #f3f3f3;
+}
+
+.tree-item-row:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0176d3;
+}
+
+.tree-item-row.slds-is-selected {
+    background-color: #eef4ff;
+}
+
+.tree-item-row.slds-is-selected:hover {
+    background-color: #e0ebff;
+}
+
+/* Semi-bold font for selected items */
+.tree-item-row.slds-is-selected .tree-item-label {
+    font-weight: 600;
+}
+
+/* Toggle button styling */
+.tree-toggle {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 4px;
+}
+
+/* Spacer for items without expand button */
+.tree-spacer {
+    display: inline-block;
+    width: 1.25rem;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+
+/* Item label styling */
+.tree-item-label {
+    flex: 1;
+    min-width: 0;
+    color: #181818;
+    font-size: 0.875rem;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Child group indentation */
+.slds-tree__group {
+    padding-left: 1.25rem;
+    margin-left: 0.5rem;
+    border-left: 1px solid #e5e5e5;
+}
+
+/* Content item row styling */
+.content-item-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.content-item-row:last-child {
+    margin-bottom: 0;
+}
+
+.content-item-row:hover {
+    background-color: #f3f3f3;
+}
+
+/* Content label styling */
+.content-label {
+    color: #444444;
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+/* Icon container for badge overlay */
+.icon-container {
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+.icon-container lightning-icon {
+    width: 16px;
+    height: 16px;
+    --slds-c-icon-size-x-small: 16px;
+}
+
+/* Template badge (shield icon) - bottom right with blue circle */
+.template-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0176d3;
+    border-radius: 50%;
+}
+
+.template-badge lightning-icon {
+    width: 6px;
+    height: 6px;
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+/* Folder icon styling - 16px size */
+.content-item-row lightning-icon {
+    flex-shrink: 0;
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    --slds-c-icon-size-x-small: 16px;
+}

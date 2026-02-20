@@ -1,0 +1,760 @@
+/* Collection Detail Component Styling */
+
+.collection-detail-container {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* ========================================
+   Record Page Header
+   ======================================== */
+.record-header {
+    padding: 1rem 1.5rem;
+    background-color: #ffffff;
+}
+
+.record-header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.record-header-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.record-header-actions lightning-button {
+    --slds-c-button-neutral-color-border: #706e6b;
+    --slds-c-button-radius-border: 100px;
+}
+
+.record-header-icon {
+    flex-shrink: 0;
+}
+
+.record-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.record-name {
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 2rem;
+    color: #181818;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Key Fields Row */
+.record-header-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.header-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+}
+
+.field-label {
+    font-size: 0.75rem;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.25rem;
+}
+
+.field-value {
+    font-size: 0.875rem;
+    color: #181818;
+}
+
+.placeholder-value {
+    color: #b0adab;
+}
+
+.template-link {
+    color: #0176d3;
+    text-decoration: none;
+}
+
+.template-link:hover {
+    color: #014486;
+    text-decoration: underline;
+}
+
+/* ========================================
+   Path/Progress Component
+   ======================================== */
+.path-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #f3f3f3;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.path-stages {
+    display: flex;
+    flex: 1;
+    height: 32px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #c9c9c9;
+    background-color: #ffffff;
+}
+
+.path-stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f3f3;
+    color: #706e6b;
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+/* Chevron arrow using pseudo-elements */
+.path-stage::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 10px solid #f3f3f3;
+    z-index: 2;
+}
+
+.path-stage::before {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 10px solid #c9c9c9;
+    z-index: 1;
+}
+
+/* First stage - rounded left */
+.path-stage:first-child {
+    border-radius: 16px 0 0 16px;
+    padding-left: 1rem;
+}
+
+/* Last stage - rounded right, no chevron */
+.path-stage:last-child {
+    border-radius: 0 16px 16px 0;
+    padding-right: 1rem;
+}
+
+.path-stage:last-child::after,
+.path-stage:last-child::before {
+    display: none;
+}
+
+/* Current stage styling */
+.path-stage.is-current {
+    background-color: var(--slds-g-color-surface-container-inverse-1, #032D60);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.path-stage.is-current::after {
+    border-left-color: var(--slds-g-color-surface-container-inverse-1, #032D60);
+}
+
+/* Complete stage styling */
+.path-stage.is-complete {
+    background-color: #2e844a;
+    color: #ffffff;
+}
+
+.path-stage.is-complete::after {
+    border-left-color: #2e844a;
+}
+
+/* Incomplete stage styling */
+.path-stage.is-incomplete {
+    background-color: #f3f3f3;
+    color: #706e6b;
+}
+
+.stage-label {
+    position: relative;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   Content Cards - 3 Column Grid
+   ======================================== */
+.cards-container {
+    padding: 1rem;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.card-column {
+    min-width: 0;
+}
+
+/* ========================================
+   Nested Card Styling
+   ======================================== */
+.nested-card {
+    background-color: #ffffff;
+    border: 1px solid #c9c9c9;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.nested-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+}
+
+.nested-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.nested-card-title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #181818;
+}
+
+.nested-card-header-right {
+    flex-shrink: 0;
+}
+
+.nested-card-content {
+    padding: 0.75rem 1rem;
+    min-height: 120px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.empty-card-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    text-align: center;
+}
+
+/* List item styling */
+.list-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+/* Child collection items */
+.child-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+}
+
+.child-item:hover {
+    background-color: #f3f3f3;
+}
+
+.child-item:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0176d3;
+}
+
+.child-name {
+    font-weight: 600;
+}
+
+/* Mini Progress Indicator for Child Collections */
+.mini-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 4px;
+}
+
+.mini-progress-bar {
+    width: 60px;
+    height: 4px;
+    background-color: #e5e5e5;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background-color: #2e844a;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.mini-progress-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: #706e6b;
+}
+
+/* Content items */
+.content-item {
+    padding: 0.5rem;
+}
+
+.content-name {
+    color: #181818;
+}
+
+/* Member items */
+.member-item {
+    padding: 0.5rem;
+}
+
+.member-name {
+    display: block;
+    font-weight: 500;
+    color: #181818;
+}
+
+.member-role {
+    display: block;
+    font-size: 0.75rem;
+    color: #706e6b;
+}
+
+/* Empty state */
+.empty-collection {
+    padding: 3rem;
+}
+
+.empty-icon {
+    --slds-c-icon-color-foreground-default: #c9c9c9;
+}
+
+/* ========================================
+   Completeness Section
+   ======================================== */
+.completeness-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    background-color: #f7f9fb;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.completeness-ring-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.completeness-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.ring-background {
+    fill: none;
+    stroke: #e5e5e5;
+    stroke-width: 8;
+}
+
+.ring-progress {
+    fill: none;
+    stroke: #2e844a;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.completeness-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.percentage-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #181818;
+    line-height: 1;
+}
+
+.percentage-label {
+    display: block;
+    font-size: 0.6875rem;
+    color: #706e6b;
+    margin-top: 2px;
+}
+
+.completeness-details {
+    flex: 1;
+}
+
+.completeness-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #181818;
+    margin: 0 0 0.25rem 0;
+}
+
+.completeness-subtitle {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin: 0 0 1rem 0;
+}
+
+.completeness-breakdown {
+    display: flex;
+    gap: 2rem;
+}
+
+.breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.breakdown-item lightning-icon {
+    --slds-c-icon-color-foreground-default: #706e6b;
+}
+
+.breakdown-label {
+    font-size: 0.8125rem;
+    color: #444444;
+}
+
+.breakdown-value {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #181818;
+}
+
+/* ========================================
+   Content Checklist Styles
+   ======================================== */
+.content-checklist {
+    display: flex;
+    flex-direction: column;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.checklist-item:last-child {
+    border-bottom: none;
+}
+
+.checklist-item.is-complete {
+    background-color: #f4fbf6;
+}
+
+.checklist-item.is-pending {
+    background-color: #ffffff;
+}
+
+.checklist-item.is-additional {
+    background-color: #f9f9f9;
+}
+
+.checklist-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.checklist-item.is-complete .checklist-icon lightning-icon {
+    --slds-c-icon-color-foreground-default: #2e844a;
+}
+
+.checklist-item.is-pending .checklist-icon lightning-icon {
+    --slds-c-icon-color-foreground-default: #706e6b;
+}
+
+.checklist-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.checklist-name {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #181818;
+    margin-bottom: 2px;
+}
+
+.checklist-file {
+    display: block;
+    font-size: 0.75rem;
+    color: #0176d3;
+}
+
+.checklist-description {
+    display: block;
+    font-size: 0.75rem;
+    color: #706e6b;
+}
+
+.checklist-status {
+    flex-shrink: 0;
+}
+
+.checklist-status lightning-button {
+    --slds-c-button-neutral-color-border: #c9c9c9;
+    --slds-c-button-radius-border: 4px;
+}
+
+.status-badge-success {
+    --slds-c-badge-color-background: #2e844a;
+    --slds-c-badge-text-color: #ffffff;
+}
+
+/* Additional content divider */
+.additional-content-divider {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    margin: 0.5rem 0;
+}
+
+.additional-content-divider span {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   Template Layout (1/3 + 2/3)
+   ======================================== */
+.cards-layout-template {
+    display: flex;
+    gap: 1rem;
+    min-height: 300px;
+}
+
+.left-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.right-column {
+    flex: 2;
+    min-width: 0;
+}
+
+.requirements-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.requirements-header {
+    flex-shrink: 0;
+}
+
+/* ========================================
+   Requirements Tabs
+   ======================================== */
+.requirements-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e5e5;
+    background-color: #fafaf9;
+}
+
+.requirements-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #706e6b;
+    transition: all 0.15s ease;
+}
+
+.requirements-tab:hover {
+    background-color: #f3f3f3;
+    color: #181818;
+}
+
+.requirements-tab.is-active {
+    border-bottom-color: var(--slds-g-color-accent-2, #0176d3);
+    color: var(--slds-g-color-accent-2, #0176d3);
+    background-color: #ffffff;
+}
+
+.requirements-tab lightning-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+}
+
+.tab-count {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #706e6b;
+    margin-left: 0.25rem;
+}
+
+.requirements-tab.is-active .tab-count {
+    color: #706e6b;
+}
+
+/* ========================================
+   Requirements Tab Content
+   ======================================== */
+.requirements-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #ffffff;
+}
+
+.requirements-tab-content .content-checklist {
+    padding: 0;
+}
+
+.requirements-tab-content .checklist-item {
+    padding: 1rem;
+}
+
+/* ========================================
+   Task Category Label
+   ======================================== */
+.task-category {
+    display: block;
+    font-size: 0.6875rem;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+}
+
+/* Member avatar (custom, replacing lightning-avatar) */
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-avatar lightning-icon {
+    --slds-c-icon-color-foreground-default: #706e6b;
+}
+
+/* Nested card Add button styling */
+.nested-card-header-right lightning-button {
+    --slds-c-button-neutral-color-border: #706e6b;
+    --slds-c-button-neutral-color-background: transparent;
+    --slds-c-button-text-color: #0176d3;
+    --slds-c-button-radius-border: 100px;
+    font-weight: 600;
+}
+
+.nested-card-header-right lightning-button::part(button) {
+    font-weight: 600;
+}
+
+.nested-card-header-right button,
+.nested-card-header-right .slds-button {
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .path-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .path-stages {
+        width: 100%;
+    }
+    
+    .path-stage {
+        font-size: 0.75rem;
+    }
+    
+    .path-stage::after {
+        right: -8px;
+        border-left-width: 8px;
+    }
+    
+    .path-stage::before {
+        right: -10px;
+        border-left-width: 8px;
+    }
+}

@@ -1,0 +1,83 @@
+<template>
+    <div class={itemContainerClass} role="treeitem" aria-expanded={isExpanded} aria-level={item.level}>
+        
+        <!-- Tree Item Row -->
+        <div class={itemRowClass} onclick={handleSelect} onkeydown={handleKeyDown} tabindex="0">
+            
+            <!-- Expand/Collapse Button (only for collections with children or content) -->
+            <template lwc:if={canExpand}>
+                <button 
+                    class="slds-button slds-button_icon slds-m-right_x-small tree-toggle"
+                    onclick={handleToggle}
+                    aria-label={toggleAriaLabel}>
+                    <lightning-icon 
+                        icon-name={expandIcon} 
+                        size="x-small"
+                        alternative-text={toggleAriaLabel}>
+                    </lightning-icon>
+                </button>
+            </template>
+            
+            <!-- Spacer for items that cannot expand -->
+            <template lwc:if={cannotExpand}>
+                <span class="slds-m-right_x-small tree-spacer"></span>
+            </template>
+            
+            <!-- Collection/Content Icon with Badge -->
+            <div class="icon-container">
+                <lightning-icon 
+                    icon-name={itemIcon} 
+                    size="x-small"
+                    alternative-text={item.name}>
+                </lightning-icon>
+                <template lwc:if={isFromTemplate}>
+                    <span class="template-badge" title="From Template">
+                        <lightning-icon 
+                            icon-name="utility:shield" 
+                            size="xx-small"
+                            alternative-text="Template Collection">
+                        </lightning-icon>
+                    </span>
+                </template>
+            </div>
+            
+            <!-- Item Name -->
+            <span class="slds-truncate tree-item-label" title={item.name}>
+                {item.name}
+            </span>
+        </div>
+        
+        <!-- Expanded Content (Child Collections + Content Items) -->
+        <template lwc:if={showExpanded}>
+            <div class="slds-tree__group" role="group">
+                
+                <!-- Child Collections (Recursive) -->
+                <template for:each={item.children} for:item="child">
+                    <main-collection-tree-item
+                        key={child.id}
+                        item={child}
+                        selected-id={selectedId}
+                        expanded-ids={expandedIds}
+                        onselect={handleChildSelect}>
+                    </main-collection-tree-item>
+                </template>
+                
+                <!-- Content Items -->
+                <template for:each={contentItems} for:item="content">
+                    <div key={content.id} class="content-item-row" role="treeitem">
+                        <span class="slds-m-right_x-small tree-spacer"></span>
+                        <lightning-icon 
+                            icon-name={content.icon} 
+                            size="x-small"
+                            class="slds-m-right_small"
+                            alternative-text={content.contentType}>
+                        </lightning-icon>
+                        <span class="slds-truncate tree-item-label content-label" title={content.name}>
+                            {content.name}
+                        </span>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

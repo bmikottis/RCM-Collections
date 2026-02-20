@@ -1,0 +1,298 @@
+<template>
+    <div class="console-container">
+        
+        <!-- Global Header Bar -->
+        <header class="global-header">
+            <div class="global-header-left">
+                <div class="app-logo">
+                    <span class="logo-icon">M</span>
+                </div>
+                <span class="app-name">Makana Pharma</span>
+            </div>
+            <div class="global-header-center">
+                <div class="global-search">
+                    <lightning-icon 
+                        icon-name="utility:search" 
+                        size="x-small"
+                        class="global-search-icon"
+                        alternative-text="Search">
+                    </lightning-icon>
+                    <input type="text" class="global-search-input" placeholder="Search..." />
+                </div>
+            </div>
+            <div class="global-header-right">
+                <lightning-button-icon icon-name="utility:emoji" variant="bare" alternative-text="Emoji" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:favorite" variant="bare" alternative-text="Favorites" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:add" variant="bare" alternative-text="Add" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:salesforce1" variant="bare" alternative-text="Salesforce" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:help" variant="bare" alternative-text="Help" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:settings" variant="bare" alternative-text="Settings" size="medium"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:notification" variant="bare" alternative-text="Notifications" size="medium"></lightning-button-icon>
+<div class="user-avatar">
+                    <lightning-icon icon-name="utility:user" size="x-small" alternative-text="User profile"></lightning-icon>
+                </div>
+            </div>
+        </header>
+
+        <!-- Console Navigation Bar -->
+        <nav class="console-nav">
+            <div class="console-nav-left">
+                <button class="app-launcher-button" title="App Launcher">
+                    <lightning-icon icon-name="utility:apps" size="x-small" alternative-text="App Launcher"></lightning-icon>
+                </button>
+                <span class="console-app-name">Content Management</span>
+            </div>
+            <div class="console-tabs">
+                <div class="console-tab is-active">
+                    <lightning-icon icon-name="standard:folder" size="x-small" class="tab-icon" alternative-text="Collection"></lightning-icon>
+                    <span class="tab-label">Regulated Content Coll...</span>
+                    <lightning-button-icon icon-name="utility:chevrondown" variant="bare" size="x-small" alternative-text="Tab options"></lightning-button-icon>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="collection-hierarchy-container">
+        
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="page-header-left">
+                <lightning-icon 
+                    icon-name="standard:folder" 
+                    size="medium"
+                    alternative-text="Collections">
+                </lightning-icon>
+                <h1 class="page-title">Regulated Content Collections</h1>
+            </div>
+        </header>
+        
+        <!-- Content Card (Tree + Preview) -->
+        <div class="browser-content-card">
+            
+            <!-- Left: Tree Navigation -->
+            <aside class="tree-rail">
+                <div class="rail-header">
+                    <div class="rail-header-left">
+                        <lightning-icon 
+                            icon-name="utility:hierarchy" 
+                            size="x-small"
+                            class="slds-m-right_x-small">
+                        </lightning-icon>
+                        <span class="rail-title">Collections</span>
+                    </div>
+                    <div class="rail-header-actions">
+                        <button 
+                            class={searchButtonClass}
+                            onclick={handleSearchToggle}
+                            title="Search">
+                            <lightning-icon 
+                                icon-name="utility:search" 
+                                size="x-small"
+                                alternative-text="Search collections">
+                            </lightning-icon>
+                        </button>
+                        <button 
+                            class={filterButtonClass}
+                            onclick={handleFilterToggle}
+                            title="Filter">
+                            <lightning-icon 
+                                icon-name="utility:filterList" 
+                                size="x-small"
+                                alternative-text="Filter collections">
+                            </lightning-icon>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search Input (shown when search is active) -->
+                <template lwc:if={showSearch}>
+                    <div class="search-container">
+                        <lightning-input 
+                            type="search"
+                            placeholder="Search collections..."
+                            value={searchTerm}
+                            onchange={handleSearchChange}
+                            variant="label-hidden"
+                            class="search-input">
+                        </lightning-input>
+                    </div>
+                </template>
+                
+                <!-- Filter Panel (shown when filter is active) -->
+                <template lwc:if={showFilter}>
+                    <div class="filter-panel">
+                        <div class="filter-section">
+                            <span class="filter-label">Collection Template</span>
+                            <lightning-checkbox-group
+                                name="typeFilter"
+                                options={collectionTypeOptions}
+                                value={selectedTypeFilters}
+                                onchange={handleTypeFilterChange}>
+                            </lightning-checkbox-group>
+                        </div>
+                        <div class="filter-section">
+                            <span class="filter-label">Status</span>
+                            <lightning-checkbox-group
+                                name="statusFilter"
+                                options={statusOptions}
+                                value={selectedStatusFilters}
+                                onchange={handleStatusFilterChange}>
+                            </lightning-checkbox-group>
+                        </div>
+                        <div class="filter-section">
+                            <span class="filter-label">Ownership</span>
+                            <lightning-checkbox-group
+                                name="ownershipFilter"
+                                options={ownershipOptions}
+                                value={selectedOwnershipFilters}
+                                onchange={handleOwnershipFilterChange}>
+                            </lightning-checkbox-group>
+                        </div>
+                        <div class="filter-section">
+                            <span class="filter-label">Contains Content Types</span>
+                            <div class="search-lookup">
+                                <div class="search-lookup-input-container">
+                                    <input 
+                                        type="text"
+                                        class="search-lookup-input"
+                                        placeholder="Search content types..."
+                                        value={contentTypeSearchTerm}
+                                        onfocus={handleContentTypeSearchFocus}
+                                        onblur={handleContentTypeSearchBlur}
+                                        oninput={handleContentTypeSearchInput}
+                                    />
+                                    <lightning-icon 
+                                        icon-name="utility:search" 
+                                        size="x-small"
+                                        class="search-lookup-icon"
+                                        alternative-text="Search">
+                                    </lightning-icon>
+                                </div>
+                                <template lwc:if={showContentTypeDropdown}>
+                                    <div class="search-lookup-dropdown">
+                                        <template lwc:if={hasFilteredContentTypes}>
+                                            <ul class="search-lookup-list" role="listbox">
+                                                <template for:each={filteredContentTypeOptions} for:item="option">
+                                                    <li 
+                                                        key={option.value} 
+                                                        class="search-lookup-option"
+                                                        role="option"
+                                                        onmousedown={handleContentTypeOptionClick}
+                                                        data-value={option.value}>
+                                                        {option.label}
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </template>
+                                        <template lwc:else>
+                                            <div class="search-lookup-empty">No matching content types</div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <template lwc:if={hasSelectedContentTypes}>
+                                <div class="selected-pills">
+                                    <template for:each={selectedContentTypePills} for:item="pill">
+                                        <span key={pill.value} class="filter-pill">
+                                            <span class="pill-label">{pill.label}</span>
+                                            <button 
+                                                class="pill-remove" 
+                                                onclick={handleRemoveContentType}
+                                                data-value={pill.value}
+                                                aria-label={pill.removeLabel}>
+                                                <lightning-icon 
+                                                    icon-name="utility:close" 
+                                                    size="xx-small"
+                                                    alternative-text="Remove">
+                                                </lightning-icon>
+                                            </button>
+                                        </span>
+                                    </template>
+                                    <template lwc:if={hasMoreContentTypes}>
+                                        <span class="pills-more">+{moreContentTypesCount} more</span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="filter-actions">
+                            <lightning-button 
+                                label="Clear" 
+                                variant="neutral" 
+                                onclick={handleClearFilters}>
+                            </lightning-button>
+                            <lightning-button 
+                                label="Apply" 
+                                variant="brand" 
+                                onclick={handleApplyFilters}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Tree Content (hidden when filter panel is shown) -->
+                <template lwc:if={showTreeContent}>
+                    <div class="tree-nav-content" role="tree" aria-label="Collection hierarchy">
+                        <template for:each={rootCollections} for:item="collection">
+                            <main-collection-tree-item
+                                key={collection.id}
+                                item={collection}
+                                selected-id={selectedCollectionId}
+                                expanded-ids={expandedIdsArray}
+                                onselect={handleCollectionSelect}>
+                            </main-collection-tree-item>
+                        </template>
+                    </div>
+                </template>
+            </aside>
+            
+            <!-- Right: Collection Preview -->
+            <main class="detail-main">
+                <!-- Breadcrumb Navigation -->
+                <template lwc:if={hasBreadcrumbs}>
+                    <nav class="breadcrumb-bar" aria-label="Breadcrumb">
+                        <div class="breadcrumb-list">
+                            <template for:each={breadcrumbs} for:item="crumb">
+                                <span key={crumb.id} class="breadcrumb-item">
+                                    <template lwc:if={crumb.isLast}>
+                                        <span class="breadcrumb-current">{crumb.name}</span>
+                                    </template>
+                                    <template lwc:else>
+                                        <a href="#" class="breadcrumb-link" onclick={handleBreadcrumbClick} data-id={crumb.id}>{crumb.name}</a>
+                                        <span class="breadcrumb-separator">›</span>
+                                    </template>
+                                </span>
+                            </template>
+                        </div>
+                    </nav>
+                </template>
+                
+                <template lwc:if={hasSelectedCollection}>
+                    <main-collection-detail
+                        collection={selectedCollection}
+                        collection-type={selectedCollectionType}
+                        completeness-data={selectedCollectionCompleteness}
+                        oncollectionclick={handleCollectionDetailClick}>
+                    </main-collection-detail>
+                </template>
+                
+                <template lwc:else>
+                    <!-- Empty State -->
+                    <div class="empty-state">
+                        <lightning-icon 
+                            icon-name="utility:touch_action" 
+                            size="large"
+                            class="empty-state-icon">
+                        </lightning-icon>
+                        <h3 class="slds-text-heading_medium slds-m-top_medium slds-m-bottom_small">
+                            Select a Collection
+                        </h3>
+                        <p class="slds-text-body_regular slds-text-color_weak">
+                            Choose a collection from the tree to view its details, content, and child collections.
+                        </p>
+                    </div>
+                </template>
+            </main>
+        </div>
+        </div>
+    </div>
+</template>

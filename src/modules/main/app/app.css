@@ -1,10 +1,18 @@
-main {
-    margin: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Reset body margin/padding */
+:host {
+    display: block;
 }
 
-h1 {
-    color: #1798c1;
+/* Main App Container */
+.app-container {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+}
+
+/* Full height layout */
+main-collection-hierarchy {
+    display: block;
+    height: 100vh;
 }
