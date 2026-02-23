@@ -1,0 +1,171 @@
+{
+  "bundles": {
+    "lightning/iconSvgTemplatesDoctypeRtl|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesDoctypeRtl/v/1_27_2-alpha/s/sha256-ZOEdMBtglpe2zY2aPOubu_QOGl2ewmdqNGrkV1ZwWyE/bundle_lightning_iconSvgTemplatesDoctypeRtl.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-ZOEdMBtglpe2zY2aPOubu/QOGl2ewmdqNGrkV1ZwWyE="
+    },
+    "lightning/iconSvgTemplatesDoctype|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesDoctype/v/1_27_2-alpha/s/sha256-35eUqTuFYIQdCfHbfbVm49ZNXAsiizvza2A36KKfqEE/bundle_lightning_iconSvgTemplatesDoctype.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-35eUqTuFYIQdCfHbfbVm49ZNXAsiizvza2A36KKfqEE="
+    },
+    "lightning/iconSvgTemplatesCustomRtl|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesCustomRtl/v/1_27_2-alpha/s/sha256-vg4vgqJT97c9f2IQ4UEBGx5Z7tayBa6EaRmje8ZybWU/bundle_lightning_iconSvgTemplatesCustomRtl.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-vg4vgqJT97c9f2IQ4UEBGx5Z7tayBa6EaRmje8ZybWU="
+    },
+    "lightning/iconSvgTemplatesCustom|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesCustom/v/1_27_2-alpha/s/sha256-SZRg61colfV_-9HJgQ8t5ZW2QpUxm2htkb-VfWh2nJg/bundle_lightning_iconSvgTemplatesCustom.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-SZRg61colfV/+9HJgQ8t5ZW2QpUxm2htkb+VfWh2nJg="
+    },
+    "lightning/iconSvgTemplatesActionRtl|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesActionRtl/v/1_27_2-alpha/s/sha256-1qIqkemwZvH-KyrWaYlwhBBO4xKnAMf9c-S7KBlO5r0/bundle_lightning_iconSvgTemplatesActionRtl.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-1qIqkemwZvH+KyrWaYlwhBBO4xKnAMf9c+S7KBlO5r0="
+    },
+    "lightning/iconSvgTemplatesAction|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesAction/v/1_27_2-alpha/s/sha256-Y641ExTlhyfuqhYBgdNbQp2e7mG0Zcc21NzMxLaDZ6M/bundle_lightning_iconSvgTemplatesAction.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-Y641ExTlhyfuqhYBgdNbQp2e7mG0Zcc21NzMxLaDZ6M="
+    },
+    "lightning/iconSvgTemplatesStandardRtl|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesStandardRtl/v/1_27_2-alpha/s/sha256-Rv8LWMspKfpSx7of-HmJW0dMKsn2KeUkLuQw8B5oMBw/bundle_lightning_iconSvgTemplatesStandardRtl.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-Rv8LWMspKfpSx7of+HmJW0dMKsn2KeUkLuQw8B5oMBw="
+    },
+    "lightning/iconSvgTemplatesStandard|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesStandard/v/1_27_2-alpha/s/sha256-vZCXFP0QZmUGPsShN3wie6499eGjdxTGqd4fULC6emg/bundle_lightning_iconSvgTemplatesStandard.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-vZCXFP0QZmUGPsShN3wie6499eGjdxTGqd4fULC6emg="
+    },
+    "lightning/iconSvgTemplatesUtility|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesUtility/v/1_27_2-alpha/s/sha256-xASQ86_cjfJiWnCxii8zRvwPShoi_-8usL7zlxc7zD0/bundle_lightning_iconSvgTemplatesUtility.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-xASQ86/cjfJiWnCxii8zRvwPShoi/+8usL7zlxc7zD0="
+    },
+    "lightning/iconSvgTemplatesUtilityRtl|v/1_27_2-alpha": {
+      "version": "1.27.2-alpha",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lightning/iconSvgTemplatesUtilityRtl/v/1_27_2-alpha/s/sha256-TfN4EuZxBWmtk1f7YQ6UfQdvXOGHdnm6bmcGU6cM6rk/bundle_lightning_iconSvgTemplatesUtilityRtl.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-TfN4EuZxBWmtk1f7YQ6UfQdvXOGHdnm6bmcGU6cM6rk="
+    },
+    "@lwrjs/app-service/main/module/esm|v/0_18_1": {
+      "version": "0.18.1",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/@lwrjs/app-service/main/module/esm/v/0_18_1/s/sha256-rV6kdwW_aeJxSSPYWrisGe56a3RlNxijnyFO_6QJW2s/bundle_@lwrjs_app-service_main_module_esm.js",
+      "includedModules": [],
+      "imports": [
+        "lwr/esmLoader|v/0_18_1",
+        "@lwc/synthetic-shadow|v/8_21_6",
+        "lwr/profiler|v/0_18_1",
+        "lwc|v/8_21_6"
+      ],
+      "dynamicImports": [],
+      "integrity": "sha256-rV6kdwW/aeJxSSPYWrisGe56a3RlNxijnyFO/6QJW2s="
+    },
+    "lwc|v/8_21_6": {
+      "version": "8.21.6",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lwc/v/8_21_6/s/sha256-EH8y4DI1HV8y1TKFqbOv8sow7fgyEwuD1GcruCCMvx8/bundle_lwc.js",
+      "includedModules": [],
+      "imports": [],
+      "dynamicImports": [],
+      "integrity": "sha256-EH8y4DI1HV8y1TKFqbOv8sow7fgyEwuD1GcruCCMvx8="
+    },
+    "lwr/esmLoader|v/0_18_1": {
+      "version": "0.18.1",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lwr/esmLoader/v/0_18_1/s/sha256-XZ3-fTIQeMpr-t515p72MK4vr6gSnXsH3O_YELtRaFw/bundle_lwr_esmLoader.js",
+      "includedModules": [],
+      "imports": [],
+      "dynamicImports": [],
+      "integrity": "sha256-XZ3+fTIQeMpr+t515p72MK4vr6gSnXsH3O/YELtRaFw="
+    },
+    "@lwc/synthetic-shadow|v/8_21_6": {
+      "version": "8.21.6",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/@lwc/synthetic-shadow/v/8_21_6/s/sha256--ubVqDVmG8RVo3l-_kcO6vaaHDjCXLX-ljdmIph1yWc/bundle_@lwc_synthetic-shadow.js",
+      "includedModules": [],
+      "imports": [],
+      "dynamicImports": [],
+      "integrity": "sha256-+ubVqDVmG8RVo3l+/kcO6vaaHDjCXLX+ljdmIph1yWc="
+    },
+    "lwr/profiler|v/0_18_1": {
+      "version": "0.18.1",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/lwr/profiler/v/0_18_1/s/sha256-kGLXJohj797McyfBP40zJ-_7G1vXcR4obQNMGxQNgGk/bundle_lwr_profiler.js",
+      "includedModules": [],
+      "imports": [],
+      "dynamicImports": [],
+      "integrity": "sha256-kGLXJohj797McyfBP40zJ+/7G1vXcR4obQNMGxQNgGk="
+    },
+    "main/app|v/0_0_1": {
+      "version": "0.0.1",
+      "path": "/1/bundle/esm/l/en-US/bi/0/module/mi/main/app/v/0_0_1/s/sha256-GcFjwEb_-OfkR0VtVTZAhwcgl5EGBFNgY4bxrS3aUrE/bundle_main_app.js",
+      "includedModules": [],
+      "imports": [
+        "lwc|v/8_21_6",
+        "lwr/esmLoader|v/0_18_1"
+      ],
+      "dynamicImports": [
+        "lightning/iconSvgTemplatesUtilityRtl|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesActionRtl|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesStandardRtl|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesDoctypeRtl|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesCustomRtl|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesUtility|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesAction|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesStandard|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesDoctype|v/1_27_2-alpha",
+        "lightning/iconSvgTemplatesCustom|v/1_27_2-alpha"
+      ],
+      "integrity": "sha256-GcFjwEb/+OfkR0VtVTZAhwcgl5EGBFNgY4bxrS3aUrE="
+    }
+  }
+}

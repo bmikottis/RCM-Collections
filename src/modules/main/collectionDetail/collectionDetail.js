@@ -342,7 +342,9 @@ export default class CollectionDetail extends LightningElement {
     get completenessLabel() {
         const data = this.completeness;
         if (!data) return '';
-        return `${data.totalCompleted} of ${data.totalRequired} items complete`;
+        const completed = data.totalCompleted || 0;
+        const required = data.totalRequired || 0;
+        return `${completed} of ${required} items complete`;
     }
 
     /**
@@ -399,7 +401,9 @@ export default class CollectionDetail extends LightningElement {
     get approvalsSummary() {
         const data = this.completeness;
         if (!data) return '';
-        return `${data.approvalsCompleted}/${data.approvalsTotal} complete`;
+        const completed = data.approvalsCompleted || 0;
+        const total = data.approvalsTotal || 0;
+        return `${completed}/${total} complete`;
     }
 
     /**
@@ -478,7 +482,9 @@ export default class CollectionDetail extends LightningElement {
     get contentSummary() {
         const data = this.completeness;
         if (!data) return '';
-        return `${data.contentCompleted}/${data.contentTotal} required`;
+        const completed = data.contentCompleted || 0;
+        const total = data.contentTotal || 0;
+        return `${completed}/${total} required`;
     }
 
     /**
@@ -488,7 +494,9 @@ export default class CollectionDetail extends LightningElement {
     get taskSummary() {
         const data = this.completeness;
         if (!data) return '';
-        return `${data.tasksCompleted}/${data.tasksTotal} complete`;
+        const completed = data.tasksCompleted || 0;
+        const total = data.tasksTotal || 0;
+        return `${completed}/${total} complete`;
     }
 
     /**
@@ -497,8 +505,10 @@ export default class CollectionDetail extends LightningElement {
      */
     get childrenSummary() {
         const data = this.completeness;
-        if (!data || data.childrenTotal === 0) return '';
-        return `${data.childrenCompleted}/${data.childrenTotal} complete`;
+        const total = data?.childrenTotal || 0;
+        if (!data || total === 0) return '';
+        const completed = data.childrenCompleted || 0;
+        return `${completed}/${total} complete`;
     }
 
     /**
