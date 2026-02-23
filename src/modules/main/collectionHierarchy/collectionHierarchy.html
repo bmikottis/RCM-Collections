@@ -288,7 +288,8 @@
                         collection-type={selectedCollectionType}
                         completeness-data={selectedCollectionCompleteness}
                         oncollectionclick={handleCollectionDetailClick}
-                        onviewdetails={handleViewDetails}>
+                        onviewdetails={handleViewDetails}
+                        onopencontentrecord={handleOpenContentRecord}>
                     </main-collection-detail>
                 </template>
                 
@@ -312,7 +313,7 @@
         </div>
         </template>
 
-        <!-- Record Page View -->
+        <!-- Collection Record Page View -->
         <template lwc:if={showRecordPage}>
             <div class="record-page-wrapper">
                 <main-collection-record-page
@@ -320,6 +321,18 @@
                     collection-type={activeRecordCollectionType}
                     onviewcollection={handleViewCollection}>
                 </main-collection-record-page>
+            </div>
+        </template>
+
+        <!-- Content Record Page View (opened from Collection Content link) -->
+        <template lwc:if={showContentRecordPage}>
+            <div class="record-page-wrapper">
+                <main-content-record-page
+                    content={activeContentRecordData}
+                    parent-collection-name={activeContentRecordParentName}
+                    parent-collection-id={activeContentRecordParentId}
+                    onviewcollection={handleViewCollection}>
+                </main-content-record-page>
             </div>
         </template>
         </div>

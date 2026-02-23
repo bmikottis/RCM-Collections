@@ -524,6 +524,45 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Check if content record page view should be shown
+     * @returns {boolean}
+     */
+    get showContentRecordPage() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        return activeTab?.type === 'content-record';
+    }
+
+    /**
+     * Get content record data for the active content tab
+     * @returns {Object|null}
+     */
+    get activeContentRecordData() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        if (activeTab?.type === 'content-record' && activeTab.content) {
+            return activeTab.content;
+        }
+        return null;
+    }
+
+    /**
+     * Get parent collection name for active content record tab
+     * @returns {string}
+     */
+    get activeContentRecordParentName() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        return activeTab?.parentCollectionName || '';
+    }
+
+    /**
+     * Get parent collection id for active content record tab
+     * @returns {string|null}
+     */
+    get activeContentRecordParentId() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        return activeTab?.parentCollectionId || null;
+    }
+
+    /**
      * Get the collection for the active record page
      * @returns {Object|null}
      */
@@ -609,10 +648,10 @@ export default class CollectionHierarchy extends LightningElement {
     handleViewCollection(event) {
         const { collectionId } = event.detail;
         const collection = findCollectionById(this.collectionsData, collectionId);
-        
+
         if (collection) {
             const existingTab = this.consoleTabs.find(tab => tab.collectionId === collectionId);
-            
+
             if (existingTab) {
                 this.activeTabId = existingTab.id;
             } else {
@@ -627,6 +666,41 @@ export default class CollectionHierarchy extends LightningElement {
                 this.consoleTabs = [...this.consoleTabs, newTab];
                 this.activeTabId = newTabId;
             }
+        }
+    }
+
+    /**
+     * Handle open content record (from Collection Content card link or "Go to Record" in preview modal)
+     * Adds a content-record tab and switches to it.
+     * @param {CustomEvent} event - detail: { content, parentCollectionId, parentCollectionName }
+     */
+    handleOpenContentRecord(event) {
+        const { content, parentCollectionId, parentCollectionName } = event.detail || {};
+        if (!content?.id) return;
+
+        const contentId = content.id;
+        const existingTab = this.consoleTabs.find(
+            tab => tab.type === 'content-record' && tab.content?.id === contentId
+        );
+
+        if (existingTab) {
+            this.activeTabId = existingTab.id;
+        } else {
+            const tabId = `content-${contentId}`;
+            const label = content.name && content.name.length > 20
+                ? content.name.substring(0, 20) + '...'
+                : (content.name || 'Content');
+            const newTab = {
+                id: tabId,
+                label,
+                type: 'content-record',
+                content: { ...content },
+                parentCollectionId: parentCollectionId || null,
+                parentCollectionName: parentCollectionName || '',
+                closable: true
+            };
+            this.consoleTabs = [...this.consoleTabs, newTab];
+            this.activeTabId = tabId;
         }
     }
 }

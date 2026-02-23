@@ -673,6 +673,35 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
+     * Handle click on content link – open content record in a new console tab
+     * @param {Event} event
+     */
+    handleContentLinkClick(event) {
+        event.preventDefault();
+        const contentId = event.currentTarget.dataset.id;
+        const content = this.collectionContent.find(c => c.id === contentId);
+        if (content) {
+            this.dispatchOpenContentRecord(content);
+        }
+    }
+
+    /**
+     * Dispatch opencontentrecord event for hierarchy to add a content-record tab
+     * @param {Object} content - content item { id, name, contentType, ... }
+     */
+    dispatchOpenContentRecord(content) {
+        this.dispatchEvent(new CustomEvent('opencontentrecord', {
+            detail: {
+                content: { ...content },
+                parentCollectionId: this.collection?.id || null,
+                parentCollectionName: this.collection?.name || ''
+            },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    /**
      * Handle preview content
      * @param {Event} event
      */
@@ -704,10 +733,12 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle go to record from preview
+     * Handle go to record from preview – open content record in a new console tab and close modal
      */
     handleGoToRecord() {
-        console.log('Go to content record:', this.previewContent?.id);
+        if (this.previewContent) {
+            this.dispatchOpenContentRecord(this.previewContent);
+        }
         this.handleClosePreview();
     }
 }

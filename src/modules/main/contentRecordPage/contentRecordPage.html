@@ -1,0 +1,252 @@
+<template>
+    <div class="content-record-container">
+        <!-- Record type bar (dark bar) -->
+        <div class="content-record-type-bar" role="banner" aria-label="Regulated Content Version">
+            <span class="content-record-type-bar-label">RCM Content Version Record</span>
+        </div>
+
+        <!-- Main content area (white) -->
+        <div class="content-record-scroll">
+            <!-- Header: Regulated Content Version + RCV id + version dropdown -->
+            <header class="content-record-header">
+                <div class="content-record-header-left">
+                    <div class="content-record-versioning">
+                        <lightning-icon
+                            icon-name={contentIcon}
+                            size="small"
+                            alternative-text="Content">
+                        </lightning-icon>
+                        <span class="content-record-version-label">Regulated Content Version</span>
+                        <span class="content-record-version-id">{recordId}</span>
+                    </div>
+                    <div class="content-record-version-dropdown-wrap">
+                        <button type="button" class="content-record-version-dropdown" aria-haspopup="listbox" aria-expanded="false">
+                            <span>v {contentVersion}</span>
+                            <lightning-icon icon-name="utility:chevrondown" size="xx-small" alternative-text="Version"></lightning-icon>
+                        </button>
+                        <lightning-button-icon icon-name="utility:close" variant="bare" size="x-small" alternative-text="Close" class="content-record-version-close"></lightning-button-icon>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Key info row: Content Name, Version, Status, Effective Dates -->
+            <div class="content-record-key-info">
+                <div class="content-record-key-row">
+                    <span class="content-record-key-label">Content Name:</span>
+                    <span class="content-record-key-value content-record-content-name">{contentName}</span>
+                </div>
+                <div class="content-record-key-fields">
+                    <span class="content-record-key-item"><strong>Version:</strong> {contentVersion}</span>
+                    <span class="content-record-key-item"><strong>Status:</strong> {contentStatus}</span>
+                    <span class="content-record-key-item"><strong>Effective Dates:</strong> {effectiveDates}</span>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="content-record-actions">
+                <lightning-button label="Follow" variant="neutral" icon-name="utility:add" class="content-record-action-follow"></lightning-button>
+                <lightning-button label="Edit" variant="neutral" onclick={handleEdit}></lightning-button>
+                <lightning-button label="Delete" variant="neutral"></lightning-button>
+                <div class="content-record-action-clone">
+                    <lightning-button label="Clone" variant="neutral" icon-name="utility:down"></lightning-button>
+                </div>
+                <lightning-button-icon icon-name="utility:down" variant="border-filled" alternative-text="More actions"></lightning-button-icon>
+            </div>
+
+            <!-- Workflow status bar -->
+            <div class="content-record-workflow" role="navigation" aria-label="Content workflow">
+                <div class="content-record-workflow-stages">
+                    <span class={draftStageClass}>Draft</span>
+                    <span class="content-record-workflow-arrow" aria-hidden="true">→</span>
+                    <span class={reviewStageClass}>Review</span>
+                    <span class="content-record-workflow-arrow" aria-hidden="true">→</span>
+                    <span class={approveStageClass}>Approve</span>
+                    <span class="content-record-workflow-arrow" aria-hidden="true">→</span>
+                    <span class={archiveStageClass}>Archive</span>
+                </div>
+                <div class="content-record-workflow-action">
+                    <lightning-button label="Send for review" variant="brand" icon-name="utility:down"></lightning-button>
+                </div>
+            </div>
+
+            <!-- Tabs: Document | Review & Approval | Audit Trail | Related -->
+            <div class="content-record-tab-bar">
+                <button type="button" class={documentTabClass} onclick={handleDocumentTabClick}>Document</button>
+                <button type="button" class={reviewTabClass} onclick={handleReviewTabClick}>Review &amp; Approval</button>
+                <button type="button" class={auditTabClass} onclick={handleAuditTabClick}>Audit Trail</button>
+                <button type="button" class={relatedTabClass} onclick={handleRelatedTabClick}>Related</button>
+            </div>
+
+            <!-- Tab content area + Annotations sidebar -->
+            <div class="content-record-body">
+                <div class="content-record-main">
+                    <template lwc:if={isDocumentTabActive}>
+                        <!-- Document tab: file name, Download, toolbar, preview -->
+                        <div class="content-record-document-panel">
+                            <div class="content-record-document-header">
+                                <div class="content-record-document-title-row">
+                                    <lightning-icon icon-name="doctype:pdf" size="x-small" alternative-text="PDF"></lightning-icon>
+                                    <span class="content-record-document-title">Content File Name</span>
+                                </div>
+                                <div class="content-record-document-header-actions">
+                                    <lightning-button label="Download" variant="neutral" icon-name="utility:down"></lightning-button>
+                                    <lightning-button-icon icon-name="utility:threedots" variant="bare" alternative-text="More options"></lightning-button-icon>
+                                </div>
+                            </div>
+                            <div class="content-record-document-toolbar">
+                                <div class="content-record-document-nav">
+                                    <lightning-button-icon icon-name="utility:chevronleft" variant="bare" size="small" alternative-text="First page"></lightning-button-icon>
+                                    <lightning-button-icon icon-name="utility:chevronleft" variant="bare" size="small" alternative-text="Previous page"></lightning-button-icon>
+                                    <span class="content-record-document-pages">1 of 14</span>
+                                    <lightning-button-icon icon-name="utility:chevronright" variant="bare" size="small" alternative-text="Next page"></lightning-button-icon>
+                                    <lightning-button-icon icon-name="utility:chevronright" variant="bare" size="small" alternative-text="Last page"></lightning-button-icon>
+                                </div>
+                                <div class="content-record-document-toolbar-center">
+                                    <lightning-button-icon icon-name="utility:search" variant="bare" size="small" alternative-text="Search"></lightning-button-icon>
+                                    <lightning-button-icon icon-name="utility:zoomin" variant="bare" size="small" alternative-text="Zoom in"></lightning-button-icon>
+                                    <lightning-button-icon icon-name="utility:zoomout" variant="bare" size="small" alternative-text="Zoom out"></lightning-button-icon>
+                                    <button type="button" class="content-record-zoom-level">125%</button>
+                                </div>
+                            </div>
+                            <div class="content-record-document-preview">
+                                <div class="content-record-preview-placeholder">
+                                    <div class="content-record-preview-inner">
+                                        <lightning-icon icon-name="doctype:pdf" size="large" class="content-record-preview-icon" alternative-text="Document"></lightning-icon>
+                                        <p class="slds-text-body_regular slds-text-color_weak">{contentName}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">Document preview would render here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template lwc:if={isReviewTabActive}>
+                        <div class="content-record-tab-placeholder">
+                            <p class="slds-text-color_weak">Review &amp; Approval content</p>
+                        </div>
+                    </template>
+
+                    <template lwc:if={isAuditTabActive}>
+                        <div class="content-record-tab-placeholder">
+                            <p class="slds-text-color_weak">Audit Trail content</p>
+                        </div>
+                    </template>
+
+                    <template lwc:if={isRelatedTabActive}>
+                        <div class="content-record-related">
+                            <div class="content-record-related-list-header">
+                                <h3 class="content-record-related-title">Parent Collection</h3>
+                            </div>
+                            <template lwc:if={parentCollectionName}>
+                                <div class="content-record-related-item">
+                                    <lightning-icon icon-name="standard:folder" size="x-small" alternative-text="Collection"></lightning-icon>
+                                    <a href="#" class="content-record-link" onclick={handleParentCollectionClick}>{parentCollectionName}</a>
+                                </div>
+                            </template>
+                            <template lwc:else>
+                                <div class="content-record-empty">No parent collection</div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Annotations sidebar (right) -->
+                <aside class="content-record-sidebar" aria-label="Annotations">
+                    <div class="content-record-annotations-panel">
+                        <h3 class="content-record-annotations-title">Annotations ({annotationsCount})</h3>
+                        <div class="content-record-annotations-search">
+                            <lightning-icon icon-name="utility:search" size="x-small" class="content-record-annotations-search-icon" alternative-text="Search"></lightning-icon>
+                            <input type="text" class="content-record-annotations-search-input" placeholder="Search..." aria-label="Search annotations" />
+                        </div>
+                        <div class="content-record-annotations-toolbar">
+                            <lightning-button-icon icon-name="utility:sort" variant="bare" size="x-small" alternative-text="Sort"></lightning-button-icon>
+                            <lightning-button-icon icon-name="utility:filterList" variant="bare" size="x-small" alternative-text="Filter"></lightning-button-icon>
+                        </div>
+                        <div class="content-record-annotations-list">
+                            <template for:each={annotationItems} for:item="ann">
+                                <div key={ann.id} class="content-record-annotation-card">
+                                    <div class="content-record-annotation-header">
+                                        <button type="button" class="content-record-annotation-chevron" aria-expanded={ann.expanded} onclick={handleAnnotationToggle} data-id={ann.id} aria-label={ann.expandLabel}>
+                                            <lightning-icon icon-name={ann.expandedIcon} size="x-small" alternative-text=""></lightning-icon>
+                                        </button>
+                                        <span class="content-record-annotation-id">Annotation ID - {ann.id}</span>
+                                        <div class="content-record-annotation-more-wrap">
+                                            <button type="button" class="content-record-annotation-more" aria-label="More options" aria-haspopup="true" aria-expanded={ann.menuOpen} onclick={handleMoreClick} data-id={ann.id}>
+                                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" alternative-text=""></lightning-icon>
+                                            </button>
+                                            <template lwc:if={ann.menuOpen}>
+                                                <div class="content-record-annotation-dropdown" role="menu">
+                                                    <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="copy-link" data-id={ann.id} onclick={handleMoreOptionSelect}>Copy link</button>
+                                                    <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="edit" data-id={ann.id} onclick={handleMoreOptionSelect}>Edit</button>
+                                                    <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="delete" data-id={ann.id} onclick={handleMoreOptionSelect}>Delete</button>
+                                                    <template lwc:if={ann.isResolved}>
+                                                        <button type="button" role="menuitem" class="content-record-annotation-menu-item content-record-annotation-menu-item-checked" data-action="resolve" data-id={ann.id} onclick={handleMoreOptionSelect}>Resolve ✓</button>
+                                                        <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="unresolve" data-id={ann.id} onclick={handleMoreOptionSelect}>Unresolve</button>
+                                                    </template>
+                                                    <template lwc:else>
+                                                        <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="resolve" data-id={ann.id} onclick={handleMoreOptionSelect}>Resolve</button>
+                                                        <button type="button" role="menuitem" class="content-record-annotation-menu-item content-record-annotation-menu-item-checked" data-action="unresolve" data-id={ann.id} onclick={handleMoreOptionSelect}>Unresolve ✓</button>
+                                                    </template>
+                                                    <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="assign" data-id={ann.id} onclick={handleMoreOptionSelect}>Assign to...</button>
+                                                    <button type="button" role="menuitem" class="content-record-annotation-menu-item" data-action="add-to-library" data-id={ann.id} onclick={handleMoreOptionSelect}>Add to library</button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <template lwc:if={ann.expanded}>
+                                        <div class="content-record-annotation-meta">
+                                            <lightning-icon icon-name="utility:user" size="xx-small" class="content-record-annotation-user-icon" alternative-text=""></lightning-icon>
+                                            <a href="#" class="content-record-annotation-author" data-author={ann.createdBy} onclick={handleAuthorClick}>{ann.createdBy}</a>
+                                            <span class="content-record-annotation-dot" aria-hidden="true">·</span>
+                                            <span class="content-record-annotation-time">{ann.timeAgo}</span>
+                                            <span class="content-record-annotation-dot" aria-hidden="true">·</span>
+                                            <a href="#" class="content-record-annotation-status" data-id={ann.id} onclick={handleStatusClick}>{ann.statusLabel}</a>
+                                        </div>
+                                        <template lwc:if={ann.snippet}>
+                                            <div class="content-record-annotation-snippet">
+                                                <span class="content-record-annotation-snippet-quote">"{ann.snippet}"</span>
+                                            </div>
+                                        </template>
+                                        <div class="content-record-annotation-section">
+                                            <button type="button" class="content-record-annotation-section-row" data-id={ann.id} onclick={handleLinkedClaimsToggle}>
+                                                <lightning-icon icon-name={ann.linkedClaimsChevron} size="xx-small" class="content-record-annotation-section-chevron" alternative-text=""></lightning-icon>
+                                                <span class="content-record-annotation-section-label">Linked Claims ({ann.linkedClaimsCount})</span>
+                                            </button>
+                                            <a href="#" class="content-record-annotation-section-link" data-id={ann.id} onclick={handleLinkClaimClick}>Link Claim</a>
+                                        </div>
+                                        <template lwc:if={ann.linkedClaimsExpanded}>
+                                            <div class="content-record-annotation-section-body">No linked claims. Use &quot;Link Claim&quot; to add one.</div>
+                                        </template>
+                                        <div class="content-record-annotation-section">
+                                            <button type="button" class="content-record-annotation-section-row" data-id={ann.id} onclick={handleCommentsToggle}>
+                                                <lightning-icon icon-name={ann.commentsChevron} size="xx-small" class="content-record-annotation-section-chevron" alternative-text=""></lightning-icon>
+                                                <span class="content-record-annotation-section-label">Comments ({ann.commentsCount})</span>
+                                            </button>
+                                            <a href="#" class="content-record-annotation-section-link" data-id={ann.id} onclick={handleAddCommentClick}>Add Comment</a>
+                                        </div>
+                                        <template lwc:if={ann.commentsExpanded}>
+                                            <div class="content-record-annotation-section-body">No comments yet. Use &quot;Add Comment&quot; to add one.</div>
+                                        </template>
+                                        <div class="content-record-annotation-anchor">
+                                            <div class="content-record-anchor-checkbox-wrap">
+                                                <lightning-input type="checkbox" label="Mark as Anchor" data-id={ann.id} variant="label-inline" class="content-record-anchor-input" checked={ann.anchorChecked} onchange={handleAnchorChange}></lightning-input>
+                                            </div>
+                                            <span class="content-record-annotation-info-icon" title="Mark this annotation as an anchor for reference in the document.">
+                                                <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
+                                            </span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template lwc:if={hasNoAnnotations}>
+                                <div class="content-record-annotations-empty">
+                                    <p class="slds-text-color_weak">No annotations yet</p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</template>
