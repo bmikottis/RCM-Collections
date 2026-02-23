@@ -1,0 +1,161 @@
+<template>
+    <div class="record-page-container">
+        <!-- Record Header -->
+        <header class="record-page-header">
+            <div class="record-page-header-left">
+                <div class="record-icon">
+                    <lightning-icon icon-name="standard:folder" size="medium" alternative-text="Collection"></lightning-icon>
+                </div>
+                <div class="record-title-container">
+                    <span class="record-object-label">{objectLabel}</span>
+                    <h1 class="record-page-title">{collectionName}</h1>
+                </div>
+            </div>
+            <div class="record-page-header-right">
+                <lightning-button label="Edit" variant="neutral" onclick={handleEdit}></lightning-button>
+                <lightning-button-icon icon-name="utility:down" variant="border-filled" alternative-text="More actions"></lightning-button-icon>
+            </div>
+        </header>
+
+        <!-- Highlight Panel -->
+        <div class="highlight-panel">
+            <template for:each={highlightFields} for:item="field">
+                <div key={field.label} class="highlight-field">
+                    <span class="highlight-label">{field.label}</span>
+                    <span class="highlight-value">{field.value}</span>
+                </div>
+            </template>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="record-page-body">
+            <!-- Left Column - Main Content -->
+            <div class="record-page-main">
+                <!-- Tab Bar -->
+                <div class="record-tab-bar">
+                    <button class={relatedTabClass} onclick={handleRelatedTabClick}>Related</button>
+                    <button class={detailsTabClass} onclick={handleDetailsTabClick}>Details</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="record-tab-content">
+                    <!-- Related Tab -->
+                    <template lwc:if={isRelatedTabActive}>
+                        <div class="related-lists">
+                            <!-- Child Collections Related List -->
+                            <div class="related-list">
+                                <div class="related-list-header">
+                                    <h3 class="related-list-title">Child Collections {childCollectionsCount}</h3>
+                                    <lightning-button label="New" variant="neutral"></lightning-button>
+                                </div>
+                                <template lwc:if={hasChildCollections}>
+                                    <table class="related-list-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Owner</th>
+                                                <th scope="col">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={childCollections} for:item="child">
+                                                <tr key={child.id} class="related-list-row" data-id={child.id} onclick={handleChildClick}>
+                                                    <td><a href="#" class="record-link">{child.name}</a></td>
+                                                    <td>{child.metadata.owner}</td>
+                                                    <td>{child.metadata.status}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
+                                <template lwc:else>
+                                    <div class="related-list-empty">No child collections</div>
+                                </template>
+                            </div>
+
+                            <!-- Content Items Related List -->
+                            <div class="related-list">
+                                <div class="related-list-header">
+                                    <h3 class="related-list-title">Content Items {contentItemsCount}</h3>
+                                    <lightning-button label="Add" variant="neutral"></lightning-button>
+                                </div>
+                                <template lwc:if={hasContentItems}>
+                                    <table class="related-list-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={contentItems} for:item="content">
+                                                <tr key={content.id} class="related-list-row" data-id={content.id} onclick={handleContentClick}>
+                                                    <td>
+                                                        <div class="content-name-cell">
+                                                            <lightning-icon icon-name={content.icon} size="x-small" alternative-text={content.contentType}></lightning-icon>
+                                                            <a href="#" class="record-link">{content.name}</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>{content.contentType}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
+                                <template lwc:else>
+                                    <div class="related-list-empty">No content items</div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Details Tab -->
+                    <template lwc:if={isDetailsTabActive}>
+                        <div class="details-sections">
+                            <div class="detail-section">
+                                <h3 class="detail-section-title">Information</h3>
+                                <div class="field-grid">
+                                    <template for:each={informationFields} for:item="field">
+                                        <div key={field.label} class="field-item">
+                                            <span class="field-label">{field.label}</span>
+                                            <span class="field-value">{field.value}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="detail-section">
+                                <h3 class="detail-section-title">System Information</h3>
+                                <div class="field-grid">
+                                    <template for:each={systemFields} for:item="field">
+                                        <div key={field.label} class="field-item">
+                                            <span class="field-label">{field.label}</span>
+                                            <span class="field-value">{field.value}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Right Column - Activity -->
+            <aside class="record-page-sidebar">
+                <div class="activity-panel">
+                    <h3 class="activity-title">Activity</h3>
+                    <div class="activity-tabs">
+                        <button class="activity-tab is-active">All</button>
+                        <button class="activity-tab">Comments</button>
+                        <button class="activity-tab">History</button>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-empty">
+                            <lightning-icon icon-name="utility:comments" size="large" class="activity-empty-icon"></lightning-icon>
+                            <p>No activity yet</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</template>

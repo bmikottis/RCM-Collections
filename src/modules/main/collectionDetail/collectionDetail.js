@@ -38,7 +38,11 @@ export default class CollectionDetail extends LightningElement {
     @api collectionType;
     @api completenessData;
     
-    @track activeRequirementsTab = 'content'; // 'content' or 'tasks'
+    @track activeRequirementsTab = 'content'; // 'content', 'tasks', or 'approvals'
+    @track openContentMenuId = null;
+    @track openAddedBadgeMenuId = null;
+    @track showPreviewModal = false;
+    @track previewContent = null;
 
     /**
      * Check if Content tab is active
@@ -52,6 +56,13 @@ export default class CollectionDetail extends LightningElement {
      */
     get isTasksTabActive() {
         return this.activeRequirementsTab === 'tasks';
+    }
+
+    /**
+     * Check if Approvals tab is active
+     */
+    get isApprovalsTabActive() {
+        return this.activeRequirementsTab === 'approvals';
     }
 
     /**
@@ -69,6 +80,20 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
+     * Get Approvals tab class
+     */
+    get approvalsTabClass() {
+        return this.isApprovalsTabActive ? 'requirements-tab is-active' : 'requirements-tab';
+    }
+
+    /**
+     * Check if collection is locked (100% complete and approved)
+     */
+    get isLocked() {
+        return this.collection?.isLocked === true;
+    }
+
+    /**
      * Handle Content tab click
      */
     handleContentTabClick() {
@@ -80,6 +105,13 @@ export default class CollectionDetail extends LightningElement {
      */
     handleTasksTabClick() {
         this.activeRequirementsTab = 'tasks';
+    }
+
+    /**
+     * Handle Approvals tab click
+     */
+    handleApprovalsTabClick() {
+        this.activeRequirementsTab = 'approvals';
     }
 
     /**
@@ -120,7 +152,21 @@ export default class CollectionDetail extends LightningElement {
      * @returns {string}
      */
     get statusValue() {
+        if (this.isFromTemplate) {
+            return this.completenessPercentage === 100 ? 'Approved' : 'In Progress';
+        }
         return this.metadata?.status || '—';
+    }
+
+    /**
+     * Get the status variant for display
+     * @returns {string}
+     */
+    get statusVariantComputed() {
+        if (this.isFromTemplate) {
+            return this.completenessPercentage === 100 ? 'success' : 'warning';
+        }
+        return this.statusVariant;
     }
 
     /**
@@ -323,8 +369,69 @@ export default class CollectionDetail extends LightningElement {
             iconVariant: item.isCompleted ? 'success' : '',
             statusClass: item.isCompleted ? 'checklist-item is-complete' : 'checklist-item is-pending',
             statusLabel: item.isCompleted ? 'Added' : 'Required',
-            addedFileName: item.fulfilledBy?.name || null
+            addedFileName: item.fulfilledBy?.name || null,
+            showMenu: this.openAddedBadgeMenuId === item.id
         }));
+    }
+
+    /**
+     * Get approvals checklist items
+     * @returns {Array}
+     */
+    get approvalsChecklist() {
+        const data = this.completeness;
+        if (!data) return [];
+        return data.approvalsChecklist || [];
+    }
+
+    /**
+     * Check if there are approvals
+     * @returns {boolean}
+     */
+    get hasApprovals() {
+        return this.approvalsChecklist.length > 0;
+    }
+
+    /**
+     * Get approvals summary
+     * @returns {string}
+     */
+    get approvalsSummary() {
+        const data = this.completeness;
+        if (!data) return '';
+        return `${data.approvalsCompleted}/${data.approvalsTotal} complete`;
+    }
+
+    /**
+     * Get collection content items (all content added to collection)
+     * @returns {Array}
+     */
+    get collectionContent() {
+        if (!this.collection?.content) {
+            return [];
+        }
+        return this.collection.content.map(item => ({
+            ...item,
+            icon: 'doctype:unknown',
+            showMenu: this.openContentMenuId === item.id
+        }));
+    }
+
+    /**
+     * Check if collection has content
+     * @returns {boolean}
+     */
+    get hasCollectionContent() {
+        return this.collectionContent.length > 0;
+    }
+
+    /**
+     * Get collection content count
+     * @returns {string}
+     */
+    get collectionContentCount() {
+        const count = this.collectionContent.length;
+        return `(${count})`;
     }
 
     /**
@@ -471,12 +578,118 @@ export default class CollectionDetail extends LightningElement {
      * @param {Event} event
      */
     handleOpenRecord(event) {
-        // Placeholder - would navigate to full record page
         console.log('Open record:', this.collection?.id, this.collection?.name);
-        this.dispatchEvent(new CustomEvent('openrecord', {
-            detail: { id: this.collection?.id },
+        this.dispatchEvent(new CustomEvent('viewdetails', {
+            detail: { collectionId: this.collection?.id },
             bubbles: true,
             composed: true
         }));
+    }
+
+    /**
+     * Handle content menu toggle
+     * @param {Event} event
+     */
+    handleContentMenuToggle(event) {
+        const contentId = event.currentTarget.dataset.id;
+        if (this.openContentMenuId === contentId) {
+            this.openContentMenuId = null;
+        } else {
+            this.openContentMenuId = contentId;
+            this.openAddedBadgeMenuId = null;
+        }
+    }
+
+    /**
+     * Handle remove content from collection
+     * @param {Event} event
+     */
+    handleRemoveContent(event) {
+        const contentId = event.currentTarget.dataset.id;
+        console.log('Remove content:', contentId);
+        this.openContentMenuId = null;
+    }
+
+    /**
+     * Handle added badge click
+     * @param {Event} event
+     */
+    handleAddedBadgeClick(event) {
+        const itemId = event.currentTarget.dataset.id;
+        if (this.openAddedBadgeMenuId === itemId) {
+            this.openAddedBadgeMenuId = null;
+        } else {
+            this.openAddedBadgeMenuId = itemId;
+            this.openContentMenuId = null;
+        }
+    }
+
+    /**
+     * Handle view content from badge menu
+     * @param {Event} event
+     */
+    handleViewContent(event) {
+        const itemId = event.currentTarget.dataset.id;
+        console.log('View content:', itemId);
+        this.openAddedBadgeMenuId = null;
+    }
+
+    /**
+     * Handle replace content from badge menu
+     * @param {Event} event
+     */
+    handleReplaceContent(event) {
+        const itemId = event.currentTarget.dataset.id;
+        console.log('Replace content:', itemId);
+        this.openAddedBadgeMenuId = null;
+    }
+
+    /**
+     * Handle remove required content from badge menu
+     * @param {Event} event
+     */
+    handleRemoveRequiredContent(event) {
+        const itemId = event.currentTarget.dataset.id;
+        console.log('Remove required content:', itemId);
+        this.openAddedBadgeMenuId = null;
+    }
+
+    /**
+     * Handle preview content
+     * @param {Event} event
+     */
+    handlePreviewContent(event) {
+        const contentId = event.currentTarget.dataset.id;
+        const content = this.collectionContent.find(c => c.id === contentId);
+        if (content) {
+            this.previewContent = content;
+            this.showPreviewModal = true;
+        }
+    }
+
+    /**
+     * Handle close preview modal
+     */
+    handleClosePreview() {
+        this.showPreviewModal = false;
+        this.previewContent = null;
+    }
+
+    /**
+     * Handle modal backdrop click
+     * @param {Event} event
+     */
+    handleModalClick(event) {
+        if (event.target.classList.contains('preview-modal-backdrop')) {
+            this.handleClosePreview();
+        }
+    }
+
+    /**
+     * Handle go to record from preview
+     */
+    handleGoToRecord() {
+        console.log('Go to content record:', this.previewContent?.id);
+        this.handleClosePreview();
     }
 }

@@ -54,6 +54,11 @@ export const collectionTypes = [
             { id: 'task-020', name: 'IRB/Ethics approval obtained', category: 'Approval' },
             { id: 'task-021', name: 'Site initiation completed', category: 'Milestone' },
             { id: 'task-022', name: 'Data Management Plan finalized', category: 'Planning' }
+        ],
+        requiredApprovals: [
+            { id: 'approval-001', name: 'Clinical Lead Approval', approver: 'Dr. Sarah Johnson' },
+            { id: 'approval-002', name: 'Regulatory Affairs Approval', approver: 'Mike Chen' },
+            { id: 'approval-003', name: 'Quality Assurance Sign-off', approver: 'Emily Davis' }
         ]
     },
     { 
@@ -188,14 +193,22 @@ export const sampleCollections = {
             typeId: 'ct-003',
             parentId: 'root',
             level: 1,
+            isFromTemplate: true,
+            isLocked: true,
             metadata: {
                 owner: 'Clinical Operations',
                 region: 'Global',
-                status: 'Active'
+                status: 'Approved'
             },
             content: [
-                { id: 'cnt-013', name: 'Clinical Study Protocol.pdf', contentType: 'pdf' }
+                { id: 'cnt-013', name: 'Clinical Study Protocol.pdf', contentType: 'pdf', fulfillsRequirement: 'req-020' },
+                { id: 'cnt-013b', name: 'Investigator Brochure.pdf', contentType: 'pdf', fulfillsRequirement: 'req-021' },
+                { id: 'cnt-013c', name: 'Informed Consent Form.pdf', contentType: 'pdf', fulfillsRequirement: 'req-022' },
+                { id: 'cnt-013d', name: 'Case Report Form.pdf', contentType: 'pdf', fulfillsRequirement: 'req-023' },
+                { id: 'cnt-013e', name: 'Statistical Analysis Plan.pdf', contentType: 'pdf', fulfillsRequirement: 'req-024' }
             ],
+            completedTasks: ['task-020', 'task-021', 'task-022'],
+            completedApprovals: ['approval-001', 'approval-002', 'approval-003'],
             children: [
                 {
                     id: 'col-002-001',
@@ -203,16 +216,20 @@ export const sampleCollections = {
                     typeId: 'ct-003',
                     parentId: 'col-002',
                     level: 2,
+                    isFromTemplate: true,
+                    isLocked: true,
                     metadata: {
                         owner: 'Clinical Operations',
                         region: 'Global',
                         status: 'Approved'
                     },
                     content: [
-                        { id: 'cnt-014', name: 'ICF Master Template.pdf', contentType: 'pdf' },
+                        { id: 'cnt-014', name: 'ICF Master Template.pdf', contentType: 'pdf', fulfillsRequirement: 'req-022' },
                         { id: 'cnt-015', name: 'ICF Amendment 1.pdf', contentType: 'pdf' },
                         { id: 'cnt-016', name: 'IRB Approval Letter.pdf', contentType: 'pdf' }
                     ],
+                    completedTasks: ['task-020', 'task-021', 'task-022'],
+                    completedApprovals: ['approval-001', 'approval-002', 'approval-003'],
                     children: [
                         {
                             id: 'col-002-001-001',
@@ -220,15 +237,19 @@ export const sampleCollections = {
                             typeId: 'ct-003',
                             parentId: 'col-002-001',
                             level: 3,
+                            isFromTemplate: true,
+                            isLocked: true,
                             metadata: {
                                 owner: 'Site Management',
                                 region: 'US',
-                                status: 'Active'
+                                status: 'Approved'
                             },
                             content: [
-                                { id: 'cnt-017', name: 'ICF_Site_001_Boston.pdf', contentType: 'pdf' },
+                                { id: 'cnt-017', name: 'ICF_Site_001_Boston.pdf', contentType: 'pdf', fulfillsRequirement: 'req-022' },
                                 { id: 'cnt-018', name: 'ICF_Site_002_Chicago.pdf', contentType: 'pdf' }
                             ],
+                            completedTasks: ['task-020', 'task-021', 'task-022'],
+                            completedApprovals: ['approval-001', 'approval-002', 'approval-003'],
                             children: []
                         }
                     ]
@@ -239,15 +260,19 @@ export const sampleCollections = {
                     typeId: 'ct-003',
                     parentId: 'col-002',
                     level: 2,
+                    isFromTemplate: true,
+                    isLocked: true,
                     metadata: {
                         owner: 'Data Management',
                         region: 'Global',
-                        status: 'Active'
+                        status: 'Approved'
                     },
                     content: [
-                        { id: 'cnt-019', name: 'CRF Completion Guidelines.pdf', contentType: 'pdf' },
+                        { id: 'cnt-019', name: 'CRF Completion Guidelines.pdf', contentType: 'pdf', fulfillsRequirement: 'req-023' },
                         { id: 'cnt-020', name: 'eCRF User Manual.pdf', contentType: 'pdf' }
                     ],
+                    completedTasks: ['task-020', 'task-021', 'task-022'],
+                    completedApprovals: ['approval-001', 'approval-002', 'approval-003'],
                     children: []
                 }
             ]
@@ -454,8 +479,10 @@ export function calculateCompleteness(collection) {
     
     const requiredContent = collectionType.requiredContent || [];
     const requiredTasks = collectionType.requiredTasks || [];
+    const requiredApprovals = collectionType.requiredApprovals || [];
     const content = collection.content || [];
     const completedTasks = collection.completedTasks || [];
+    const completedApprovals = collection.completedApprovals || [];
     const children = collection.children || [];
     
     // Calculate content completeness
@@ -468,6 +495,10 @@ export function calculateCompleteness(collection) {
     // Calculate task completeness
     const tasksCompleted = completedTasks.length;
     const tasksTotal = requiredTasks.length;
+    
+    // Calculate approvals completeness
+    const approvalsCompleted = completedApprovals.length;
+    const approvalsTotal = requiredApprovals.length;
     
     // Calculate child collection completeness
     let childrenCompleted = 0;
@@ -490,17 +521,18 @@ export function calculateCompleteness(collection) {
         }
     });
     
-    // Overall percentage (weighted: content 40%, tasks 30%, children 30%)
-    // If no children, weight is split between content and tasks
+    // Overall percentage (weighted)
+    // If no children, weight is split between content, tasks, and approvals
     let percentage;
     if (childrenTotal > 0) {
         const contentPct = contentTotal > 0 ? (contentCompleted / contentTotal) * 100 : 100;
         const tasksPct = tasksTotal > 0 ? (tasksCompleted / tasksTotal) * 100 : 100;
+        const approvalsPct = approvalsTotal > 0 ? (approvalsCompleted / approvalsTotal) * 100 : 100;
         const childrenPct = childrenTotal > 0 ? (childrenCompleted / childrenTotal) * 100 : 100;
-        percentage = Math.round((contentPct * 0.4) + (tasksPct * 0.3) + (childrenPct * 0.3));
+        percentage = Math.round((contentPct * 0.3) + (tasksPct * 0.2) + (approvalsPct * 0.2) + (childrenPct * 0.3));
     } else {
-        const totalItems = contentTotal + tasksTotal;
-        const completedItems = contentCompleted + tasksCompleted;
+        const totalItems = contentTotal + tasksTotal + approvalsTotal;
+        const completedItems = contentCompleted + tasksCompleted + approvalsCompleted;
         percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     }
     
@@ -517,12 +549,26 @@ export function calculateCompleteness(collection) {
     // Build task checklist with status
     const taskChecklist = requiredTasks.map(task => ({
         ...task,
-        isCompleted: completedTasks.includes(task.id)
+        isCompleted: completedTasks.includes(task.id),
+        icon: completedTasks.includes(task.id) ? 'utility:check' : 'utility:clock',
+        iconVariant: completedTasks.includes(task.id) ? 'success' : '',
+        statusClass: completedTasks.includes(task.id) ? 'checklist-item is-complete' : 'checklist-item is-pending',
+        statusLabel: completedTasks.includes(task.id) ? 'Complete' : 'Pending'
     }));
     
-    // Calculate totals including children
-    const totalItemsWithChildren = contentTotal + tasksTotal + childrenTotal;
-    const completedItemsWithChildren = contentCompleted + tasksCompleted + childrenCompleted;
+    // Build approvals checklist with status
+    const approvalsChecklist = requiredApprovals.map(approval => ({
+        ...approval,
+        isCompleted: completedApprovals.includes(approval.id),
+        icon: completedApprovals.includes(approval.id) ? 'utility:check' : 'utility:clock',
+        iconVariant: completedApprovals.includes(approval.id) ? 'success' : '',
+        statusClass: completedApprovals.includes(approval.id) ? 'checklist-item is-complete' : 'checklist-item is-pending',
+        statusLabel: completedApprovals.includes(approval.id) ? 'Approved' : 'Pending'
+    }));
+    
+    // Calculate totals including children and approvals
+    const totalItemsWithChildren = contentTotal + tasksTotal + approvalsTotal + childrenTotal;
+    const completedItemsWithChildren = contentCompleted + tasksCompleted + approvalsCompleted + childrenCompleted;
     
     return {
         percentage,
@@ -530,6 +576,8 @@ export function calculateCompleteness(collection) {
         contentTotal,
         tasksCompleted,
         tasksTotal,
+        approvalsCompleted,
+        approvalsTotal,
         childrenCompleted,
         childrenTotal,
         childrenStatus,
@@ -537,6 +585,7 @@ export function calculateCompleteness(collection) {
         totalRequired: totalItemsWithChildren,
         contentChecklist,
         taskChecklist,
+        approvalsChecklist,
         additionalContent: content.filter(c => !c.fulfillsRequirement)
     };
 }

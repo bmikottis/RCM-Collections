@@ -15,6 +15,7 @@ export default class CollectionTreeItem extends LightningElement {
     @api selectedId;
     
     @track isExpanded = false;
+    @track showAddMenu = false;
 
     _expandedIds = [];
     _previousExpandedIdsLength = 0;
@@ -134,6 +135,38 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
+     * Check if this item is a collection (not content)
+     * @returns {boolean}
+     */
+    get isCollection() {
+        return this.item?.id?.startsWith('col-') || this.item?.id?.startsWith('sub-');
+    }
+
+    /**
+     * Check if this collection is locked (100% complete)
+     * @returns {boolean}
+     */
+    get isLocked() {
+        return this.item?.isLocked === true;
+    }
+
+    /**
+     * Check if we should show the add button
+     * @returns {boolean}
+     */
+    get showAddButton() {
+        return this.isCollection && !this.isLocked;
+    }
+
+    /**
+     * Check if we should show the locked icon
+     * @returns {boolean}
+     */
+    get showLockedIcon() {
+        return this.isCollection && this.isLocked;
+    }
+
+    /**
      * Get container class based on selection state
      * @returns {string}
      */
@@ -227,5 +260,48 @@ export default class CollectionTreeItem extends LightningElement {
     @api
     collapse() {
         this.isExpanded = false;
+    }
+
+    /**
+     * Handle add button click
+     * @param {Event} event
+     */
+    handleAddButtonClick(event) {
+        event.stopPropagation();
+        this.showAddMenu = !this.showAddMenu;
+    }
+
+    /**
+     * Handle add child collection
+     * @param {Event} event
+     */
+    handleAddChildCollection(event) {
+        event.stopPropagation();
+        this.showAddMenu = false;
+        this.dispatchEvent(new CustomEvent('addchildcollection', {
+            detail: { 
+                parentId: this.item.id,
+                parentName: this.item.name
+            },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    /**
+     * Handle add content
+     * @param {Event} event
+     */
+    handleAddContent(event) {
+        event.stopPropagation();
+        this.showAddMenu = false;
+        this.dispatchEvent(new CustomEvent('addcontent', {
+            detail: { 
+                collectionId: this.item.id,
+                collectionName: this.item.name
+            },
+            bubbles: true,
+            composed: true
+        }));
     }
 }

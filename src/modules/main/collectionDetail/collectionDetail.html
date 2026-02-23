@@ -29,7 +29,7 @@
                 <div class="header-field">
                     <span class="field-label">Status</span>
                     <span class="field-value">
-                        <lightning-badge label={statusValue} variant={statusVariant}></lightning-badge>
+                        <lightning-badge label={statusValue} variant={statusVariantComputed}></lightning-badge>
                     </span>
                 </div>
                 <div class="header-field">
@@ -91,26 +91,11 @@
                             <span class="breakdown-label">Required Tasks</span>
                             <span class="breakdown-value">{taskSummary}</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- Path/Progress Component (Read-only status indicator) - Only for non-template collections -->
-        <template lwc:else>
-            <div class="path-container">
-                <div class="path-stages">
-                    <div class="path-stage is-current">
-                        <span class="stage-label">Draft</span>
-                    </div>
-                    <div class="path-stage is-incomplete">
-                        <span class="stage-label">Review</span>
-                    </div>
-                    <div class="path-stage is-incomplete">
-                        <span class="stage-label">Approve</span>
-                    </div>
-                    <div class="path-stage is-incomplete">
-                        <span class="stage-label">Archive</span>
+                        <div class="breakdown-item">
+                            <lightning-icon icon-name="utility:approval" size="x-small" alternative-text="Approvals"></lightning-icon>
+                            <span class="breakdown-label">Approvals</span>
+                            <span class="breakdown-value">{approvalsSummary}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -135,7 +120,11 @@
                                     <span class="nested-card-title">Child Collections</span>
                                 </div>
                                 <div class="nested-card-header-right">
-                                    <lightning-button label="Add" variant="neutral"></lightning-button>
+                                    <template lwc:if={isLocked}>
+                                    </template>
+                                    <template lwc:else>
+                                        <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
+                                    </template>
                                 </div>
                             </div>
                             <div class="nested-card-content">
@@ -198,7 +187,7 @@
                                     <span class="nested-card-title">Members</span>
                                 </div>
                                 <div class="nested-card-header-right">
-                                    <lightning-button label="Add" variant="neutral"></lightning-button>
+                                    <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
                                 </div>
                             </div>
                             <div class="nested-card-content">
@@ -227,7 +216,7 @@
                         </div>
                     </div>
                     
-                    <!-- Right Column (2/3) - Template Requirements with Tabs -->
+                    <!-- Right Column (2/3) - Template Requirements + Collection Content -->
                     <div class="right-column">
                         <div class="nested-card requirements-card">
                             <div class="nested-card-header requirements-header">
@@ -241,12 +230,14 @@
                                 <button class={contentTabClass} onclick={handleContentTabClick}>
                                     <lightning-icon icon-name="utility:file" size="x-small" alternative-text="Content"></lightning-icon>
                                     <span>Required Content</span>
-                                    <span class="tab-count">{contentSummary}</span>
                                 </button>
                                 <button class={tasksTabClass} onclick={handleTasksTabClick}>
                                     <lightning-icon icon-name="utility:task" size="x-small" alternative-text="Tasks"></lightning-icon>
                                     <span>Required Tasks</span>
-                                    <span class="tab-count">{taskSummary}</span>
+                                </button>
+                                <button class={approvalsTabClass} onclick={handleApprovalsTabClick}>
+                                    <lightning-icon icon-name="utility:approval" size="x-small" alternative-text="Approvals"></lightning-icon>
+                                    <span>Reviews &amp; Approvals</span>
                                 </button>
                             </div>
                             
@@ -276,42 +267,25 @@
                                                 </div>
                                                 <div class="checklist-status">
                                                     <template lwc:if={item.isCompleted}>
-                                                        <lightning-badge label="Added" class="status-badge-success"></lightning-badge>
+                                                        <div class="added-badge-menu-wrapper">
+                                                            <button class="added-badge-button" data-id={item.id} onclick={handleAddedBadgeClick}>
+                                                                Added
+                                                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" alternative-text="Menu"></lightning-icon>
+                                                            </button>
+                                                            <template lwc:if={item.showMenu}>
+                                                                <div class="added-badge-dropdown">
+                                                                    <button class="dropdown-menu-item" data-id={item.id} onclick={handleViewContent}>View</button>
+                                                                    <button class="dropdown-menu-item" data-id={item.id} onclick={handleReplaceContent}>Replace</button>
+                                                                    <button class="dropdown-menu-item dropdown-menu-item-danger" data-id={item.id} onclick={handleRemoveRequiredContent}>Remove</button>
+                                                                </div>
+                                                            </template>
+                                                        </div>
                                                     </template>
                                                     <template lwc:else>
-                                                        <lightning-button label="Add" variant="neutral" size="small"></lightning-button>
+                                                        <lightning-button label="Add" variant="base" class="checklist-action-button"></lightning-button>
                                                     </template>
                                                 </div>
                                             </div>
-                                        </template>
-                                        
-                                        <!-- Additional Content Section -->
-                                        <template lwc:if={hasAdditionalContent}>
-                                            <div class="additional-content-divider">
-                                                <span>Additional Content</span>
-                                            </div>
-                                            <template for:each={additionalContent} for:item="content">
-                                                <div key={content.id} class="checklist-item is-additional">
-                                                    <div class="checklist-icon">
-                                                        <lightning-icon 
-                                                            icon-name={content.icon} 
-                                                            size="x-small"
-                                                            alternative-text={content.contentType}>
-                                                        </lightning-icon>
-                                                    </div>
-                                                    <div class="checklist-content">
-                                                        <span class="checklist-name">{content.name}</span>
-                                                    </div>
-                                                    <div class="checklist-status">
-                                                        <lightning-button-icon 
-                                                            icon-name="utility:preview" 
-                                                            alternative-text="Preview"
-                                                            size="small"
-                                                            variant="bare">
-                                                        </lightning-button-icon>
-                                                    </div>
-                                                </div>
-                                            </template>
                                         </template>
                                     </div>
                                 </template>
@@ -339,7 +313,7 @@
                                                             <lightning-badge label="Complete" class="status-badge-success"></lightning-badge>
                                                         </template>
                                                         <template lwc:else>
-                                                            <lightning-button label="Mark Complete" variant="neutral" size="small"></lightning-button>
+                                                            <lightning-button label="Mark Complete" variant="base" class="checklist-action-button"></lightning-button>
                                                         </template>
                                                     </div>
                                                 </div>
@@ -352,6 +326,117 @@
                                         </div>
                                     </template>
                                 </template>
+
+                                <!-- Approvals Tab -->
+                                <template lwc:if={isApprovalsTabActive}>
+                                    <template lwc:if={hasApprovals}>
+                                        <div class="content-checklist">
+                                            <template for:each={approvalsChecklist} for:item="approval">
+                                                <div key={approval.id} class={approval.statusClass}>
+                                                    <div class="checklist-icon">
+                                                        <lightning-icon 
+                                                            icon-name={approval.icon} 
+                                                            size="x-small"
+                                                            variant={approval.iconVariant}
+                                                            alternative-text={approval.statusLabel}>
+                                                        </lightning-icon>
+                                                    </div>
+                                                    <div class="checklist-content">
+                                                        <span class="checklist-name">{approval.name}</span>
+                                                        <span class="task-category">{approval.approver}</span>
+                                                    </div>
+                                                    <div class="checklist-status">
+                                                        <template lwc:if={approval.isCompleted}>
+                                                            <lightning-badge label="Approved" class="status-badge-success"></lightning-badge>
+                                                        </template>
+                                                        <template lwc:else>
+                                                            <lightning-button label="Request" variant="base" class="checklist-action-button"></lightning-button>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template lwc:else>
+                                        <div class="empty-card-state">
+                                            <p class="slds-text-color_weak">No approvals required for this template</p>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Collection Content Card -->
+                        <div class="nested-card collection-content-card">
+                            <div class="nested-card-header">
+                                <div class="nested-card-header-left">
+                                    <lightning-icon 
+                                        icon-name="standard:file" 
+                                        size="small"
+                                        alternative-text="Collection Content">
+                                    </lightning-icon>
+                                    <span class="nested-card-title">Collection Content</span>
+                                    <span class="content-count">{collectionContentCount}</span>
+                                </div>
+                                <div class="nested-card-header-right">
+                                    <template lwc:if={isLocked}>
+                                    </template>
+                                    <template lwc:else>
+                                        <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="nested-card-content">
+                                <template lwc:if={hasCollectionContent}>
+                                    <ul class="slds-list_vertical">
+                                        <template for:each={collectionContent} for:item="content">
+                                            <li key={content.id} class="slds-list__item list-item">
+                                                <div class="slds-media slds-media_center content-item">
+                                                    <div class="slds-media__figure">
+                                                        <lightning-icon 
+                                                            icon-name={content.icon} 
+                                                            size="small"
+                                                            alternative-text={content.contentType}>
+                                                        </lightning-icon>
+                                                    </div>
+                                                    <div class="slds-media__body">
+                                                        <a href="#" class="content-item-link">{content.name}</a>
+                                                    </div>
+                                                    <div class="slds-media__figure slds-media__figure_reverse content-actions">
+                                                        <lightning-button-icon 
+                                                            icon-name="utility:preview" 
+                                                            alternative-text="Preview"
+                                                            size="small"
+                                                            variant="bare"
+                                                            data-id={content.id}
+                                                            onclick={handlePreviewContent}>
+                                                        </lightning-button-icon>
+                                                        <div class="content-menu-wrapper">
+                                                            <lightning-button-icon 
+                                                                icon-name="utility:threedots" 
+                                                                alternative-text="More actions"
+                                                                size="small"
+                                                                variant="bare"
+                                                                data-id={content.id}
+                                                                onclick={handleContentMenuToggle}>
+                                                            </lightning-button-icon>
+                                                            <template lwc:if={content.showMenu}>
+                                                                <div class="content-dropdown-menu">
+                                                                    <button class="dropdown-menu-item dropdown-menu-item-danger" data-id={content.id} onclick={handleRemoveContent}>Remove</button>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                                <template lwc:else>
+                                    <div class="empty-card-state">
+                                        <p class="slds-text-color_weak">No content added</p>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -360,13 +445,14 @@
             </div>
         </template>
         
-        <!-- Freeform Collections - Original 3 Column Layout -->
+        <!-- Freeform Collections - Two Column Layout (matching template layout) -->
         <template lwc:else>
             <div class="cards-container">
-                <div class="cards-grid">
+                <div class="cards-layout-template">
                     
-                    <!-- Child Collections Card -->
-                    <div class="card-column">
+                    <!-- Left Column (1/3) - Child Collections + Members -->
+                    <div class="left-column">
+                        <!-- Child Collections Card -->
                         <div class="nested-card">
                             <div class="nested-card-header">
                                 <div class="nested-card-header-left">
@@ -378,7 +464,7 @@
                                     <span class="nested-card-title">Child Collections</span>
                                 </div>
                                 <div class="nested-card-header-right">
-                                    <lightning-button label="Add" variant="neutral"></lightning-button>
+                                    <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
                                 </div>
                             </div>
                             <div class="nested-card-content">
@@ -420,64 +506,8 @@
                                 </template>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Content Items Card -->
-                    <div class="card-column">
-                        <div class="nested-card">
-                            <div class="nested-card-header">
-                                <div class="nested-card-header-left">
-                                    <lightning-icon 
-                                        icon-name="standard:file" 
-                                        size="small"
-                                        alternative-text="Content Items">
-                                    </lightning-icon>
-                                    <span class="nested-card-title">Content Items</span>
-                                </div>
-                                <div class="nested-card-header-right">
-                                    <lightning-button label="Add" variant="neutral"></lightning-button>
-                                </div>
-                            </div>
-                            <div class="nested-card-content">
-                                <template lwc:if={hasContent}>
-                                    <ul class="slds-list_vertical">
-                                        <template for:each={contentItems} for:item="content">
-                                            <li key={content.id} class="slds-list__item list-item">
-                                                <div class="slds-media slds-media_center content-item">
-                                                    <div class="slds-media__figure">
-                                                        <lightning-icon 
-                                                            icon-name={content.icon} 
-                                                            size="small"
-                                                            alternative-text={content.contentType}>
-                                                        </lightning-icon>
-                                                    </div>
-                                                    <div class="slds-media__body">
-                                                        <span class="content-name">{content.name}</span>
-                                                    </div>
-                                                    <div class="slds-media__figure slds-media__figure_reverse">
-                                                        <lightning-button-icon 
-                                                            icon-name="utility:preview" 
-                                                            alternative-text="Preview"
-                                                            size="small"
-                                                            variant="bare">
-                                                        </lightning-button-icon>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </template>
-                                    </ul>
-                                </template>
-                                <template lwc:else>
-                                    <div class="empty-card-state">
-                                        <p class="slds-text-color_weak">No content items</p>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Members/Collaborators Card -->
-                    <div class="card-column">
+                        
+                        <!-- Members/Collaborators Card -->
                         <div class="nested-card">
                             <div class="nested-card-header">
                                 <div class="nested-card-header-left">
@@ -489,7 +519,7 @@
                                     <span class="nested-card-title">Members</span>
                                 </div>
                                 <div class="nested-card-header-right">
-                                    <lightning-button label="Add" variant="neutral"></lightning-button>
+                                    <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
                                 </div>
                             </div>
                             <div class="nested-card-content">
@@ -518,8 +548,149 @@
                         </div>
                     </div>
                     
+                    <!-- Right Column (2/3) - Collection Content only for freeform -->
+                    <div class="right-column">
+                        <!-- Collection Content Card -->
+                        <div class="nested-card collection-content-card">
+                            <div class="nested-card-header">
+                                <div class="nested-card-header-left">
+                                    <lightning-icon 
+                                        icon-name="standard:file" 
+                                        size="small"
+                                        alternative-text="Collection Content">
+                                    </lightning-icon>
+                                    <span class="nested-card-title">Collection Content</span>
+                                    <span class="content-count">{collectionContentCount}</span>
+                                </div>
+                                <div class="nested-card-header-right">
+                                    <lightning-button label="Add" variant="neutral" class="card-add-button"></lightning-button>
+                                </div>
+                            </div>
+                            <div class="nested-card-content">
+                                <template lwc:if={hasCollectionContent}>
+                                    <ul class="slds-list_vertical">
+                                        <template for:each={collectionContent} for:item="content">
+                                            <li key={content.id} class="slds-list__item list-item">
+                                                <div class="slds-media slds-media_center content-item">
+                                                    <div class="slds-media__figure">
+                                                        <lightning-icon 
+                                                            icon-name={content.icon} 
+                                                            size="small"
+                                                            alternative-text={content.contentType}>
+                                                        </lightning-icon>
+                                                    </div>
+                                                    <div class="slds-media__body">
+                                                        <a href="#" class="content-item-link">{content.name}</a>
+                                                    </div>
+                                                    <div class="slds-media__figure slds-media__figure_reverse content-actions">
+                                                        <lightning-button-icon 
+                                                            icon-name="utility:preview" 
+                                                            alternative-text="Preview"
+                                                            size="small"
+                                                            variant="bare"
+                                                            data-id={content.id}
+                                                            onclick={handlePreviewContent}>
+                                                        </lightning-button-icon>
+                                                        <div class="content-menu-wrapper">
+                                                            <lightning-button-icon 
+                                                                icon-name="utility:threedots" 
+                                                                alternative-text="More actions"
+                                                                size="small"
+                                                                variant="bare"
+                                                                data-id={content.id}
+                                                                onclick={handleContentMenuToggle}>
+                                                            </lightning-button-icon>
+                                                            <template lwc:if={content.showMenu}>
+                                                                <div class="content-dropdown-menu">
+                                                                    <button class="dropdown-menu-item dropdown-menu-item-danger" data-id={content.id} onclick={handleRemoveContent}>Remove</button>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                                <template lwc:else>
+                                    <div class="empty-card-state">
+                                        <p class="slds-text-color_weak">No content items</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </template>
     </div>
+
+    <!-- Preview Modal -->
+    <template lwc:if={showPreviewModal}>
+        <div class="preview-modal-backdrop" onclick={handleModalClick}>
+            <div class="preview-modal">
+                <div class="preview-modal-header">
+                    <div class="preview-header-left">
+                        <lightning-icon icon-name="doctype:unknown" size="small" alternative-text="Document"></lightning-icon>
+                        <span class="preview-title">{previewContent.name}</span>
+                    </div>
+                    <div class="preview-header-right">
+                        <lightning-button label="Go to Record" variant="neutral" onclick={handleGoToRecord}></lightning-button>
+                        <lightning-button-icon 
+                            icon-name="utility:close" 
+                            alternative-text="Close"
+                            size="medium"
+                            variant="bare-inverse"
+                            onclick={handleClosePreview}>
+                        </lightning-button-icon>
+                    </div>
+                </div>
+                <div class="preview-modal-body">
+                    <div class="preview-document-placeholder">
+                        <div class="preview-document-page">
+                            <div class="preview-document-header">
+                                <div class="preview-logo-placeholder"></div>
+                                <div class="preview-header-text">
+                                    <div class="preview-text-line preview-text-title"></div>
+                                    <div class="preview-text-line preview-text-subtitle"></div>
+                                </div>
+                            </div>
+                            <div class="preview-document-body">
+                                <div class="preview-text-line"></div>
+                                <div class="preview-text-line"></div>
+                                <div class="preview-text-line preview-text-short"></div>
+                                <div class="preview-spacer"></div>
+                                <div class="preview-text-line"></div>
+                                <div class="preview-text-line"></div>
+                                <div class="preview-text-line"></div>
+                                <div class="preview-text-line preview-text-medium"></div>
+                                <div class="preview-spacer"></div>
+                                <div class="preview-table-placeholder">
+                                    <div class="preview-table-row preview-table-header">
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                    </div>
+                                    <div class="preview-table-row">
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                    </div>
+                                    <div class="preview-table-row">
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                        <div class="preview-table-cell"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="preview-document-footer">
+                                <div class="preview-text-line preview-text-short"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 </template>

@@ -26,6 +26,11 @@ export default class CollectionHierarchy extends LightningElement {
     @track contentTypeSearchTerm = '';
     @track showContentTypeDropdown = false;
     @track selectedOwnershipFilters = [];
+    
+    @track consoleTabs = [
+        { id: 'main', label: 'Regulated Content Coll...', type: 'main', closable: false }
+    ];
+    @track activeTabId = 'main';
 
     /**
      * Get root level collections for the tree
@@ -480,5 +485,148 @@ export default class CollectionHierarchy extends LightningElement {
             statuses: this.selectedStatusFilters
         });
         this.showFilter = false;
+    }
+
+    /**
+     * Handle New Collection button click
+     */
+    handleNewCollection() {
+        console.log('New Collection clicked');
+    }
+
+    /**
+     * Get console tabs with active state
+     * @returns {Array}
+     */
+    get consoleTabsWithState() {
+        return this.consoleTabs.map(tab => ({
+            ...tab,
+            isActive: tab.id === this.activeTabId,
+            tabClass: tab.id === this.activeTabId ? 'console-tab is-active' : 'console-tab'
+        }));
+    }
+
+    /**
+     * Check if browser view should be shown (main tab active)
+     * @returns {boolean}
+     */
+    get showBrowserView() {
+        return this.activeTabId === 'main';
+    }
+
+    /**
+     * Check if record page view should be shown
+     * @returns {boolean}
+     */
+    get showRecordPage() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        return activeTab?.type === 'record';
+    }
+
+    /**
+     * Get the collection for the active record page
+     * @returns {Object|null}
+     */
+    get activeRecordCollection() {
+        const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
+        if (activeTab?.type === 'record' && activeTab.collectionId) {
+            return findCollectionById(this.collectionsData, activeTab.collectionId);
+        }
+        return null;
+    }
+
+    /**
+     * Get the collection type for the active record page
+     * @returns {Object|null}
+     */
+    get activeRecordCollectionType() {
+        const collection = this.activeRecordCollection;
+        if (collection?.typeId) {
+            return getCollectionType(collection.typeId);
+        }
+        return null;
+    }
+
+    /**
+     * Handle console tab click
+     * @param {Event} event
+     */
+    handleConsoleTabClick(event) {
+        const tabId = event.currentTarget.dataset.tabId;
+        this.activeTabId = tabId;
+    }
+
+    /**
+     * Handle close tab click
+     * @param {Event} event
+     */
+    handleCloseTab(event) {
+        event.stopPropagation();
+        const tabId = event.currentTarget.dataset.tabId;
+        const tabIndex = this.consoleTabs.findIndex(tab => tab.id === tabId);
+        
+        if (tabIndex > -1) {
+            this.consoleTabs = this.consoleTabs.filter(tab => tab.id !== tabId);
+            
+            if (this.activeTabId === tabId) {
+                this.activeTabId = 'main';
+            }
+        }
+    }
+
+    /**
+     * Handle view details from collection detail panel
+     * @param {CustomEvent} event
+     */
+    handleViewDetails(event) {
+        const { collectionId } = event.detail;
+        const collection = findCollectionById(this.collectionsData, collectionId);
+        
+        if (collection) {
+            const existingTab = this.consoleTabs.find(tab => tab.collectionId === collectionId);
+            
+            if (existingTab) {
+                this.activeTabId = existingTab.id;
+            } else {
+                const newTabId = `record-${collectionId}`;
+                const newTab = {
+                    id: newTabId,
+                    label: collection.name.length > 20 ? collection.name.substring(0, 20) + '...' : collection.name,
+                    type: 'record',
+                    collectionId: collectionId,
+                    closable: true
+                };
+                this.consoleTabs = [...this.consoleTabs, newTab];
+                this.activeTabId = newTabId;
+            }
+        }
+    }
+
+    /**
+     * Handle view collection from record page (to navigate to another collection)
+     * @param {CustomEvent} event
+     */
+    handleViewCollection(event) {
+        const { collectionId } = event.detail;
+        const collection = findCollectionById(this.collectionsData, collectionId);
+        
+        if (collection) {
+            const existingTab = this.consoleTabs.find(tab => tab.collectionId === collectionId);
+            
+            if (existingTab) {
+                this.activeTabId = existingTab.id;
+            } else {
+                const newTabId = `record-${collectionId}`;
+                const newTab = {
+                    id: newTabId,
+                    label: collection.name.length > 20 ? collection.name.substring(0, 20) + '...' : collection.name,
+                    type: 'record',
+                    collectionId: collectionId,
+                    closable: true
+                };
+                this.consoleTabs = [...this.consoleTabs, newTab];
+                this.activeTabId = newTabId;
+            }
+        }
     }
 }

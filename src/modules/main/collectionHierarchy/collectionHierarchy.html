@@ -43,17 +43,25 @@
                 <span class="console-app-name">Content Management</span>
             </div>
             <div class="console-tabs">
-                <div class="console-tab is-active">
-                    <lightning-icon icon-name="standard:folder" size="x-small" class="tab-icon" alternative-text="Collection"></lightning-icon>
-                    <span class="tab-label">Regulated Content Coll...</span>
-                    <lightning-button-icon icon-name="utility:chevrondown" variant="bare" size="x-small" alternative-text="Tab options"></lightning-button-icon>
-                </div>
+                <template for:each={consoleTabsWithState} for:item="tab">
+                    <div key={tab.id} class={tab.tabClass} data-tab-id={tab.id} onclick={handleConsoleTabClick}>
+                        <span class="tab-label">{tab.label}</span>
+                        <template lwc:if={tab.closable}>
+                            <lightning-button-icon icon-name="utility:close" variant="bare" size="x-small" alternative-text="Close tab" data-tab-id={tab.id} onclick={handleCloseTab}></lightning-button-icon>
+                        </template>
+                        <template lwc:else>
+                            <lightning-button-icon icon-name="utility:chevrondown" variant="bare" size="x-small" alternative-text="Tab options"></lightning-button-icon>
+                        </template>
+                    </div>
+                </template>
             </div>
         </nav>
 
         <!-- Main Content Area -->
         <div class="collection-hierarchy-container">
         
+        <!-- Browser View (Main Tab) -->
+        <template lwc:if={showBrowserView}>
         <!-- Page Header -->
         <header class="page-header">
             <div class="page-header-left">
@@ -63,6 +71,14 @@
                     alternative-text="Collections">
                 </lightning-icon>
                 <h1 class="page-title">Regulated Content Collections</h1>
+            </div>
+            <div class="page-header-right">
+                <lightning-button 
+                    label="New Collection" 
+                    variant="neutral" 
+                    icon-name="utility:add"
+                    onclick={handleNewCollection}>
+                </lightning-button>
             </div>
         </header>
         
@@ -271,7 +287,8 @@
                         collection={selectedCollection}
                         collection-type={selectedCollectionType}
                         completeness-data={selectedCollectionCompleteness}
-                        oncollectionclick={handleCollectionDetailClick}>
+                        oncollectionclick={handleCollectionDetailClick}
+                        onviewdetails={handleViewDetails}>
                     </main-collection-detail>
                 </template>
                 
@@ -293,6 +310,18 @@
                 </template>
             </main>
         </div>
+        </template>
+
+        <!-- Record Page View -->
+        <template lwc:if={showRecordPage}>
+            <div class="record-page-wrapper">
+                <main-collection-record-page
+                    collection={activeRecordCollection}
+                    collection-type={activeRecordCollectionType}
+                    onviewcollection={handleViewCollection}>
+                </main-collection-record-page>
+            </div>
+        </template>
         </div>
     </div>
 </template>

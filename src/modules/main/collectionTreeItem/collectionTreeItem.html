@@ -23,21 +23,18 @@
                 <span class="slds-m-right_x-small tree-spacer"></span>
             </template>
             
-            <!-- Collection/Content Icon with Badge -->
+            <!-- Collection/Content Icon -->
             <div class="icon-container">
-                <lightning-icon 
-                    icon-name={itemIcon} 
-                    size="x-small"
-                    alternative-text={item.name}>
-                </lightning-icon>
                 <template lwc:if={isFromTemplate}>
-                    <span class="template-badge" title="From Template">
-                        <lightning-icon 
-                            icon-name="utility:shield" 
-                            size="xx-small"
-                            alternative-text="Template Collection">
-                        </lightning-icon>
-                    </span>
+                    <img src="/public/assets/folder-shield.svg" alt="Template Collection" class="folder-shield-icon" />
+                </template>
+                <template lwc:else>
+                    <lightning-icon 
+                        icon-name={itemIcon} 
+                        size="x-small"
+                        class="folder-icon"
+                        alternative-text={item.name}>
+                    </lightning-icon>
                 </template>
             </div>
             
@@ -45,6 +42,30 @@
             <span class="slds-truncate tree-item-label" title={item.name}>
                 {item.name}
             </span>
+
+            <!-- Tree Item Actions -->
+            <template lwc:if={showAddButton}>
+                <div class="tree-item-actions">
+                    <button class="tree-add-button" onclick={handleAddButtonClick} title="Add">
+                        <lightning-icon icon-name="utility:add" size="xx-small" alternative-text="Add"></lightning-icon>
+                    </button>
+                    <template lwc:if={showAddMenu}>
+                        <div class="tree-add-menu">
+                            <button class="tree-add-menu-item" onclick={handleAddChildCollection}>
+                                Add Child Collection
+                            </button>
+                            <button class="tree-add-menu-item" onclick={handleAddContent}>
+                                Add Content
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={showLockedIcon}>
+                <div class="tree-item-actions tree-item-locked">
+                    <lightning-icon icon-name="utility:lock" size="xx-small" alternative-text="Locked" title="Collection is locked (100% complete)"></lightning-icon>
+                </div>
+            </template>
         </div>
         
         <!-- Expanded Content (Child Collections + Content Items) -->

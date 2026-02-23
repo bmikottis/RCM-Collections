@@ -598,6 +598,9 @@
 .right-column {
     flex: 2;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .requirements-card {
@@ -720,6 +723,306 @@
 .nested-card-header-right button,
 .nested-card-header-right .slds-button {
     font-weight: 600;
+}
+
+/* ========================================
+   Card Add Button (Pill Shape)
+   ======================================== */
+.card-add-button {
+    --slds-c-button-radius-border: 100px;
+}
+
+/* ========================================
+   Checklist Action Button (Tertiary Style)
+   ======================================== */
+.checklist-action-button {
+    --slds-c-button-text-color: #0176d3;
+    font-weight: 500;
+}
+
+/* ========================================
+   Collection Content Card
+   ======================================== */
+.collection-content-card {
+    margin-top: 0;
+}
+
+.content-count {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin-left: 0.25rem;
+}
+
+.content-item-link {
+    color: #0176d3;
+    text-decoration: none;
+}
+
+.content-item-link:hover {
+    text-decoration: underline;
+}
+
+.content-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ========================================
+   Content Menu Dropdown
+   ======================================== */
+.content-menu-wrapper {
+    position: relative;
+}
+
+.content-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 9000;
+    background-color: #ffffff;
+    border: 1px solid #c9c9c9;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+    min-width: 120px;
+    padding: 0.25rem 0;
+}
+
+.dropdown-menu-item {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    color: #181818;
+    cursor: pointer;
+}
+
+.dropdown-menu-item:hover {
+    background-color: #f3f3f3;
+}
+
+.dropdown-menu-item-danger {
+    color: #c23934;
+}
+
+.dropdown-menu-item-danger:hover {
+    background-color: #fef1ee;
+}
+
+/* ========================================
+   Added Badge Menu (Option B)
+   ======================================== */
+.added-badge-menu-wrapper {
+    position: relative;
+}
+
+.added-badge-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #2e844a;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.added-badge-button:hover {
+    background-color: #236b3b;
+}
+
+.added-badge-button lightning-icon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.added-badge-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 9000;
+    background-color: #ffffff;
+    border: 1px solid #c9c9c9;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+    min-width: 120px;
+    padding: 0.25rem 0;
+    margin-top: 4px;
+}
+
+/* ========================================
+   Preview Modal
+   ======================================== */
+.preview-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(32, 33, 36, 0.9);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.preview-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: #3c4043;
+    width: 100%;
+}
+
+.preview-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.preview-header-left lightning-icon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.preview-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.preview-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.preview-header-right lightning-button {
+    --slds-c-button-neutral-color-background: transparent;
+    --slds-c-button-neutral-color-border: #ffffff;
+    --slds-c-button-text-color: #ffffff;
+}
+
+.preview-modal-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow: auto;
+}
+
+.preview-document-placeholder {
+    max-width: 800px;
+    width: 100%;
+}
+
+.preview-document-page {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    min-height: 600px;
+}
+
+.preview-document-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e5e5;
+    margin-bottom: 1.5rem;
+}
+
+.preview-logo-placeholder {
+    width: 80px;
+    height: 40px;
+    background-color: #e5e5e5;
+    border-radius: 4px;
+}
+
+.preview-header-text {
+    flex: 1;
+}
+
+.preview-text-line {
+    height: 12px;
+    background-color: #e5e5e5;
+    border-radius: 2px;
+    margin-bottom: 0.75rem;
+}
+
+.preview-text-title {
+    width: 60%;
+    height: 16px;
+    background-color: #c9c9c9;
+}
+
+.preview-text-subtitle {
+    width: 40%;
+}
+
+.preview-text-short {
+    width: 30%;
+}
+
+.preview-text-medium {
+    width: 50%;
+}
+
+.preview-spacer {
+    height: 1rem;
+}
+
+.preview-table-placeholder {
+    margin-top: 1rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.preview-table-row {
+    display: flex;
+}
+
+.preview-table-row:not(:last-child) {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.preview-table-header {
+    background-color: #f3f3f3;
+}
+
+.preview-table-cell {
+    flex: 1;
+    padding: 0.75rem;
+    height: 40px;
+}
+
+.preview-table-header .preview-table-cell {
+    background-color: #e5e5e5;
+    height: 20px;
+    margin: 0.5rem;
+    border-radius: 2px;
+}
+
+.preview-table-cell:not(:last-child) {
+    border-right: 1px solid #e5e5e5;
+}
+
+.preview-document-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
 }
 
 /* Responsive adjustments */
