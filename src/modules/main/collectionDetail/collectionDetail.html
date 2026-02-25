@@ -12,7 +12,15 @@
                     </lightning-icon>
                 </div>
                 <div class="record-header-info">
-                    <h1 class="record-name">{collection.name}</h1>
+                    <div class="record-name-row">
+                        <h1 class="record-name">{collection.name}</h1>
+                        <template lwc:if={hasRigidStructure}>
+                            <span class="record-structure-badge" title="This collection uses a template with a fixed, required structure that cannot be modified.">
+                                <lightning-icon icon-name="utility:lock" size="xx-small" class="record-structure-lock-icon" alternative-text=""></lightning-icon>
+                                <span class="record-structure-label">Required structure</span>
+                            </span>
+                        </template>
+                    </div>
                 </div>
                 <div class="record-header-actions">
                     <lightning-button 
@@ -28,9 +36,7 @@
             <div class="record-header-fields">
                 <div class="header-field">
                     <span class="field-label">Status</span>
-                    <span class="field-value">
-                        <lightning-badge label={statusValue} variant={statusVariantComputed}></lightning-badge>
-                    </span>
+                    <span class="field-value">{statusValue}</span>
                 </div>
                 <div class="header-field">
                     <span class="field-label">Collection Type</span>
@@ -101,8 +107,25 @@
             </div>
         </template>
         
-        <!-- Content Cards - New Layout for Template Collections -->
-        <template lwc:if={isFromTemplate}>
+        <!-- Empty State: Template-based collection with no children and no content -->
+        <template lwc:if={showTemplateEmptyState}>
+            <div class="collection-empty-state" role="status" aria-label="Collection is empty">
+                <div class="collection-empty-state-icon-wrap">
+                    <lightning-icon icon-name="standard:folder_open" size="large" class="collection-empty-state-icon" alternative-text=""></lightning-icon>
+                </div>
+                <h2 class="slds-text-heading_medium collection-empty-state-title">Get started with your collection</h2>
+                <p class="slds-text-body_regular slds-text-color_weak collection-empty-state-body">
+                    This collection uses the <strong>{templateName}</strong> template. Add child collections to build the structure, then add content to meet the template requirements.
+                </p>
+                <div class="collection-empty-state-actions">
+                    <lightning-button label="Add child collection" variant="brand" class="collection-empty-state-primary" title="Add a child collection"></lightning-button>
+                    <lightning-button label="Find required content" variant="neutral" onclick={handleFindRequiredContent} title="Find required content"></lightning-button>
+                </div>
+            </div>
+        </template>
+        
+        <!-- Content Cards - New Layout for Template Collections (when not empty) -->
+        <template lwc:if={showTemplateCards}>
             <div class="cards-container">
                 <div class="cards-layout-template">
                     
@@ -168,8 +191,9 @@
                                     </ul>
                                 </template>
                                 <template lwc:else>
-                                    <div class="empty-card-state">
-                                        <p class="slds-text-color_weak">No child collections</p>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="utility:open_folder" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No child collections. Add one to organize content.</p>
                                     </div>
                                 </template>
                             </div>
@@ -191,6 +215,7 @@
                                 </div>
                             </div>
                             <div class="nested-card-content">
+                                <template lwc:if={hasMembers}>
                                 <ul class="slds-list_vertical">
                                     <template for:each={members} for:item="member">
                                         <li key={member.id} class="slds-list__item list-item">
@@ -212,6 +237,13 @@
                                         </li>
                                     </template>
                                 </ul>
+                                </template>
+                                <template lwc:else>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="utility:user" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No members. Add collaborators to this collection.</p>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -443,8 +475,9 @@
                                     </ul>
                                 </template>
                                 <template lwc:else>
-                                    <div class="empty-card-state">
-                                        <p class="slds-text-color_weak">No content added</p>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="standard:file" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No content added. Add documents to this collection.</p>
                                     </div>
                                 </template>
                             </div>
@@ -455,7 +488,7 @@
             </div>
         </template>
         
-        <!-- Freeform Collections - Two Column Layout (matching template layout) -->
+        <!-- Freeform Collections - Two Column Layout (same structure; empty states inside each card) -->
         <template lwc:else>
             <div class="cards-container">
                 <div class="cards-layout-template">
@@ -510,8 +543,9 @@
                                     </ul>
                                 </template>
                                 <template lwc:else>
-                                    <div class="empty-card-state">
-                                        <p class="slds-text-color_weak">No child collections</p>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="utility:open_folder" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No child collections. Add one to organize content.</p>
                                     </div>
                                 </template>
                             </div>
@@ -533,6 +567,7 @@
                                 </div>
                             </div>
                             <div class="nested-card-content">
+                                <template lwc:if={hasMembers}>
                                 <ul class="slds-list_vertical">
                                     <template for:each={members} for:item="member">
                                         <li key={member.id} class="slds-list__item list-item">
@@ -554,6 +589,13 @@
                                         </li>
                                     </template>
                                 </ul>
+                                </template>
+                                <template lwc:else>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="utility:user" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No members. Add collaborators to this collection.</p>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -623,8 +665,9 @@
                                     </ul>
                                 </template>
                                 <template lwc:else>
-                                    <div class="empty-card-state">
-                                        <p class="slds-text-color_weak">No content items</p>
+                                    <div class="card-empty-state" role="status">
+                                        <lightning-icon icon-name="standard:file" size="small" class="card-empty-state-icon" alternative-text=""></lightning-icon>
+                                        <p class="card-empty-state-text">No content items. Add files or documents to this collection.</p>
                                     </div>
                                 </template>
                             </div>

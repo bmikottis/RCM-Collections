@@ -94,6 +94,13 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
+     * True when this collection uses a template with a rigid, non-modifiable structure
+     */
+    get hasRigidStructure() {
+        return this.collectionType?.structureModifiable === false;
+    }
+
+    /**
      * Handle Content tab click
      */
     handleContentTabClick() {
@@ -290,11 +297,19 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Get members list (sample data for prototype)
+     * Get members list (sample data for prototype; or collection.members when available)
      * @returns {Array}
      */
     get members() {
-        return SAMPLE_MEMBERS;
+        return this.collection?.members ?? SAMPLE_MEMBERS;
+    }
+
+    /**
+     * Whether the collection has any members (for in-card empty state)
+     * @returns {boolean}
+     */
+    get hasMembers() {
+        return this.members && this.members.length > 0;
     }
 
     /**
@@ -302,7 +317,7 @@ export default class CollectionDetail extends LightningElement {
      * @returns {string}
      */
     get membersCount() {
-        return `${SAMPLE_MEMBERS.length}`;
+        return `${(this.members || []).length}`;
     }
 
     /**
@@ -325,6 +340,30 @@ export default class CollectionDetail extends LightningElement {
      */
     get isFromTemplate() {
         return this.collection?.isFromTemplate === true;
+    }
+
+    /**
+     * Show dedicated empty state for template-based collection (no children, no content)
+     * @returns {boolean}
+     */
+    get showTemplateEmptyState() {
+        return this.isFromTemplate && this.isEmpty;
+    }
+
+    /**
+     * Show template cards layout when collection has content or children
+     * @returns {boolean}
+     */
+    get showTemplateCards() {
+        return this.isFromTemplate && !this.isEmpty;
+    }
+
+    /**
+     * Template name for empty state message
+     * @returns {string}
+     */
+    get templateName() {
+        return this.collectionType?.name || 'selected';
     }
 
     /**

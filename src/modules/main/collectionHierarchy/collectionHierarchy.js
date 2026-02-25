@@ -5,7 +5,9 @@ import {
     findCollectionById, 
     getCollectionPath,
     getCollectionType,
-    calculateCompleteness 
+    calculateCompleteness,
+    addRootCollection,
+    buildNewCollectionFromTemplate
 } from './sampleData';
 
 /**
@@ -31,6 +33,17 @@ export default class CollectionHierarchy extends LightningElement {
         { id: 'main', label: 'Regulated Content Coll...', type: 'main', closable: false }
     ];
     @track activeTabId = 'main';
+
+    @track showCreateModal = false;
+    @track createStep = 1;
+    @track selectedTemplate = null;
+    @track createSearchTerm = '';
+    @track createForm = {
+        name: '',
+        status: 'Draft',
+        region: 'Global',
+        description: ''
+    };
 
     /**
      * Get root level collections for the tree
@@ -487,11 +500,164 @@ export default class CollectionHierarchy extends LightningElement {
         this.showFilter = false;
     }
 
+    get createStepOne() {
+        return this.createStep === 1;
+    }
+
+    get createStepTwo() {
+        return this.createStep === 2;
+    }
+
+    get filteredTemplates() {
+        const term = (this.createSearchTerm || '').toLowerCase().trim();
+        const mapType = (t) => ({
+            ...t,
+            descriptionShort: (t.description || '').substring(0, 80),
+            isRigidStructure: t.structureModifiable === false
+        });
+        if (!term) {
+            return collectionTypes.map(mapType);
+        }
+        return collectionTypes
+            .filter(t =>
+                (t.name || '').toLowerCase().includes(term) ||
+                (t.description || '').toLowerCase().includes(term)
+            )
+            .map(mapType);
+    }
+
+    get createFromScratchMatchesSearch() {
+        const term = (this.createSearchTerm || '').toLowerCase().trim();
+        if (!term) return true;
+        return 'create from scratch'.includes(term) || 'free standing'.includes(term) || 'no template'.includes(term);
+    }
+
+    get selectedTemplateName() {
+        return this.selectedTemplate ? this.selectedTemplate.name : 'None';
+    }
+
+    /** Placeholder for Collection Name when creating from template (e.g. naming example). */
+    get createNamePlaceholder() {
+        return (this.selectedTemplate && this.selectedTemplate.namingExample) || 'Enter collection name';
+    }
+
+    /** Help text for required naming structure when template defines it. Shown below Collection Name. */
+    get createNameHelpText() {
+        return (this.selectedTemplate && this.selectedTemplate.namingStructure) || null;
+    }
+
+    get statusOptionsForCreate() {
+        return [
+            { label: 'Draft', value: 'Draft' },
+            { label: 'Active', value: 'Active' },
+            { label: 'In Progress', value: 'In Progress' },
+            { label: 'Under Review', value: 'Under Review' },
+            { label: 'Approved', value: 'Approved' }
+        ];
+    }
+
+    get regionOptionsForCreate() {
+        return [
+            { label: 'Global', value: 'Global' },
+            { label: 'US', value: 'US' },
+            { label: 'EU', value: 'EU' },
+            { label: 'APAC', value: 'APAC' }
+        ];
+    }
+
+    get createFormNameEmpty() {
+        return !(this.createForm.name || '').trim();
+    }
+
     /**
      * Handle New Collection button click
      */
     handleNewCollection() {
-        console.log('New Collection clicked');
+        this.showCreateModal = true;
+        this.createStep = 1;
+        this.selectedTemplate = null;
+        this.createSearchTerm = '';
+        this.createForm = { name: '', status: 'Draft', region: 'Global', description: '' };
+    }
+
+    handleCloseCreateModal() {
+        this.showCreateModal = false;
+        this.createStep = 1;
+        this.selectedTemplate = null;
+    }
+
+    handleCreateBackdropClick(event) {
+        if (event.target.classList.contains('create-modal-backdrop')) {
+            this.handleCloseCreateModal();
+        }
+    }
+
+    handleCreateModalClick(event) {
+        event.stopPropagation();
+    }
+
+    handleCreateSearchChange(event) {
+        this.createSearchTerm = event.target.value;
+    }
+
+    handleSelectFromScratch() {
+        this.selectedTemplate = null;
+        this.createStep = 2;
+    }
+
+    handleSelectTemplate(event) {
+        const typeId = event.currentTarget.dataset.typeId;
+        const template = collectionTypes.find(t => t.id === typeId);
+        if (template) {
+            this.selectedTemplate = template;
+            this.createStep = 2;
+        }
+    }
+
+    handleCreateBack() {
+        this.createStep = 1;
+    }
+
+    handleCreateFormChange(event) {
+        const field = event.target.dataset.field;
+        const value = event.detail !== undefined ? event.detail.value : event.target.value;
+        if (field !== undefined) {
+            this.createForm = { ...this.createForm, [field]: value };
+        }
+    }
+
+    handleCreateSave() {
+        const name = (this.createForm.name || '').trim();
+        if (!name) {
+            return;
+        }
+        const newId = `col-new-${Date.now()}`;
+        const metadata = {
+            region: this.createForm.region || 'Global',
+            status: this.createForm.status || 'Draft',
+            description: this.createForm.description || ''
+        };
+        const newCollection = this.selectedTemplate
+            ? buildNewCollectionFromTemplate(this.selectedTemplate, newId, name, metadata)
+            : {
+                id: newId,
+                name,
+                typeId: null,
+                parentId: 'root',
+                level: 1,
+                isFromTemplate: false,
+                metadata,
+                content: [],
+                children: [],
+                members: []
+            };
+        this.collectionsData = addRootCollection(this.collectionsData, newCollection);
+        this.expandedIds = new Set([...this.expandedIds, newId]);
+        this.selectedCollectionId = newId;
+        this.showCreateModal = false;
+        this.createStep = 1;
+        this.selectedTemplate = null;
+        this.createForm = { name: '', status: 'Draft', region: 'Global', description: '' };
     }
 
     /**

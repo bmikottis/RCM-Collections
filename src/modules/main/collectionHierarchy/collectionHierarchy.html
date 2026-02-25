@@ -337,4 +337,119 @@
         </template>
         </div>
     </div>
+
+    <!-- Create New Collection Modal -->
+    <template lwc:if={showCreateModal}>
+        <section class="create-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="create-modal-title" onclick={handleCreateBackdropClick}>
+            <div class="create-modal" onclick={handleCreateModalClick}>
+                <header class="create-modal-header">
+                    <h2 id="create-modal-title" class="create-modal-title">New Collection</h2>
+                    <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Close" onclick={handleCloseCreateModal} class="create-modal-close"></lightning-button-icon>
+                </header>
+                <div class="create-modal-body">
+                    <template lwc:if={createStepOne}>
+                        <div class="create-step1">
+                            <p class="create-modal-hint">Choose a template or create from scratch.</p>
+                            <div class="create-search-row">
+                                <div class="create-search-wrap">
+                                    <lightning-icon icon-name="utility:search" size="x-small" class="create-search-icon" alternative-text="Search"></lightning-icon>
+                                    <input type="text" class="create-search-input" placeholder="Search templates..." value={createSearchTerm} oninput={handleCreateSearchChange} aria-label="Search templates" />
+                                </div>
+                            </div>
+                            <template lwc:if={createFromScratchMatchesSearch}>
+                                <div class="create-section">
+                                    <button type="button" class="create-card create-card-from-scratch" onclick={handleSelectFromScratch}>
+                                        <lightning-icon icon-name="utility:add" size="medium" class="create-card-icon" alternative-text=""></lightning-icon>
+                                        <div class="create-card-content">
+                                            <span class="create-card-name">Create from Scratch</span>
+                                            <span class="create-card-desc">Start with an empty collection. Add content and structure as needed.</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </template>
+                            <div class="create-section">
+                                <h3 class="create-section-title">Templates ({filteredTemplates.length})</h3>
+                                <div class="create-cards-grid">
+                                    <template for:each={filteredTemplates} for:item="tpl">
+                                        <button key={tpl.id} type="button" class="create-card" data-type-id={tpl.id} onclick={handleSelectTemplate}>
+                                            <lightning-icon icon-name={tpl.icon} size="medium" class="create-card-icon" alternative-text=""></lightning-icon>
+                                            <div class="create-card-content">
+                                                <div class="create-card-name-row">
+                                                    <span class="create-card-name">{tpl.name}</span>
+                                                    <template lwc:if={tpl.isRigidStructure}>
+                                                        <span class="create-card-structure-badge" title="This template has a fixed, required structure that cannot be modified.">
+                                                            <lightning-icon icon-name="utility:lock" size="xx-small" class="create-card-lock-icon" alternative-text=""></lightning-icon>
+                                                            <span class="create-card-structure-label">Required structure</span>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                                <span class="create-card-desc">{tpl.descriptionShort}</span>
+                                            </div>
+                                        </button>
+                                    </template>
+                                </div>
+                                <template lwc:if={filteredTemplates.length}></template>
+                                <template lwc:else>
+                                    <p class="create-no-results slds-text-color_weak">No templates match your search.</p>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                    <template lwc:if={createStepTwo}>
+                        <div class="create-step2">
+                            <p class="create-modal-hint">Enter details for the new collection.</p>
+                            <div class="create-form slds-form">
+                                <div class="create-form-grid">
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label" for="create-name">Collection Name<span class="required-asterisk" aria-hidden="true">*</span></label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-input id="create-name" type="text" label="" placeholder={createNamePlaceholder} required data-field="name" value={createForm.name} onchange={handleCreateFormChange} variant="label-hidden"></lightning-input>
+                                            <template lwc:if={createNameHelpText}>
+                                                <span id="create-name-helptext" class="slds-form-element__help" role="status">{createNameHelpText}</span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label">Template</label>
+                                        <div class="slds-form-element__control create-form-readonly">
+                                            <span class="slds-form-element__static">{selectedTemplateName}</span>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label" for="create-status">Status</label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-combobox name="status" label="" options={statusOptionsForCreate} value={createForm.status} onchange={handleCreateFormChange} data-field="status" variant="label-hidden"></lightning-combobox>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label" for="create-region">Region</label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-combobox name="region" label="" options={regionOptionsForCreate} value={createForm.region} onchange={handleCreateFormChange} data-field="region" variant="label-hidden"></lightning-combobox>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-1">
+                                        <label class="slds-form-element__label" for="create-description">Description</label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-textarea name="description" label="" placeholder="Enter a description of the collection" data-field="description" value={createForm.description} onchange={handleCreateFormChange} variant="label-hidden" max-length="500"></lightning-textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <footer class="create-modal-footer">
+                    <template lwc:if={createStepTwo}>
+                        <lightning-button label="Back" variant="neutral" onclick={handleCreateBack} class="create-footer-back"></lightning-button>
+                    </template>
+                    <div class="create-footer-actions">
+                        <lightning-button label="Cancel" variant="neutral" onclick={handleCloseCreateModal} class="create-footer-cancel"></lightning-button>
+                        <template lwc:if={createStepTwo}>
+                            <lightning-button label="Save" variant="brand" onclick={handleCreateSave} disabled={createFormNameEmpty}></lightning-button>
+                        </template>
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </template>
 </template>

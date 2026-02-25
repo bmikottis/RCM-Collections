@@ -39,6 +39,13 @@
     min-width: 0;
 }
 
+.record-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .record-name {
     font-size: 1.5rem;
     font-weight: 400;
@@ -47,6 +54,31 @@
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.record-structure-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--slds-g-color-neutral-base-50, #706e6b);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.record-structure-lock-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-50, #706e6b);
+    flex-shrink: 0;
+}
+
+.record-structure-label {
     white-space: nowrap;
 }
 
@@ -223,6 +255,49 @@
 }
 
 /* ========================================
+   Collection Empty State (new template or freeform)
+   ======================================== */
+.collection-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    margin: 1.5rem;
+    background-color: var(--slds-g-color-surface-2, #fafaf9);
+    border: 1px dashed var(--slds-g-color-border-base-2, #c9c9c9);
+    border-radius: 0.5rem;
+    min-height: 280px;
+}
+
+.collection-empty-state-icon-wrap {
+    margin-bottom: 1rem;
+}
+
+.collection-empty-state-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-80, #c9c9c9);
+}
+
+.collection-empty-state-title {
+    margin: 0 0 0.5rem 0;
+    color: var(--slds-g-color-neutral-base-30, #181818);
+}
+
+.collection-empty-state-body {
+    margin: 0 0 1.5rem 0;
+    max-width: 28rem;
+    line-height: 1.5;
+}
+
+.collection-empty-state-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+/* ========================================
    Nested Card Styling
    ======================================== */
 .nested-card {
@@ -269,6 +344,29 @@
     justify-content: center;
     height: 100px;
     text-align: center;
+}
+
+/* In-card empty state (Child Collections, Members, Collection Content) */
+.card-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    min-height: 100px;
+}
+
+.card-empty-state-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-80, #c9c9c9);
+    margin-bottom: 0.5rem;
+}
+
+.card-empty-state-text {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--slds-g-color-neutral-base-50, #706e6b);
 }
 
 /* List item styling */
@@ -604,9 +702,9 @@
 }
 
 .requirements-card {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    align-self: flex-start;
 }
 
 .requirements-header {
@@ -703,7 +801,7 @@
    Requirements Tab Content
    ======================================== */
 .requirements-tab-content {
-    flex: 1;
+    flex: 0 0 auto;
     overflow-y: auto;
     background-color: #ffffff;
 }

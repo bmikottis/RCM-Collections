@@ -625,3 +625,248 @@ lightning-icon[icon-name^="standard:"] {
         border-bottom: 1px solid #e5e5e5;
     }
 }
+
+/* ========================================
+   Create New Collection Modal
+   ======================================== */
+.create-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 7000;
+    padding: 1rem;
+}
+
+.create-modal {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.create-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.create-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #181818;
+}
+
+.create-modal-close {
+    flex-shrink: 0;
+}
+
+.create-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.create-modal-hint {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin: 0 0 1rem 0;
+}
+
+.create-search-row {
+    margin-bottom: 1.25rem;
+}
+
+.create-search-wrap {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #fafaf9;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.create-search-icon {
+    margin-right: 0.5rem;
+    --slds-c-icon-color-foreground-default: #706e6b;
+}
+
+.create-search-input {
+    flex: 1;
+    border: none;
+    background: none;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.create-section {
+    margin-bottom: 1.5rem;
+}
+
+.create-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #181818;
+    margin: 0 0 0.75rem 0;
+}
+
+.create-cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.create-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem;
+    text-align: left;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.create-card:hover {
+    border-color: #0176d3;
+    background-color: #f7f9fb;
+}
+
+.create-card-from-scratch {
+    border-style: dashed;
+}
+
+.create-card-icon {
+    flex-shrink: 0;
+    --slds-c-icon-color-foreground-default: #0176d3;
+}
+
+.create-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.create-card-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.create-card-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #181818;
+}
+
+.create-card-structure-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    background-color: #f3f3f3;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.create-card-lock-icon {
+    --slds-c-icon-color-foreground-default: #706e6b;
+    flex-shrink: 0;
+}
+.create-card-structure-label {
+    white-space: nowrap;
+}
+
+.create-card-desc {
+    font-size: 0.8125rem;
+    color: #706e6b;
+    line-height: 1.4;
+}
+
+.create-no-results {
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.create-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    row-gap: 1rem;
+}
+
+.create-form-grid .slds-form-element {
+    min-width: 0;
+    width: 100%;
+}
+
+.create-form-grid .slds-size_1-of-1 {
+    grid-column: 1 / -1;
+}
+
+.create-form-grid .slds-form-element__control {
+    width: 100%;
+    min-width: 0;
+}
+
+.create-form-grid .slds-form-element__control lightning-input,
+.create-form-grid .slds-form-element__control lightning-combobox {
+    width: 100%;
+    display: block;
+}
+
+.create-form-readonly {
+    padding-top: 0.25rem;
+    width: 100%;
+}
+
+.create-form-readonly .slds-form-element__static {
+    font-size: 0.875rem;
+    color: #181818;
+}
+
+.required-asterisk {
+    color: var(--slds-g-color-error-base-50, #ea001e);
+    margin-left: 0.125rem;
+}
+
+.create-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e5e5;
+}
+
+.create-footer-back {
+    margin-right: auto;
+}
+
+.create-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
