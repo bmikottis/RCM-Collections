@@ -483,6 +483,85 @@
     border-bottom: 1px solid #e5e5e5;
 }
 
+/* ========================================
+   Workflow Path (below completeness)
+   ======================================== */
+.workflow-path-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background-color: var(--slds-g-color-surface-2, #fafaf9);
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.workflow-path {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    min-width: 0;
+}
+
+.workflow-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    padding: 0.375rem 0.75rem;
+    background-color: var(--slds-g-color-neutral-base-95, #e5e5e5);
+    color: var(--slds-g-color-neutral-base-50, #706e6b);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%, 8px 50%);
+    margin-left: -6px;
+}
+
+.workflow-step:first-child {
+    margin-left: 0;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+.workflow-step:last-child {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 50%);
+}
+
+/* Completed: light turquoise with white checkmark */
+.workflow-step-completed {
+    background-color: #84d2c5;
+    color: #ffffff;
+    z-index: 1;
+}
+
+.workflow-step-completed .workflow-step-check {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+/* Active: dark blue with white text */
+.workflow-step-active {
+    background-color: #0f3563;
+    color: #ffffff;
+    z-index: 2;
+}
+
+/* Default: light gray (base .workflow-step already has neutral-base-95) */
+
+.workflow-step-label {
+    white-space: nowrap;
+}
+
+.workflow-path-actions {
+    flex-shrink: 0;
+}
+
+.workflow-path-actions lightning-button-menu {
+    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #c9c9c9);
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
+    --slds-c-button-neutral-text-color: var(--slds-g-color-accent-3, #1a4f89);
+}
+
 .completeness-ring-container {
     position: relative;
     width: 100px;

@@ -38,8 +38,8 @@
                 </template>
             </div>
             
-            <!-- Item Name -->
-            <span class="slds-truncate tree-item-label" title={item.name}>
+            <!-- Item Name (collections: click opens record in new console tab) -->
+            <span class={nameLabelClass} title={item.name} onclick={handleNameClick} onkeydown={handleNameKeyDown} role={nameRole} tabindex={nameTabindex} data-collection-id={item.id}>
                 {item.name}
             </span>
 

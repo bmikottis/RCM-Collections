@@ -22,14 +22,6 @@
                         </template>
                     </div>
                 </div>
-                <div class="record-header-actions">
-                    <lightning-button 
-                        label="View Details" 
-                        variant="neutral" 
-                        onclick={handleOpenRecord}
-                        title="View full record page">
-                    </lightning-button>
-                </div>
             </div>
             
             <!-- Key Fields Row -->
@@ -103,6 +95,29 @@
                             <span class="breakdown-value">{approvalsSummary}</span>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Workflow path (Draft → Review → Approve → Archive) below completeness -->
+            <div class="workflow-path-section">
+                <div class="workflow-path" role="list" aria-label="Collection workflow">
+                    <template lwc:for-each={workflowSteps} lwc:for-item="step" lwc:key={step.key}>
+                        <div class={step.stepClass} role="listitem" data-step-key={step.key}>
+                            <template lwc:if={step.stateCompleted}>
+                                <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                            </template>
+                            <template lwc:else>
+                                <span class="workflow-step-label">{step.label}</span>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                <div class="workflow-path-actions">
+                    <lightning-button-menu label={workflowActionLabel} variant="neutral" alternative-text={workflowActionLabel} icon-name="utility:down" icon-position="right" menu-alignment="right">
+                        <template lwc:for-each={workflowActionMenuItems} lwc:for-item="item" lwc:key={item.value}>
+                            <lightning-menu-item value={item.value} label={item.label}></lightning-menu-item>
+                        </template>
+                    </lightning-button-menu>
                 </div>
             </div>
         </template>

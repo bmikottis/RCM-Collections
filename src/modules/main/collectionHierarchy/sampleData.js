@@ -326,6 +326,7 @@ export const sampleCollections = {
             level: 1,
             isFromTemplate: true,
             isLocked: true,
+            workflowStage: 'archive',
             metadata: {
                 owner: 'Clinical Operations',
                 region: 'Global',

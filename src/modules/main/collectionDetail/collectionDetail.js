@@ -29,6 +29,14 @@ const SAMPLE_MEMBERS = [
     { id: 'm3', name: 'Emily Davis', role: 'Viewer', avatar: null }
 ];
 
+/** Workflow path stages: key, label, and action label when this stage is active */
+const WORKFLOW_STAGES = [
+    { key: 'draft', label: 'Draft', actionLabel: 'Send for review' },
+    { key: 'review', label: 'Review', actionLabel: 'Submit for approval' },
+    { key: 'approve', label: 'Approve', actionLabel: 'Complete Approval' },
+    { key: 'archive', label: 'Archive', actionLabel: 'Archive Collection' }
+];
+
 /**
  * Collection Detail component displays information about a selected collection
  * including its metadata, child collections, and content items.
@@ -182,6 +190,72 @@ export default class CollectionDetail extends LightningElement {
             return this.completenessPercentage === 100 ? 'success' : 'warning';
         }
         return this.statusVariant;
+    }
+
+    /**
+     * Current workflow stage (draft | review | approve | archive)
+     * @returns {string}
+     */
+    get currentWorkflowStage() {
+        const stage = this.collection?.workflowStage || this.collection?.metadata?.workflowStage || 'draft';
+        const valid = WORKFLOW_STAGES.some(s => s.key === stage);
+        return valid ? stage : 'draft';
+    }
+
+    /**
+     * Path steps with state: completed (turquoise + check), active (dark blue), default (gray)
+     * @returns {Array<{ key: string, label: string, state: string, stepClass: string }>}
+     */
+    get workflowSteps() {
+        const current = this.currentWorkflowStage;
+        const currentIndex = WORKFLOW_STAGES.findIndex(s => s.key === current);
+        return WORKFLOW_STAGES.map((stage, index) => {
+            let state = 'default';
+            if (index < currentIndex) state = 'completed';
+            else if (index === currentIndex) state = 'active';
+            const stepClass = [
+                'workflow-step',
+                state === 'completed' ? 'workflow-step-completed' : '',
+                state === 'active' ? 'workflow-step-active' : ''
+            ].filter(Boolean).join(' ');
+            return {
+                key: stage.key,
+                label: stage.label,
+                state,
+                stateCompleted: state === 'completed',
+                stepClass
+            };
+        });
+    }
+
+    /**
+     * Label for the workflow action button (e.g. "Archive Collection" when stage is archive)
+     * @returns {string}
+     */
+    get workflowActionLabel() {
+        const stage = WORKFLOW_STAGES.find(s => s.key === this.currentWorkflowStage);
+        return stage?.actionLabel || 'Send for review';
+    }
+
+    /**
+     * Menu items for the workflow action dropdown
+     * @returns {Array<{ value: string, label: string }>}
+     */
+    get workflowActionMenuItems() {
+        const stage = this.currentWorkflowStage;
+        if (stage === 'draft') {
+            return [{ value: 'review', label: 'Send for review' }, { value: 'approve', label: 'Submit for approval' }];
+        }
+        if (stage === 'review') {
+            return [{ value: 'approve', label: 'Submit for approval' }];
+        }
+        if (stage === 'approve') {
+            return [{ value: 'complete', label: 'Complete Approval' }];
+        }
+        if (stage === 'archive') {
+            return [{ value: 'archive', label: 'Archive Collection' }];
+        }
+        return [{ value: 'review', label: 'Send for review' }];
     }
 
     /**

@@ -196,7 +196,66 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
-     * Handle item selection
+     * Get name label class (link styling only for collections)
+     * @returns {string}
+     */
+    get nameLabelClass() {
+        let cls = 'slds-truncate tree-item-label';
+        if (this.isCollection) {
+            cls += ' tree-item-label-link';
+        }
+        return cls;
+    }
+
+    /**
+     * Role for name element (link when collection for a11y)
+     * @returns {string}
+     */
+    get nameRole() {
+        return this.isCollection ? 'link' : undefined;
+    }
+
+    /**
+     * Tabindex for name (0 when collection so it can be focused)
+     * @returns {string}
+     */
+    get nameTabindex() {
+        return this.isCollection ? '0' : '-1';
+    }
+
+    /**
+     * Handle click on collection name: open record in new console tab
+     * @param {Event} event
+     */
+    handleNameClick(event) {
+        if (!this.isCollection) return;
+        event.stopPropagation();
+        this.dispatchEvent(new CustomEvent('viewdetails', {
+            detail: { collectionId: this.item.id },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    /**
+     * Handle keyboard on collection name (Enter/Space = open in new tab)
+     * @param {KeyboardEvent} event
+     */
+    handleNameKeyDown(event) {
+        if (!this.isCollection) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.dispatchEvent(new CustomEvent('viewdetails', {
+                detail: { collectionId: this.item.id },
+                bubbles: true,
+                composed: true
+            }));
+        }
+    }
+
+    /**
+     * Handle item selection (row click, not name)
      * @param {Event} event
      */
     handleSelect(event) {

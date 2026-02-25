@@ -86,6 +86,22 @@
     align-self: center;
 }
 
+/* Collection name as link: open record in new console tab */
+.tree-item-label-link {
+    cursor: pointer;
+    color: var(--slds-g-color-accent-2, #0176d3);
+}
+
+.tree-item-label-link:hover {
+    text-decoration: underline;
+}
+
+.tree-item-label-link:focus {
+    outline: none;
+    border-radius: 2px;
+    box-shadow: 0 0 0 2px var(--slds-g-color-accent-2, #0176d3);
+}
+
 /* Child group indentation */
 .slds-tree__group {
     padding-left: 1.25rem;
