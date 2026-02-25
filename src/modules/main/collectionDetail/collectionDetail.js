@@ -203,30 +203,56 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Path steps with state: completed (turquoise + check), active (dark blue), default (gray)
-     * @returns {Array<{ key: string, label: string, state: string, stepClass: string }>}
+     * Index of current workflow stage (0=draft, 1=review, 2=approve, 3=archive)
+     * @returns {number}
      */
-    get workflowSteps() {
-        const current = this.currentWorkflowStage;
-        const currentIndex = WORKFLOW_STAGES.findIndex(s => s.key === current);
-        return WORKFLOW_STAGES.map((stage, index) => {
-            let state = 'default';
-            if (index < currentIndex) state = 'completed';
-            else if (index === currentIndex) state = 'active';
-            const stepClass = [
-                'workflow-step',
-                state === 'completed' ? 'workflow-step-completed' : '',
-                state === 'active' ? 'workflow-step-active' : ''
-            ].filter(Boolean).join(' ');
-            return {
-                key: stage.key,
-                label: stage.label,
-                state,
-                stateCompleted: state === 'completed',
-                stepClass
-            };
-        });
+    get _workflowStageIndex() {
+        return WORKFLOW_STAGES.findIndex(s => s.key === this.currentWorkflowStage);
     }
+
+    /** Step class for Draft (completed | active | default) */
+    get workflowStepDraftClass() {
+        const i = this._workflowStageIndex;
+        const base = 'workflow-step';
+        if (i > 0) return `${base} workflow-step-completed`;
+        if (i === 0) return `${base} workflow-step-active`;
+        return base;
+    }
+
+    /** Step class for Review */
+    get workflowStepReviewClass() {
+        const i = this._workflowStageIndex;
+        const base = 'workflow-step';
+        if (i > 1) return `${base} workflow-step-completed`;
+        if (i === 1) return `${base} workflow-step-active`;
+        return base;
+    }
+
+    /** Step class for Approve */
+    get workflowStepApproveClass() {
+        const i = this._workflowStageIndex;
+        const base = 'workflow-step';
+        if (i > 2) return `${base} workflow-step-completed`;
+        if (i === 2) return `${base} workflow-step-active`;
+        return base;
+    }
+
+    /** Step class for Archive */
+    get workflowStepArchiveClass() {
+        const i = this._workflowStageIndex;
+        const base = 'workflow-step';
+        if (i === 3) return `${base} workflow-step-active`;
+        return base;
+    }
+
+    /** Show check icon for Draft (completed) */
+    get isDraftStepCompleted() { return this._workflowStageIndex > 0; }
+    /** Show check icon for Review (completed) */
+    get isReviewStepCompleted() { return this._workflowStageIndex > 1; }
+    /** Show check icon for Approve (completed) */
+    get isApproveStepCompleted() { return this._workflowStageIndex > 2; }
+    /** Archive never shows check (it's last or active) */
+    get isArchiveStepCompleted() { return false; }
 
     /**
      * Label for the workflow action button (e.g. "Archive Collection" when stage is archive)

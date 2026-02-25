@@ -22,6 +22,14 @@
                         </template>
                     </div>
                 </div>
+                <div class="record-header-actions">
+                    <lightning-button 
+                        label="View Details" 
+                        variant="neutral" 
+                        onclick={handleOpenRecord}
+                        title="View full record page">
+                    </lightning-button>
+                </div>
             </div>
             
             <!-- Key Fields Row -->
@@ -101,16 +109,33 @@
             <!-- Workflow path (Draft → Review → Approve → Archive) below completeness -->
             <div class="workflow-path-section">
                 <div class="workflow-path" role="list" aria-label="Collection workflow">
-                    <template lwc:for-each={workflowSteps} lwc:for-item="step" lwc:key={step.key}>
-                        <div class={step.stepClass} role="listitem" data-step-key={step.key}>
-                            <template lwc:if={step.stateCompleted}>
-                                <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                            </template>
-                            <template lwc:else>
-                                <span class="workflow-step-label">{step.label}</span>
-                            </template>
-                        </div>
-                    </template>
+                    <div class={workflowStepDraftClass} role="listitem">
+                        <template lwc:if={isDraftStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Draft</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepReviewClass} role="listitem">
+                        <template lwc:if={isReviewStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Review</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepApproveClass} role="listitem">
+                        <template lwc:if={isApproveStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Approve</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepArchiveClass} role="listitem">
+                        <span class="workflow-step-label">Archive</span>
+                    </div>
                 </div>
                 <div class="workflow-path-actions">
                     <lightning-button-menu label={workflowActionLabel} variant="neutral" alternative-text={workflowActionLabel} icon-name="utility:down" icon-position="right" menu-alignment="right">
