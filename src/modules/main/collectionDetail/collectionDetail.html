@@ -118,7 +118,7 @@
                     This collection uses the <strong>{templateName}</strong> template. Add child collections to build the structure, then add content to meet the template requirements.
                 </p>
                 <div class="collection-empty-state-actions">
-                    <lightning-button label="Add child collection" variant="brand" class="collection-empty-state-primary" title="Add a child collection"></lightning-button>
+                    <lightning-button label="Add child collection" variant="neutral" class="collection-empty-state-primary" title="Add a child collection"></lightning-button>
                     <lightning-button label="Find required content" variant="neutral" onclick={handleFindRequiredContent} title="Find required content"></lightning-button>
                 </div>
             </div>
@@ -257,10 +257,8 @@
                                 </div>
                                 <div class="nested-card-header-right">
                                     <button class="agentic-button" onclick={handleFindRequiredContent}>
-                                        <svg class="agentic-icon" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2L13.09 8.26L19 7L14.74 11.61L21 14L14.14 14.14L14 21L11.61 14.74L7 19L8.26 13.09L2 12L8.26 10.91L7 5L11.61 9.26L12 2Z"/>
-                                            <circle cx="7" cy="17" r="1.5"/>
-                                            <circle cx="17" cy="7" r="1"/>
+                                        <svg class="agentic-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path d="M21.4387 16.7414L17.25 18.8257C15.9916 19.4529 14.9737 20.4674 14.3445 21.7217L12.2532 25.8965C11.9571 26.4929 11.0996 26.4929 10.8035 25.8965L8.71223 21.7217C8.083 20.4674 7.06513 19.4529 5.80667 18.8257L1.61798 16.7414C1.01959 16.4463 1.01959 15.5916 1.61798 15.2965L5.80667 13.2122C7.06513 12.585 8.083 11.5705 8.71223 10.3162L10.8035 6.14138C11.0996 5.54498 11.9571 5.54498 12.2532 6.14138L14.3445 10.3162C14.9737 11.5705 15.9916 12.585 17.25 13.2122L21.4387 15.2965C22.0371 15.5916 22.0371 16.4463 21.4387 16.7414ZM30.5749 26.0256L28.7797 25.128C28.2369 24.8636 27.805 24.4209 27.5336 23.886L26.6329 22.0968C26.5096 21.8385 26.1394 21.8385 26.0099 22.0968L25.1092 23.886C24.8439 24.427 24.3998 24.8574 23.8631 25.128L22.0679 26.0256C21.8088 26.1486 21.8088 26.5175 22.0679 26.6466L23.8631 27.5443C24.406 27.8087 24.8378 28.2514 25.1092 28.7863L26.0099 30.5755C26.1332 30.8338 26.5034 30.8338 26.6329 30.5755L27.5336 28.7863C27.7989 28.2453 28.243 27.8149 28.7797 27.5443L30.5749 26.6466C30.834 26.5237 30.834 26.1548 30.5749 26.0256ZM30.5749 5.37282L28.7797 4.47514C28.2369 4.21075 27.805 3.76806 27.5336 3.23314L26.6329 1.44392C26.5096 1.18568 26.1394 1.18568 26.0099 1.44392L25.1092 3.23314C24.8439 3.77421 24.3998 4.2046 23.8631 4.47514L22.0679 5.37282C21.8088 5.49579 21.8088 5.8647 22.0679 5.99382L23.8631 6.8915C24.406 7.15588 24.8378 7.59858 25.1092 8.1335L26.0099 9.92271C26.1332 10.1809 26.5034 10.1809 26.6329 9.92271L27.5336 8.1335C27.7989 7.59243 28.243 7.16203 28.7797 6.8915L30.5749 5.99382C30.834 5.87085 30.834 5.50194 30.5749 5.37282Z" fill="currentColor"/>
                                         </svg>
                                         <span>Find Required Content</span>
                                     </button>
@@ -324,7 +322,7 @@
                                                         </div>
                                                     </template>
                                                     <template lwc:else>
-                                                        <lightning-button label="Add" variant="base" class="checklist-action-button"></lightning-button>
+                                                        <lightning-button label="Add" variant="neutral" class="checklist-action-button"></lightning-button>
                                                     </template>
                                                 </div>
                                             </div>
@@ -355,7 +353,7 @@
                                                             <lightning-badge label="Complete" class="status-badge-success"></lightning-badge>
                                                         </template>
                                                         <template lwc:else>
-                                                            <lightning-button label="Mark Complete" variant="base" class="checklist-action-button"></lightning-button>
+                                                            <lightning-button label="Mark Complete" variant="neutral" class="checklist-action-button"></lightning-button>
                                                         </template>
                                                     </div>
                                                 </div>
@@ -392,7 +390,7 @@
                                                             <lightning-badge label="Approved" class="status-badge-success"></lightning-badge>
                                                         </template>
                                                         <template lwc:else>
-                                                            <lightning-button label="Request" variant="base" class="checklist-action-button"></lightning-button>
+                                                            <lightning-button label="Request" variant="neutral" class="checklist-action-button"></lightning-button>
                                                         </template>
                                                     </div>
                                                 </div>

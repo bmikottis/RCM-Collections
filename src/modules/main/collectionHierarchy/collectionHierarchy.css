@@ -253,8 +253,37 @@
     gap: 0.5rem;
 }
 
-.page-header-right lightning-button {
+/* New Collection: SLDS neutral button styling (gray border, gray text/icon) */
+.page-header-right .new-collection-button {
     --slds-c-button-radius-border: 100px;
+    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #c9c9c9);
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
+    --slds-c-button-neutral-text-color: var(--slds-g-color-neutral-base-30, #181818);
+}
+
+.page-header-right .new-collection-button::part(button) {
+    color: var(--slds-g-color-neutral-base-30, #181818);
+}
+
+.page-header-right .new-collection-button lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #181818);
+}
+
+/* Shared neutral button styling across hierarchy (same as collection detail) */
+.filter-actions lightning-button,
+.create-modal-footer lightning-button,
+.create-footer-actions lightning-button {
+    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #c9c9c9);
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
+    --slds-c-button-neutral-text-color: var(--slds-g-color-neutral-base-30, #181818);
+    --slds-c-button-radius-border: 100px;
+    font-weight: 400;
+}
+
+.filter-actions lightning-button lightning-icon,
+.create-modal-footer lightning-button lightning-icon,
+.create-footer-actions lightning-button lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #181818);
 }
 
 .page-title {

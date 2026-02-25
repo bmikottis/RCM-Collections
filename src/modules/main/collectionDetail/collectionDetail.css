@@ -25,9 +25,15 @@
     flex-shrink: 0;
 }
 
-.record-header-actions lightning-button {
-    --slds-c-button-neutral-color-border: #706e6b;
+/* Shared neutral button styling (border, text, font weight) */
+.record-header-actions lightning-button,
+.nested-card-header-right lightning-button,
+.checklist-status lightning-button {
+    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #c9c9c9);
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
+    --slds-c-button-neutral-text-color: var(--slds-g-color-neutral-base-30, #181818);
     --slds-c-button-radius-border: 100px;
+    font-weight: 400;
 }
 
 .record-header-icon {
@@ -649,10 +655,6 @@
     flex-shrink: 0;
 }
 
-.checklist-status lightning-button {
-    --slds-c-button-neutral-color-border: #c9c9c9;
-    --slds-c-button-radius-border: 4px;
-}
 
 .status-badge-success {
     --slds-c-badge-color-background: #2e844a;
@@ -704,7 +706,7 @@
 .requirements-card {
     display: flex;
     flex-direction: column;
-    align-self: flex-start;
+    width: 100%;
 }
 
 .requirements-header {
@@ -712,39 +714,37 @@
 }
 
 /* ========================================
-   Agentic Button
+   Agentic Button (matches SLDS neutral)
    ======================================== */
 .agentic-button {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #ffffff;
-    color: #0176d3;
-    border: 1px solid #c9c9c9;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    color: var(--slds-g-color-accent-2, #0176d3);
+    border: 1px solid var(--slds-g-color-border-2, #c9c9c9);
     border-radius: 100px;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.15s ease;
 }
 
 .agentic-button:hover {
-    background-color: #f7f9fb;
-    border-color: #0176d3;
-    box-shadow: 0 2px 6px rgba(1, 118, 211, 0.2);
+    background-color: var(--slds-g-color-surface-2, #fafaf9);
+    border-color: var(--slds-g-color-border-2, #c9c9c9);
 }
 
 .agentic-button:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.3);
+    box-shadow: 0 0 0 2px var(--slds-g-color-accent-2, #0176d3);
 }
 
 .agentic-icon {
     width: 18px;
     height: 18px;
-    color: #0176d3;
+    color: var(--slds-g-color-accent-2, #0176d3);
 }
 
 /* ========================================
@@ -841,37 +841,18 @@
     --slds-c-icon-color-foreground-default: #706e6b;
 }
 
-/* Nested card Add button styling */
-.nested-card-header-right lightning-button {
-    --slds-c-button-neutral-color-border: #706e6b;
-    --slds-c-button-neutral-color-background: transparent;
-    --slds-c-button-text-color: #0176d3;
-    --slds-c-button-radius-border: 100px;
-    font-weight: 600;
-}
-
-.nested-card-header-right lightning-button::part(button) {
-    font-weight: 600;
-}
-
-.nested-card-header-right button,
-.nested-card-header-right .slds-button {
-    font-weight: 600;
-}
-
-/* ========================================
-   Card Add Button (Pill Shape)
-   ======================================== */
+/* Card Add and checklist buttons use shared neutral styling above */
 .card-add-button {
     --slds-c-button-radius-border: 100px;
 }
 
-/* ========================================
-   Checklist Action Button (Tertiary Style)
-   ======================================== */
+/* Checklist Add / Mark Complete / Request – neutral, no border */
 .checklist-action-button {
-    --slds-c-button-text-color: #0176d3;
-    font-weight: 500;
+    --slds-c-button-neutral-color-border: transparent;
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
+    --slds-c-button-neutral-text-color: var(--slds-g-color-neutral-base-30, #181818);
+    --slds-c-button-radius-border: 4px;
+    font-weight: 400;
 }
 
 /* ========================================
@@ -958,21 +939,21 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem 0.5rem;
-    background-color: #2e844a;
-    color: #ffffff;
-    border: none;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    color: var(--slds-g-color-neutral-base-30, #181818);
+    border: 1px solid var(--slds-g-color-border-2, #c9c9c9);
     border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 400;
     cursor: pointer;
 }
 
 .added-badge-button:hover {
-    background-color: #236b3b;
+    background-color: var(--slds-g-color-surface-2, #fafaf9);
 }
 
 .added-badge-button lightning-icon {
-    --slds-c-icon-color-foreground-default: #ffffff;
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #181818);
 }
 
 .added-badge-dropdown {

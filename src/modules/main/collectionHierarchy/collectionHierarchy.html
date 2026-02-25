@@ -74,6 +74,7 @@
             </div>
             <div class="page-header-right">
                 <lightning-button 
+                    class="new-collection-button"
                     label="New Collection" 
                     variant="neutral" 
                     icon-name="utility:add"
@@ -238,7 +239,7 @@
                             </lightning-button>
                             <lightning-button 
                                 label="Apply" 
-                                variant="brand" 
+                                variant="neutral" 
                                 onclick={handleApplyFilters}>
                             </lightning-button>
                         </div>
@@ -445,7 +446,7 @@
                     <div class="create-footer-actions">
                         <lightning-button label="Cancel" variant="neutral" onclick={handleCloseCreateModal} class="create-footer-cancel"></lightning-button>
                         <template lwc:if={createStepTwo}>
-                            <lightning-button label="Save" variant="brand" onclick={handleCreateSave} disabled={createFormNameEmpty}></lightning-button>
+                            <lightning-button label="Save" variant="neutral" onclick={handleCreateSave} disabled={createFormNameEmpty}></lightning-button>
                         </template>
                     </div>
                 </footer>
