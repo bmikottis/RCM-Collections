@@ -34,6 +34,8 @@ export default class CollectionHierarchy extends LightningElement {
     ];
     @track activeTabId = 'main';
     @track showMainTabDropdown = false;
+    @track showTemplatesList = false;
+    @track templatesListSearchTerm = '';
 
     @track showCreateModal = false;
     @track createStep = 1;
@@ -666,19 +668,57 @@ export default class CollectionHierarchy extends LightningElement {
      * @returns {Array}
      */
     get consoleTabsWithState() {
-        return this.consoleTabs.map(tab => ({
-            ...tab,
-            isActive: tab.id === this.activeTabId,
-            tabClass: tab.id === this.activeTabId ? 'console-tab is-active' : 'console-tab'
-        }));
+        return this.consoleTabs.map(tab => {
+            const isMain = tab.id === 'main';
+            const label = isMain && this.showTemplatesList ? 'Collection Templates' : tab.label;
+            return {
+                ...tab,
+                label,
+                isActive: tab.id === this.activeTabId,
+                tabClass: tab.id === this.activeTabId ? 'console-tab is-active' : 'console-tab'
+            };
+        });
     }
 
     /**
-     * Check if browser view should be shown (main tab active)
+     * Check if browser view should be shown (main tab active, not templates list)
      * @returns {boolean}
      */
     get showBrowserView() {
-        return this.activeTabId === 'main';
+        return this.activeTabId === 'main' && !this.showTemplatesList;
+    }
+
+    /**
+     * Check if templates list view should be shown in container
+     * @returns {boolean}
+     */
+    get showTemplatesListView() {
+        return this.activeTabId === 'main' && this.showTemplatesList;
+    }
+
+    /**
+     * Templates for list view (from collection types)
+     */
+    get templatesForList() {
+        return (collectionTypes || []).map(t => ({
+            id: t.id,
+            name: t.name,
+            description: t.description || '—',
+            structureModifiable: t.structureModifiable ? 'Yes' : 'No'
+        }));
+    }
+
+    get filteredTemplatesForList() {
+        const term = (this.templatesListSearchTerm || '').toLowerCase().trim();
+        if (!term) return this.templatesForList;
+        return this.templatesForList.filter(
+            t => (t.name && t.name.toLowerCase().includes(term)) ||
+                 (t.description && t.description.toLowerCase().includes(term))
+        );
+    }
+
+    get hasTemplatesForList() {
+        return this.filteredTemplatesForList.length > 0;
     }
 
     /**
@@ -787,14 +827,36 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Handle Collection Templates menu click - navigate to list view.
-     * Uses top window so navigation works when app is in an iframe (e.g. Experience Cloud).
+     * Handle Regulated Content Collections menu click - show collections view in same container.
+     */
+    handleCollectionsClick(event) {
+        event.preventDefault();
+        this.showMainTabDropdown = false;
+        this.showTemplatesList = false;
+    }
+
+    /**
+     * Handle Collection Templates menu click - show list view in same container below nav.
      */
     handleCollectionTemplatesClick(event) {
         event.preventDefault();
         this.showMainTabDropdown = false;
-        const url = new URL(this.collectionTemplatesListUrl, window.location.origin).href;
-        window.top.location.href = url;
+        this.showTemplatesList = true;
+    }
+
+    handleTemplatesListSearchInput(event) {
+        this.templatesListSearchTerm = event.target.value;
+    }
+
+    handleTemplatesListRowClick(event) {
+        const id = event.currentTarget.dataset.id;
+        if (id) console.log('Open template:', id);
+    }
+
+    handleTemplatesListLinkClick(event) {
+        event.preventDefault();
+        const id = event.currentTarget.dataset.id;
+        if (id) console.log('Open template:', id);
     }
 
     /**

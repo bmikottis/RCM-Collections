@@ -61,6 +61,12 @@
                             <template lwc:if={showMainTabDropdown}>
                                 <div class="nav-dropdown-backdrop" onclick={handleNavDropdownClose} role="presentation"></div>
                                 <div class="nav-dropdown" role="menu" aria-label="Regulated Content menu">
+                                    <a href="/" class="nav-dropdown-item" role="menuitem" onclick={handleCollectionsClick}>
+                                        <span class="nav-dropdown-item-icon">
+                                            <lightning-icon icon-name="utility:open_folder" size="x-small" alternative-text=""></lightning-icon>
+                                        </span>
+                                        <span class="nav-dropdown-item-label">Regulated Content Collections</span>
+                                    </a>
                                     <a href={collectionTemplatesListUrl} class="nav-dropdown-item" role="menuitem" onclick={handleCollectionTemplatesClick}>
                                         <span class="nav-dropdown-item-icon">
                                             <lightning-icon icon-name="utility:file" size="x-small" alternative-text=""></lightning-icon>
@@ -330,6 +336,68 @@
                 </template>
             </main>
         </div>
+        </template>
+
+        <!-- Templates List View (same container, below nav) -->
+        <template lwc:if={showTemplatesListView}>
+            <div class="list-view-body">
+                <aside class="list-view-sidebar">
+                    <div class="list-view-sidebar-section">
+                        <h3 class="list-view-sidebar-title">Recently Viewed</h3>
+                        <p class="list-view-sidebar-meta">0 items</p>
+                    </div>
+                    <div class="list-view-sidebar-section">
+                        <label for="templates-list-view-select" class="slds-assistive-text">List view</label>
+                        <select id="templates-list-view-select" class="list-view-select">
+                            <option value="all">All</option>
+                            <option value="recent">Recently Viewed</option>
+                        </select>
+                    </div>
+                    <div class="list-view-sidebar-section">
+                        <input type="text" class="list-view-search" placeholder="Search this list..." oninput={handleTemplatesListSearchInput} aria-label="Search this list" />
+                    </div>
+                </aside>
+                <main class="list-view-main">
+                    <header class="list-view-page-header">
+                        <div class="list-view-page-header-left">
+                            <lightning-icon icon-name="standard:document" size="medium" alternative-text="Templates"></lightning-icon>
+                            <h1 class="list-view-page-title">Regulated Collection Templates</h1>
+                        </div>
+                        <div class="list-view-page-header-right">
+                            <lightning-button label="New" variant="neutral" icon-name="utility:add"></lightning-button>
+                        </div>
+                    </header>
+                    <div class="list-view-table-wrap">
+                        <template lwc:if={hasTemplatesForList}>
+                            <table class="list-view-table" role="grid" aria-label="Regulated Collection Templates">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Template Name</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col">Structure Editable</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredTemplatesForList} for:item="row">
+                                        <tr key={row.id} class="list-view-row" data-id={row.id} onclick={handleTemplatesListRowClick} role="row">
+                                            <td><a href="#" class="list-view-link" data-id={row.id} onclick={handleTemplatesListLinkClick}>{row.name}</a></td>
+                                            <td>{row.description}</td>
+                                            <td>{row.structureModifiable}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template lwc:else>
+                            <div class="list-view-empty" role="status">
+                                <lightning-icon icon-name="utility:file" size="large" class="list-view-empty-icon" alternative-text=""></lightning-icon>
+                                <p class="list-view-empty-text">No templates to display.</p>
+                                <p class="list-view-empty-hint">Try a different search.</p>
+                            </div>
+                        </template>
+                    </div>
+                </main>
+            </div>
         </template>
 
         <!-- Collection Record Page View -->
