@@ -216,6 +216,83 @@
     --slds-c-button-icon-color-foreground: #706e6b;
 }
 
+.console-tab-chevron-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.console-tab-chevron-wrap:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.console-tab-chevron-wrap lightning-icon {
+    --slds-c-icon-color-foreground-default: #706e6b;
+}
+
+.console-tab.is-active .console-tab-chevron-wrap lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250D9);
+}
+
+/* Main tab dropdown - wrapper so dropdown aligns under the tab */
+.console-tab-wrapper {
+    position: relative;
+}
+
+.nav-dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+}
+
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 14rem;
+    margin-top: 2px;
+    padding: 0.25rem 0;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-2, #c9c9c9);
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+}
+
+.nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--slds-g-color-accent-2, #0176d3);
+    text-decoration: none;
+}
+
+.nav-dropdown-item:hover {
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+.nav-dropdown-item-icon {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.nav-dropdown-item-icon lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0176d3);
+}
+
+.nav-dropdown-item-label {
+    flex: 1;
+}
+
 /* ========================================
    Main Content Area
    ======================================== */

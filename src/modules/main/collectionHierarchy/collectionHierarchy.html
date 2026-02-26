@@ -44,15 +44,33 @@
             </div>
             <div class="console-tabs">
                 <template for:each={consoleTabsWithState} for:item="tab">
-                    <div key={tab.id} class={tab.tabClass} data-tab-id={tab.id} onclick={handleConsoleTabClick}>
-                        <span class="tab-label">{tab.label}</span>
-                        <template lwc:if={tab.closable}>
+                    <template lwc:if={tab.closable}>
+                        <div key={tab.id} class={tab.tabClass} data-tab-id={tab.id} onclick={handleConsoleTabClick}>
+                            <span class="tab-label">{tab.label}</span>
                             <lightning-button-icon icon-name="utility:close" variant="bare" size="x-small" alternative-text="Close tab" data-tab-id={tab.id} onclick={handleCloseTab}></lightning-button-icon>
-                        </template>
-                        <template lwc:else>
-                            <lightning-button-icon icon-name="utility:chevrondown" variant="bare" size="x-small" alternative-text="Tab options"></lightning-button-icon>
-                        </template>
-                    </div>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <div key={tab.id} class="console-tab-wrapper">
+                            <div class={tab.tabClass} data-tab-id={tab.id} onclick={handleConsoleTabClick}>
+                                <span class="tab-label">{tab.label}</span>
+                                <div class="console-tab-chevron-wrap" onclick={handleMainTabChevronClick} role="button" tabindex="0" onkeydown={handleNavChevronKeyDown} title="Open menu">
+                                    <lightning-icon icon-name="utility:chevrondown" size="x-small" alternative-text="Tab options"></lightning-icon>
+                                </div>
+                            </div>
+                            <template lwc:if={showMainTabDropdown}>
+                                <div class="nav-dropdown-backdrop" onclick={handleNavDropdownClose} role="presentation"></div>
+                                <div class="nav-dropdown" role="menu" aria-label="Regulated Content menu">
+                                    <a href={collectionTemplatesListUrl} class="nav-dropdown-item" role="menuitem" onclick={handleCollectionTemplatesClick}>
+                                        <span class="nav-dropdown-item-icon">
+                                            <lightning-icon icon-name="utility:file" size="x-small" alternative-text=""></lightning-icon>
+                                        </span>
+                                        <span class="nav-dropdown-item-label">Collection Templates</span>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
                 </template>
             </div>
         </nav>

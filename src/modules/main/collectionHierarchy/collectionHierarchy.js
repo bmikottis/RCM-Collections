@@ -33,6 +33,7 @@ export default class CollectionHierarchy extends LightningElement {
         { id: 'main', label: 'Regulated Content Coll...', type: 'main', closable: false }
     ];
     @track activeTabId = 'main';
+    @track showMainTabDropdown = false;
 
     @track showCreateModal = false;
     @track createStep = 1;
@@ -753,12 +754,59 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Salesforce list view path for Regulated Collection Template object
+     */
+    get collectionTemplatesListUrl() {
+        return '/lightning/o/Regulated_Collection_Template__c/list';
+    }
+
+    /**
      * Handle console tab click
      * @param {Event} event
      */
     handleConsoleTabClick(event) {
         const tabId = event.currentTarget.dataset.tabId;
         this.activeTabId = tabId;
+        this.showMainTabDropdown = false;
+    }
+
+    /**
+     * Handle main tab chevron click - toggle nav dropdown
+     * @param {Event} event
+     */
+    handleMainTabChevronClick(event) {
+        event.stopPropagation();
+        this.showMainTabDropdown = !this.showMainTabDropdown;
+    }
+
+    /**
+     * Close main tab dropdown (e.g. when clicking outside)
+     */
+    handleNavDropdownClose() {
+        this.showMainTabDropdown = false;
+    }
+
+    /**
+     * Handle Collection Templates menu click - navigate to list view.
+     * Uses top window so navigation works when app is in an iframe (e.g. Experience Cloud).
+     */
+    handleCollectionTemplatesClick(event) {
+        event.preventDefault();
+        this.showMainTabDropdown = false;
+        const url = new URL(this.collectionTemplatesListUrl, window.location.origin).href;
+        window.top.location.href = url;
+    }
+
+    /**
+     * Handle keyboard on nav chevron (Enter/Space to toggle dropdown)
+     * @param {KeyboardEvent} event
+     */
+    handleNavChevronKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.showMainTabDropdown = !this.showMainTabDropdown;
+        }
     }
 
     /**
