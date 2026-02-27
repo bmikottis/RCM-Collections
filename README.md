@@ -29,8 +29,21 @@ Open the site at [http://localhost:3000](http://localhost:3000)
 ## Statically Generate and Preview the Site
 
 ```bash
-npm build # dev:prod-compat for AMD format
+npm run build # dev:prod-compat for AMD format
 npm start
 ```
 
 Open the site at [http://localhost:3000](http://localhost:3000)
+
+## Deploy to Vercel (or get a shareable link)
+
+- **Vercel:** Connect this repo in the [Vercel dashboard](https://vercel.com); the project uses `package.json` `engines.node: "20.x"` and `vercel.json` (build → `site`). If the build fails, check the Vercel build logs and ensure Node 20 is selected (Project Settings → General → Node.js Version).
+- **Shareable link from your machine:** Build and serve locally, then expose with a tunnel:
+  ```bash
+  npm run build && npx serve site --listen 3000
+  ```
+  In another terminal:
+  ```bash
+  npx localtunnel --port 3000
+  ```
+  Use the generated URL (e.g. `https://something.loca.lt`) as the shareable link. The tunnel stays up only while that process runs.
