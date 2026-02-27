@@ -41,6 +41,23 @@
     font-weight: 600;
 }
 
+/* Checkbox to the left of chevron (collections only) */
+.tree-item-checkbox-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.tree-item-checkbox {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    cursor: pointer;
+}
+
 /* Toggle button styling - flex centering so chevron aligns with row */
 .tree-item-row .tree-toggle {
     display: inline-flex;

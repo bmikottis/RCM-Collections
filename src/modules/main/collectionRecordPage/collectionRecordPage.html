@@ -42,10 +42,10 @@
                     <!-- Related Tab -->
                     <template lwc:if={isRelatedTabActive}>
                         <div class="related-lists">
-                            <!-- Child Collections Related List -->
+                            <!-- Subcollections Related List -->
                             <div class="related-list">
                                 <div class="related-list-header">
-                                    <h3 class="related-list-title">Child Collections {childCollectionsCount}</h3>
+                                    <h3 class="related-list-title">Subcollections {childCollectionsCount}</h3>
                                     <lightning-button label="New" variant="neutral"></lightning-button>
                                 </div>
                                 <template lwc:if={hasChildCollections}>
@@ -69,7 +69,7 @@
                                     </table>
                                 </template>
                                 <template lwc:else>
-                                    <div class="related-list-empty">No child collections</div>
+                                    <div class="related-list-empty">No subcollections</div>
                                 </template>
                             </div>
 

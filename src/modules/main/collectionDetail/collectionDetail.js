@@ -39,7 +39,7 @@ const WORKFLOW_STAGES = [
 
 /**
  * Collection Detail component displays information about a selected collection
- * including its metadata, child collections, and content items.
+ * including its metadata, subcollections, and content items.
  */
 export default class CollectionDetail extends LightningElement {
     @api collection;
@@ -301,7 +301,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Check if collection has child collections
+     * Check if collection has subcollections
      * @returns {boolean}
      */
     get hasChildren() {
@@ -309,7 +309,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Get child collections with completeness data
+     * Get subcollections with completeness data
      * @returns {Array}
      */
     get childCollections() {
@@ -329,8 +329,8 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Calculate completeness for a child collection (simplified inline version)
-     * @param {Object} child - The child collection
+     * Calculate completeness for a subcollection (simplified inline version)
+     * @param {Object} child - The subcollection
      * @returns {Object|null}
      */
     calculateChildCompleteness(child) {
@@ -388,7 +388,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Get child collections count label
+     * Get subcollections count label
      * @returns {string}
      */
     get childCollectionsCount() {
@@ -647,7 +647,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Get child collections summary for template collections
+     * Get subcollections summary for template collections
      * @returns {string}
      */
     get childrenSummary() {
@@ -697,7 +697,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle click on child collection
+     * Handle click on subcollection
      * @param {Event} event
      */
     handleChildClick(event) {
@@ -710,7 +710,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle keyboard navigation on child collection
+     * Handle keyboard navigation on subcollection
      * @param {KeyboardEvent} event
      */
     handleChildKeyDown(event) {
@@ -734,13 +734,31 @@ export default class CollectionDetail extends LightningElement {
      * Handle click on Open button to navigate to full record page
      * @param {Event} event
      */
-    handleOpenRecord(event) {
-        console.log('Open record:', this.collection?.id, this.collection?.name);
+    handleOpenRecord() {
         this.dispatchEvent(new CustomEvent('viewdetails', {
             detail: { collectionId: this.collection?.id },
             bubbles: true,
             composed: true
         }));
+    }
+
+    handleRecordEdit() {
+        // TODO: Edit collection
+    }
+
+    handleRecordClone() {
+        // TODO: Clone collection
+    }
+
+    handleRecordDelete() {
+        // TODO: Delete collection (with confirmation)
+    }
+
+    handleRecordMenuSelect(event) {
+        const value = event.detail?.value;
+        if (value === 'view') {
+            this.handleOpenRecord();
+        }
     }
 
     /**

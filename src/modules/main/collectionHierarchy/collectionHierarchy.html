@@ -52,9 +52,9 @@
                     </template>
                     <template lwc:else>
                         <div key={tab.id} class="console-tab-wrapper">
-                            <div class={tab.tabClass} data-tab-id={tab.id} onclick={handleConsoleTabClick}>
+                            <div class={tab.tabClass} data-tab-id={tab.id} onclick={handleMainTabAreaClick} role="button" tabindex="0" onkeydown={handleMainTabAreaKeyDown} title="Open menu">
                                 <span class="tab-label">{tab.label}</span>
-                                <div class="console-tab-chevron-wrap" onclick={handleMainTabChevronClick} role="button" tabindex="0" onkeydown={handleNavChevronKeyDown} title="Open menu">
+                                <div class="console-tab-chevron-wrap" aria-hidden="true">
                                     <lightning-icon icon-name="utility:chevrondown" size="x-small" alternative-text="Tab options"></lightning-icon>
                                 </div>
                             </div>
@@ -86,79 +86,97 @@
         
         <!-- Browser View (Main Tab) -->
         <template lwc:if={showBrowserView}>
-        <!-- Page Header -->
-        <header class="page-header">
-            <div class="page-header-left">
-                <lightning-icon 
-                    icon-name="standard:folder" 
-                    size="medium"
-                    alternative-text="Collections">
-                </lightning-icon>
-                <h1 class="page-title">Regulated Content Collections</h1>
-            </div>
-            <div class="page-header-right">
-                <lightning-button 
-                    class="new-collection-button"
-                    label="New Collection" 
-                    variant="neutral" 
-                    icon-name="utility:add"
-                    onclick={handleNewCollection}>
-                </lightning-button>
-            </div>
-        </header>
-        
         <!-- Content Card (Tree + Preview) -->
         <div class="browser-content-card">
             
-            <!-- Left: Tree Navigation -->
-            <aside class="tree-rail">
-                <div class="rail-header">
-                    <div class="rail-header-left">
-                        <lightning-icon 
-                            icon-name="utility:hierarchy" 
-                            size="x-small"
-                            class="slds-m-right_x-small">
-                        </lightning-icon>
-                        <span class="rail-title">Collections</span>
+            <!-- Left: Tree Navigation + Expand/Collapse -->
+            <div class={treeRailWrapperClass}>
+            <aside class={treeRailClass}>
+                <div class="rail-header-wrap">
+                <!-- Wrapper so list view dropdown opens right below "All Collections" row only -->
+                <div class="rail-header-top-wrap">
+                    <div class="rail-header-top">
+                        <div class="rail-header-left">
+                            <lightning-icon icon-name="standard:folder" size="medium" class="rail-header-icon" alternative-text="Collections"></lightning-icon>
+                            <button type="button" class="rail-list-view-trigger" onclick={handleRailListViewToggle} aria-haspopup="true" aria-expanded={showListViewsDropdown} aria-label="Select list view">
+                                <span class="rail-list-view-name">{currentListViewName}</span>
+                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="rail-chevron" alternative-text=""></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="rail-header-actions-wrap">
+                            <div class="rail-header-actions">
+                                <button type="button" class="icon-button" onclick={handleRailPin} title="Pin list view" aria-label="Pin list view">
+                                    <lightning-icon icon-name="utility:pin" size="x-small" alternative-text=""></lightning-icon>
+                                </button>
+                                <button type="button" class="icon-button rail-menu-trigger" onclick={handleRailMenuToggle} aria-haspopup="true" aria-expanded={showRailMenuDropdown} title="List view options" aria-label="List view menu">
+                                    <lightning-icon icon-name="utility:chevrondown" size="x-small" alternative-text=""></lightning-icon>
+                                </button>
+                            </div>
+                            <!-- Rail menu dropdown (opens directly below pin + menu icons) -->
+                            <template lwc:if={showRailMenuDropdown}>
+                                <div class="rail-dropdown-backdrop" onclick={handleRailMenuBackdrop} role="presentation"></div>
+                                <div class="rail-menu-dropdown" role="menu" aria-label="List view options">
+                                    <a href="#" class="rail-menu-item" role="menuitem" onclick={handleRailMenuNew}>New</a>
+                                    <a href="#" class="rail-menu-item" role="menuitem" onclick={handleRailMenuPrintable}>Printable View</a>
+                                    <a href="#" class="rail-menu-item" role="menuitem" onclick={handleRailMenuAssignLabel}>Assign Label</a>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="rail-header-actions">
-                        <button 
-                            class={searchButtonClass}
-                            onclick={handleSearchToggle}
-                            title="Search">
-                            <lightning-icon 
-                                icon-name="utility:search" 
-                                size="x-small"
-                                alternative-text="Search collections">
-                            </lightning-icon>
-                        </button>
-                        <button 
-                            class={filterButtonClass}
-                            onclick={handleFilterToggle}
-                            title="Filter">
-                            <lightning-icon 
-                                icon-name="utility:filterList" 
-                                size="x-small"
-                                alternative-text="Filter collections">
-                            </lightning-icon>
-                        </button>
+                    <!-- List view selector dropdown (opens directly below this row) -->
+                    <template lwc:if={showListViewsDropdown}>
+                        <div class="rail-dropdown-backdrop" onclick={handleRailListViewsBackdrop} role="presentation"></div>
+                        <div class="rail-list-views-dropdown" role="dialog" aria-label="List views">
+                            <div class="rail-list-views-search-wrap">
+                                <lightning-icon icon-name="utility:search" size="x-small" class="rail-list-views-search-icon" alternative-text=""></lightning-icon>
+                                <input type="search" class="rail-list-views-search" placeholder="Search lists..." oninput={handleListViewsSearchInput} aria-label="Search list views" />
+                            </div>
+                            <div class="rail-list-views-heading">List Views</div>
+                            <ul class="rail-list-views-list" role="listbox">
+                                <template for:each={railFilteredListViews} for:item="view">
+                                    <li key={view.id} class="rail-list-views-item" data-id={view.id} onclick={handleSelectListView} role="option" aria-selected={view.isSelected}>
+                                        <template lwc:if={view.isSelected}>
+                                            <lightning-icon icon-name="utility:check" size="x-small" class="rail-list-views-check" alternative-text="Selected"></lightning-icon>
+                                        </template>
+                                        <template lwc:else>
+                                            <span class="rail-list-views-check-placeholder"></span>
+                                        </template>
+                                        <span class="rail-list-views-item-label">{view.name}</span>
+                                        <template lwc:if={view.pinned}>
+                                            <span class="rail-list-views-pinned">(Pinned list)</span>
+                                        </template>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </div>
+                <div class="rail-header">
+                    <!-- Row 2: Metadata + display options, refresh, filter -->
+                    <div class="rail-header-bottom">
+                        <div class="rail-meta">{railCollectionCount} items · {railUpdatedText}</div>
+                        <div class="rail-secondary-actions">
+                            <button type="button" class="rail-icon-action" title="Display options" aria-label="Display options">
+                                <lightning-icon icon-name="utility:table" size="x-small" alternative-text=""></lightning-icon>
+                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="rail-action-chevron" alternative-text=""></lightning-icon>
+                            </button>
+                            <button type="button" class="rail-icon-action" onclick={handleRailRefresh} title="Refresh" aria-label="Refresh">
+                                <lightning-icon icon-name="utility:refresh" size="x-small" alternative-text=""></lightning-icon>
+                            </button>
+                            <button type="button" class={railFilterButtonClass} onclick={handleFilterToggle} title="Filter" aria-label="Filter">
+                                <lightning-icon icon-name="utility:filterList" size="x-small" alternative-text=""></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Search bar inside grey header -->
+                    <div class="rail-search-row">
+                        <lightning-icon icon-name="utility:search" size="x-small" class="rail-search-icon" alternative-text=""></lightning-icon>
+                        <input type="search" class="rail-search-input" placeholder="Search this list..." value={searchTerm} oninput={handleSearchChange} aria-label="Search this list" />
                     </div>
                 </div>
-                
-                <!-- Search Input (shown when search is active) -->
-                <template lwc:if={showSearch}>
-                    <div class="search-container">
-                        <lightning-input 
-                            type="search"
-                            placeholder="Search collections..."
-                            value={searchTerm}
-                            onchange={handleSearchChange}
-                            variant="label-hidden"
-                            class="search-input">
-                        </lightning-input>
-                    </div>
-                </template>
-                
+                </div>
+                <!-- End rail-header-wrap -->
+
                 <!-- Filter Panel (shown when filter is active) -->
                 <template lwc:if={showFilter}>
                     <div class="filter-panel">
@@ -278,13 +296,19 @@
                                 key={collection.id}
                                 item={collection}
                                 selected-id={selectedCollectionId}
+                                selected-collection-ids={selectedCollectionIds}
                                 expanded-ids={expandedIdsArray}
-                                onselect={handleCollectionSelect}>
+                                onselect={handleCollectionSelect}
+                                oncollectioncheck={handleCollectionCheck}>
                             </main-collection-tree-item>
                         </template>
                     </div>
                 </template>
             </aside>
+            <button type="button" class="rail-collapse-toggle" onclick={handleRailCollapseToggle} aria-label={railCollapseAriaLabel} title={railCollapseTitle}>
+                <lightning-icon icon-name={railCollapseIcon} size="x-small" alternative-text="" class="rail-collapse-icon"></lightning-icon>
+            </button>
+            </div>
             
             <!-- Right: Collection Preview -->
             <main class="detail-main">
@@ -330,7 +354,7 @@
                             Select a Collection
                         </h3>
                         <p class="slds-text-body_regular slds-text-color_weak">
-                            Choose a collection from the tree to view its details, content, and child collections.
+                            Choose a collection from the tree to view its details, content, and subcollections.
                         </p>
                     </div>
                 </template>
@@ -338,63 +362,79 @@
         </div>
         </template>
 
-        <!-- Templates List View (same container, below nav) -->
+        <!-- Templates List View (full width, no left nav) -->
         <template lwc:if={showTemplatesListView}>
             <div class="list-view-body">
-                <aside class="list-view-sidebar">
-                    <div class="list-view-sidebar-section">
-                        <h3 class="list-view-sidebar-title">Recently Viewed</h3>
-                        <p class="list-view-sidebar-meta">0 items</p>
-                    </div>
-                    <div class="list-view-sidebar-section">
-                        <label for="templates-list-view-select" class="slds-assistive-text">List view</label>
-                        <select id="templates-list-view-select" class="list-view-select">
-                            <option value="all">All</option>
-                            <option value="recent">Recently Viewed</option>
-                        </select>
-                    </div>
-                    <div class="list-view-sidebar-section">
-                        <input type="text" class="list-view-search" placeholder="Search this list..." oninput={handleTemplatesListSearchInput} aria-label="Search this list" />
-                    </div>
-                </aside>
                 <main class="list-view-main">
-                    <header class="list-view-page-header">
-                        <div class="list-view-page-header-left">
-                            <lightning-icon icon-name="standard:document" size="medium" alternative-text="Templates"></lightning-icon>
-                            <h1 class="list-view-page-title">Regulated Collection Templates</h1>
+                    <!-- Two-row grey page header (Salesforce list view style) -->
+                    <header class="list-view-header">
+                        <div class="list-view-header-top">
+                            <div class="list-view-header-left">
+                                <lightning-icon icon-name="standard:document" size="medium" class="list-view-header-icon" alternative-text=""></lightning-icon>
+                                <div class="list-view-header-title-block">
+                                    <span class="list-view-header-context">Collection Templates</span>
+                                    <div class="list-view-header-title-wrap">
+                                        <h1 class="list-view-header-title">Regulated Collection Templates</h1>
+                                        <lightning-icon icon-name="utility:chevrondown" size="x-small" class="list-view-header-chevron" alternative-text="View options"></lightning-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-view-header-right">
+                                <lightning-button label="New" variant="brand" icon-name="utility:add" title="New template"></lightning-button>
+                            </div>
                         </div>
-                        <div class="list-view-page-header-right">
-                            <lightning-button label="New" variant="neutral" icon-name="utility:add"></lightning-button>
+                        <div class="list-view-header-bottom">
+                            <div class="list-view-header-meta">{templatesListMetadata}</div>
+                            <div class="list-view-header-actions">
+                                <div class="list-view-header-search-wrap">
+                                    <lightning-icon icon-name="utility:search" size="x-small" class="list-view-header-search-icon" alternative-text=""></lightning-icon>
+                                    <input type="search" class="list-view-header-search" placeholder="Search..." oninput={handleTemplatesListSearchInput} aria-label="Search this list" />
+                                </div>
+                                <lightning-button-icon icon-name="utility:settings" variant="bare" alternative-text="List settings" size="small"></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:table" variant="bare" alternative-text="View options" size="small"></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:edit" variant="bare" alternative-text="Edit list" size="small"></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:refresh" variant="bare" alternative-text="Refresh" size="small"></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:filterList" variant="bare" alternative-text="Filters" size="small"></lightning-button-icon>
+                            </div>
                         </div>
                     </header>
-                    <div class="list-view-table-wrap">
-                        <template lwc:if={hasTemplatesForList}>
-                            <table class="list-view-table" role="grid" aria-label="Regulated Collection Templates">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Template Name</th>
-                                        <th scope="col">Description</th>
-                                        <th scope="col">Structure Editable</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template for:each={filteredTemplatesForList} for:item="row">
-                                        <tr key={row.id} class="list-view-row" data-id={row.id} onclick={handleTemplatesListRowClick} role="row">
-                                            <td><a href="#" class="list-view-link" data-id={row.id} onclick={handleTemplatesListLinkClick}>{row.name}</a></td>
-                                            <td>{row.description}</td>
-                                            <td>{row.structureModifiable}</td>
+                    <!-- Data table with checkbox column -->
+                    <div class="list-view-table-card">
+                        <div class="list-view-table-wrap">
+                            <template lwc:if={hasTemplatesForList}>
+                                <table class="list-view-table" role="grid" aria-label="Regulated Collection Templates">
+                                    <thead>
+                                        <tr class="list-view-thead-tr">
+                                            <th scope="col" class="list-view-th list-view-th-checkbox" role="columnheader">
+                                                <input type="checkbox" class="list-view-checkbox" data-select="all" onchange={handleTemplatesSelectAll} checked={isAllTemplatesSelected} aria-label="Select all rows" />
+                                            </th>
+                                            <th scope="col" class="list-view-th list-view-th-name" role="columnheader">Template Name</th>
+                                            <th scope="col" class="list-view-th list-view-th-desc" role="columnheader">Description</th>
+                                            <th scope="col" class="list-view-th list-view-th-right list-view-th-editable" role="columnheader">Structure Editable</th>
                                         </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </template>
-                        <template lwc:else>
-                            <div class="list-view-empty" role="status">
-                                <lightning-icon icon-name="utility:file" size="large" class="list-view-empty-icon" alternative-text=""></lightning-icon>
-                                <p class="list-view-empty-text">No templates to display.</p>
-                                <p class="list-view-empty-hint">Try a different search.</p>
-                            </div>
-                        </template>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={filteredTemplatesForList} for:item="row">
+                                            <tr key={row.id} class="list-view-row" data-id={row.id} onclick={handleTemplatesListRowClick} role="row">
+                                                <td class="list-view-td-checkbox" data-label="Select" onclick={handleTemplatesRowCheckboxClick}>
+                                                    <input type="checkbox" class="list-view-checkbox" data-id={row.id} checked={row.checked} onchange={handleTemplatesRowSelect} aria-label="Select row" />
+                                                </td>
+                                                <td class="list-view-td-name" data-label="Template Name"><a href="#" class="list-view-link" data-id={row.id} onclick={handleTemplatesListLinkClick}>{row.name}</a></td>
+                                                <td class="list-view-td-desc" data-label="Description">{row.description}</td>
+                                                <td class="list-view-td-right" data-label="Structure Editable">{row.structureModifiable}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template lwc:else>
+                                <div class="list-view-empty" role="status">
+                                    <lightning-icon icon-name="utility:file" size="large" class="list-view-empty-icon" alternative-text=""></lightning-icon>
+                                    <p class="list-view-empty-text">No templates to display.</p>
+                                    <p class="list-view-empty-hint">Try a different search.</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </main>
             </div>

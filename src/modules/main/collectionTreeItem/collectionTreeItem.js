@@ -8,17 +8,27 @@ const GENERIC_DOCUMENT_ICON = 'doctype:unknown';
 /**
  * Recursive tree item component for displaying collection hierarchy.
  * Supports expand/collapse, selection, and keyboard navigation.
- * Shows both child collections and content items with appropriate icons.
+ * Shows both subcollections and content items with appropriate icons.
  */
 export default class CollectionTreeItem extends LightningElement {
     @api item;
     @api selectedId;
-    
+
+    _selectedCollectionIds = [];
+
     @track isExpanded = false;
     @track showAddMenu = false;
 
     _expandedIds = [];
     _previousExpandedIdsLength = 0;
+
+    @api
+    get selectedCollectionIds() {
+        return this._selectedCollectionIds;
+    }
+    set selectedCollectionIds(value) {
+        this._selectedCollectionIds = Array.isArray(value) ? value : [];
+    }
 
     /**
      * Setter for expanded IDs - expands this item if its ID is in the list
@@ -41,7 +51,7 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
-     * Check if this item has child collections
+     * Check if this item has subcollections
      * @returns {boolean}
      */
     get hasChildren() {
@@ -127,6 +137,14 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
+     * Check if this collection is checked (for multi-select)
+     * @returns {boolean}
+     */
+    get itemChecked() {
+        return this._selectedCollectionIds.includes(this.item?.id);
+    }
+
+    /**
      * Check if this collection is from a template
      * @returns {boolean}
      */
@@ -184,6 +202,27 @@ export default class CollectionTreeItem extends LightningElement {
             baseClass += ' slds-is-selected';
         }
         return baseClass;
+    }
+
+    /**
+     * Prevent row select when clicking checkbox
+     * @param {Event} event
+     */
+    handleCheckboxClick(event) {
+        event.stopPropagation();
+    }
+
+    /**
+     * Handle checkbox change – dispatch so parent can track selected collection ids
+     * @param {Event} event
+     */
+    handleCheckboxChange(event) {
+        event.stopPropagation();
+        this.dispatchEvent(new CustomEvent('collectioncheck', {
+            detail: { id: this.item.id, checked: event.target.checked },
+            bubbles: true,
+            composed: true
+        }));
     }
 
     /**
@@ -272,7 +311,7 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
-     * Handle add child collection
+     * Handle add subcollection
      * @param {Event} event
      */
     handleAddChildCollection(event) {

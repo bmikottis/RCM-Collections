@@ -4,6 +4,11 @@
         <!-- Tree Item Row -->
         <div class={itemRowClass} onclick={handleSelect} onkeydown={handleKeyDown} tabindex="0">
             
+            <!-- Checkbox (collections only; content items rendered elsewhere have no checkbox) -->
+            <span class="tree-item-checkbox-wrap" onclick={handleCheckboxClick}>
+                <input type="checkbox" class="tree-item-checkbox" checked={itemChecked} data-id={item.id} onchange={handleCheckboxChange} aria-label="Select collection" />
+            </span>
+            
             <!-- Expand/Collapse Button (only for collections with children or content) -->
             <template lwc:if={canExpand}>
                 <button 
@@ -52,7 +57,7 @@
                     <template lwc:if={showAddMenu}>
                         <div class="tree-add-menu">
                             <button class="tree-add-menu-item" onclick={handleAddChildCollection}>
-                                Add Child Collection
+                                Add Subcollection
                             </button>
                             <button class="tree-add-menu-item" onclick={handleAddContent}>
                                 Add Content
@@ -68,16 +73,17 @@
             </template>
         </div>
         
-        <!-- Expanded Content (Child Collections + Content Items) -->
+        <!-- Expanded Content (Subcollections + Content Items) -->
         <template lwc:if={showExpanded}>
             <div class="slds-tree__group" role="group">
                 
-                <!-- Child Collections (Recursive) -->
+                <!-- Subcollections (Recursive) -->
                 <template for:each={item.children} for:item="child">
                     <main-collection-tree-item
                         key={child.id}
                         item={child}
                         selected-id={selectedId}
+                        selected-collection-ids={selectedCollectionIds}
                         expanded-ids={expandedIds}
                         onselect={handleChildSelect}>
                     </main-collection-tree-item>

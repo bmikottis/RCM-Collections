@@ -352,7 +352,7 @@
     text-align: center;
 }
 
-/* In-card empty state (Child Collections, Members, Collection Content) */
+/* In-card empty state (Subcollections, Members, Collection Content) */
 .card-empty-state {
     display: flex;
     flex-direction: column;
@@ -385,7 +385,7 @@
     border-bottom: none;
 }
 
-/* Child collection items */
+/* Subcollection items */
 .child-item {
     padding: 0.5rem;
     cursor: pointer;
@@ -406,7 +406,7 @@
     font-weight: 600;
 }
 
-/* Mini Progress Indicator for Child Collections */
+/* Mini Progress Indicator for Subcollections */
 .mini-progress-container {
     display: flex;
     align-items: center;

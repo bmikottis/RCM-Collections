@@ -16,12 +16,17 @@ import {
  */
 export default class CollectionHierarchy extends LightningElement {
     @track selectedCollectionId = null;
+    @track selectedCollectionIds = [];
     @track collectionsData = sampleCollections;
     @track expandedIds = new Set();
     
     @track showSearch = false;
     @track showFilter = false;
     @track searchTerm = '';
+    @track showListViewsDropdown = false;
+    @track showRailMenuDropdown = false;
+    @track listViewSearchTerm = '';
+    @track selectedListViewId = 'all';
     @track selectedTypeFilters = [];
     @track selectedStatusFilters = [];
     @track selectedContentTypes = [];
@@ -36,6 +41,8 @@ export default class CollectionHierarchy extends LightningElement {
     @track showMainTabDropdown = false;
     @track showTemplatesList = false;
     @track templatesListSearchTerm = '';
+    @track selectedTemplateIds = [];
+    @track isRailExpanded = true;
 
     @track showCreateModal = false;
     @track createStep = 1;
@@ -47,6 +54,13 @@ export default class CollectionHierarchy extends LightningElement {
         region: 'Global',
         description: ''
     };
+
+    renderedCallback() {
+        const selectAll = this.template.querySelector('.list-view-checkbox[data-select="all"]');
+        if (selectAll) {
+            selectAll.indeterminate = this.isSomeTemplatesSelected;
+        }
+    }
 
     /**
      * Get root level collections for the tree
@@ -72,6 +86,65 @@ export default class CollectionHierarchy extends LightningElement {
         return !this.showFilter;
     }
 
+    get treeRailWrapperClass() {
+        return this.isRailExpanded ? 'tree-rail-wrapper' : 'tree-rail-wrapper tree-rail-wrapper_collapsed';
+    }
+
+    get treeRailClass() {
+        return this.isRailExpanded ? 'tree-rail' : 'tree-rail tree-rail_collapsed';
+    }
+
+    get railCollapseIcon() {
+        return this.isRailExpanded ? 'utility:chevronleft' : 'utility:chevronright';
+    }
+
+    get railCollapseAriaLabel() {
+        return this.isRailExpanded ? 'Collapse left panel' : 'Expand left panel';
+    }
+
+    get railCollapseTitle() {
+        return this.isRailExpanded ? 'Collapse left panel' : 'Expand left panel';
+    }
+
+    handleRailCollapseToggle() {
+        this.isRailExpanded = !this.isRailExpanded;
+    }
+
+    /** Saved list views for the rail dropdown (Salesforce-style) */
+    get railListViews() {
+        return [
+            { id: 'all', name: 'All Collections', pinned: false },
+            { id: 'recent', name: 'Recently Viewed', pinned: true },
+            { id: 'my', name: 'My Collections', pinned: false },
+            { id: 'partner', name: 'All - Partner Collections', pinned: false },
+            { id: 'active', name: 'All Active Collections', pinned: false },
+            { id: 'inprogress', name: 'Status - In Progress', pinned: false }
+        ];
+    }
+
+    get railFilteredListViews() {
+        const term = (this.listViewSearchTerm || '').toLowerCase().trim();
+        const list = this.railListViews || [];
+        const filtered = !term ? list : list.filter(v => (v.name && v.name.toLowerCase().includes(term)));
+        const selectedId = this.selectedListViewId;
+        return filtered.map(v => ({ ...v, isSelected: v.id === selectedId }));
+    }
+
+    get currentListViewName() {
+        const list = this.railListViews || [];
+        const view = list.find(v => v.id === this.selectedListViewId);
+        return view ? view.name : 'All Collections';
+    }
+
+    get railCollectionCount() {
+        const roots = this.rootCollections || [];
+        return roots.length;
+    }
+
+    get railUpdatedText() {
+        return 'Updated a few seconds ago';
+    }
+
     /**
      * Get search button class based on active state
      * @returns {string}
@@ -86,6 +159,10 @@ export default class CollectionHierarchy extends LightningElement {
      */
     get filterButtonClass() {
         return this.showFilter ? 'icon-button icon-button-active' : 'icon-button';
+    }
+
+    get railFilterButtonClass() {
+        return this.showFilter ? 'rail-icon-action rail-icon-action-active' : 'rail-icon-action';
     }
 
     /**
@@ -290,6 +367,14 @@ export default class CollectionHierarchy extends LightningElement {
         this.selectedCollectionId = id;
     }
 
+    handleCollectionCheck(event) {
+        const { id, checked } = event.detail;
+        const set = new Set(this.selectedCollectionIds || []);
+        if (checked) set.add(id);
+        else set.delete(id);
+        this.selectedCollectionIds = Array.from(set);
+    }
+
     /**
      * Handle breadcrumb navigation click
      * @param {Event} event
@@ -376,14 +461,72 @@ export default class CollectionHierarchy extends LightningElement {
         this.selectedCollectionId = null;
     }
 
-    /**
-     * Toggle search input visibility
-     */
-    handleSearchToggle() {
-        this.showSearch = !this.showSearch;
-        if (this.showSearch) {
-            this.showFilter = false;
+    /** Open/close list view selector dropdown; close menu when opening */
+    handleRailListViewToggle() {
+        this.showListViewsDropdown = !this.showListViewsDropdown;
+        if (this.showListViewsDropdown) {
+            this.showRailMenuDropdown = false;
         }
+    }
+
+    /** Open/close rail menu dropdown (New, Printable View, etc.); close list views when opening */
+    handleRailMenuToggle() {
+        this.showRailMenuDropdown = !this.showRailMenuDropdown;
+        if (this.showRailMenuDropdown) {
+            this.showListViewsDropdown = false;
+        }
+    }
+
+    /** Select a list view from the dropdown */
+    handleSelectListView(event) {
+        const id = event.currentTarget.dataset.id;
+        if (id) {
+            this.selectedListViewId = id;
+            this.showListViewsDropdown = false;
+        }
+    }
+
+    /** Filter list views in dropdown by search */
+    handleListViewsSearchInput(event) {
+        this.listViewSearchTerm = event.target.value;
+    }
+
+    /** Close list views dropdown when clicking backdrop */
+    handleRailListViewsBackdrop() {
+        this.showListViewsDropdown = false;
+    }
+
+    /** Close rail menu when clicking backdrop */
+    handleRailMenuBackdrop() {
+        this.showRailMenuDropdown = false;
+    }
+
+    /** Refresh rail list (placeholder) */
+    handleRailRefresh() {
+        // TODO: reload collections if needed
+    }
+
+    /** Pin list view (placeholder – UI only for now) */
+    handleRailPin() {
+        // TODO: toggle pin state for current list view
+    }
+
+    handleRailMenuNew(event) {
+        event.preventDefault();
+        this.showRailMenuDropdown = false;
+        this.handleNewCollection();
+    }
+
+    handleRailMenuPrintable(event) {
+        event.preventDefault();
+        this.showRailMenuDropdown = false;
+        // TODO: printable view
+    }
+
+    handleRailMenuAssignLabel(event) {
+        event.preventDefault();
+        this.showRailMenuDropdown = false;
+        // TODO: assign label
     }
 
     /**
@@ -391,19 +534,14 @@ export default class CollectionHierarchy extends LightningElement {
      */
     handleFilterToggle() {
         this.showFilter = !this.showFilter;
-        if (this.showFilter) {
-            this.showSearch = false;
-        }
     }
 
     /**
-     * Handle search input change
+     * Handle search input change (rail "Search this list..." field)
      * @param {Event} event
      */
     handleSearchChange(event) {
         this.searchTerm = event.target.value;
-        // TODO: Implement search filtering logic
-        console.log('Search term:', this.searchTerm);
     }
 
     /**
@@ -710,15 +848,39 @@ export default class CollectionHierarchy extends LightningElement {
 
     get filteredTemplatesForList() {
         const term = (this.templatesListSearchTerm || '').toLowerCase().trim();
-        if (!term) return this.templatesForList;
-        return this.templatesForList.filter(
+        const list = !term ? this.templatesForList : this.templatesForList.filter(
             t => (t.name && t.name.toLowerCase().includes(term)) ||
                  (t.description && t.description.toLowerCase().includes(term))
         );
+        const selectedSet = new Set(this.selectedTemplateIds || []);
+        return list.map(t => ({ ...t, checked: selectedSet.has(t.id) }));
     }
 
     get hasTemplatesForList() {
         return this.filteredTemplatesForList.length > 0;
+    }
+
+    get templatesListMetadata() {
+        const n = this.filteredTemplatesForList.length;
+        const total = (this.templatesForList || []).length;
+        const sorted = 'Sorted by Template Name';
+        const filtered = total === n ? 'All' : 'Filtered';
+        return `${n} item${n !== 1 ? 's' : ''} · ${sorted} · ${filtered} · Updated just now`;
+    }
+
+    get isAllTemplatesSelected() {
+        const list = this.filteredTemplatesForList;
+        if (!list.length) return false;
+        const selected = new Set(this.selectedTemplateIds || []);
+        return list.every(row => selected.has(row.id));
+    }
+
+    get isSomeTemplatesSelected() {
+        const list = this.filteredTemplatesForList;
+        if (!list.length) return false;
+        const selected = new Set(this.selectedTemplateIds || []);
+        const count = list.filter(row => selected.has(row.id)).length;
+        return count > 0 && count < list.length;
     }
 
     /**
@@ -814,9 +976,24 @@ export default class CollectionHierarchy extends LightningElement {
      * Handle main tab chevron click - toggle nav dropdown
      * @param {Event} event
      */
-    handleMainTabChevronClick(event) {
-        event.stopPropagation();
+    /**
+     * Main tab area (label + chevron) click – activate main tab and toggle dropdown
+     */
+    handleMainTabAreaClick(event) {
+        this.activeTabId = 'main';
         this.showMainTabDropdown = !this.showMainTabDropdown;
+    }
+
+    /**
+     * Main tab area keyboard – Enter/Space toggles dropdown
+     */
+    handleMainTabAreaKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.activeTabId = 'main';
+            this.showMainTabDropdown = !this.showMainTabDropdown;
+        }
     }
 
     /**
@@ -848,27 +1025,44 @@ export default class CollectionHierarchy extends LightningElement {
         this.templatesListSearchTerm = event.target.value;
     }
 
+    handleTemplatesSelectAll(event) {
+        const checked = event.target.checked;
+        const list = this.filteredTemplatesForList;
+        const ids = list.map(r => r.id);
+        const current = new Set(this.selectedTemplateIds || []);
+        if (checked) {
+            ids.forEach(id => current.add(id));
+        } else {
+            ids.forEach(id => current.delete(id));
+        }
+        this.selectedTemplateIds = Array.from(current);
+    }
+
+    handleTemplatesRowSelect(event) {
+        event.stopPropagation();
+        const id = event.target.dataset.id;
+        const checked = event.target.checked;
+        const current = new Set(this.selectedTemplateIds || []);
+        if (checked) current.add(id);
+        else current.delete(id);
+        this.selectedTemplateIds = Array.from(current);
+    }
+
+    handleTemplatesRowCheckboxClick(event) {
+        event.stopPropagation();
+    }
+
     handleTemplatesListRowClick(event) {
+        if (event.target.closest('.list-view-td-checkbox')) return;
         const id = event.currentTarget.dataset.id;
         if (id) console.log('Open template:', id);
     }
 
     handleTemplatesListLinkClick(event) {
         event.preventDefault();
+        event.stopPropagation();
         const id = event.currentTarget.dataset.id;
         if (id) console.log('Open template:', id);
-    }
-
-    /**
-     * Handle keyboard on nav chevron (Enter/Space to toggle dropdown)
-     * @param {KeyboardEvent} event
-     */
-    handleNavChevronKeyDown(event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            event.stopPropagation();
-            this.showMainTabDropdown = !this.showMainTabDropdown;
-        }
     }
 
     /**

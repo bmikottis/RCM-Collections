@@ -607,7 +607,7 @@ export function getCollectionType(typeId) {
 
 /**
  * Calculate collection completeness for template-based collections
- * Includes recursive calculation of child collection completeness
+ * Includes recursive calculation of subcollection completeness
  * @param {Object} collection - The collection object
  * @returns {Object} Completeness metrics
  */
@@ -644,7 +644,7 @@ export function calculateCompleteness(collection) {
     const approvalsCompleted = completedApprovals.length;
     const approvalsTotal = requiredApprovals.length;
     
-    // Calculate child collection completeness
+    // Calculate subcollection completeness
     let childrenCompleted = 0;
     let childrenTotal = 0;
     const childrenStatus = [];
@@ -754,7 +754,7 @@ function cloneCollectionNode(node) {
 }
 
 /**
- * Build a new collection from a template with auto-created child collections and optional default members.
+ * Build a new collection from a template with auto-created subcollections and optional default members.
  * Template requirements (content, tasks, approvals) appear empty so the collection shows 0% until the user adds items.
  * @param {Object} template - Collection type/template (from collectionTypes)
  * @param {string} newId - Unique id for the new root collection
