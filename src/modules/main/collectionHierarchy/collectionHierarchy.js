@@ -7,7 +7,8 @@ import {
     getCollectionType,
     calculateCompleteness,
     addRootCollection,
-    buildNewCollectionFromTemplate
+    buildNewCollectionFromTemplate,
+    recommendContentForRequired
 } from './sampleData';
 
 /**
@@ -1137,6 +1138,44 @@ export default class CollectionHierarchy extends LightningElement {
                 this.activeTabId = newTabId;
             }
         }
+    }
+
+    /**
+     * Handle Find Required Content from collection detail – run AI recommendations and pass results back to detail modal
+     * @param {CustomEvent} event - detail: { pendingRequiredItems, excludeContentIds }; target is the collection-detail component
+     */
+    handleFindRequiredContent(event) {
+        const { pendingRequiredItems, excludeContentIds } = event.detail || {};
+        const detail = event.target && typeof event.target.setFindRequiredSuggestionsAndOpen === 'function'
+            ? event.target
+            : this.template.querySelector('main-collection-detail');
+        if (!detail) return;
+        if (!pendingRequiredItems || pendingRequiredItems.length === 0) {
+            detail.setFindRequiredSuggestionsAndOpen([]);
+            return;
+        }
+        detail.setFindRequiredLoading();
+        const excludeIds = new Set(excludeContentIds || []);
+        const results = recommendContentForRequired(pendingRequiredItems, this.collectionsData, excludeIds);
+        detail.setFindRequiredSuggestionsAndOpen(results);
+    }
+
+    /**
+     * Handle "Try again" for a rejected suggestion: re-run recommendation for that one required item.
+     * @param {CustomEvent} event - detail: { requiredItem, index }; target is the collection-detail component
+     */
+    handleFindRequiredContentTryAgain(event) {
+        const { requiredItem, index, excludeContentId } = event.detail || {};
+        const detail = event.target && typeof event.target.setFindRequiredSuggestionAtIndex === 'function'
+            ? event.target
+            : this.template.querySelector('main-collection-detail');
+        if (!detail || !requiredItem || index == null) return;
+        const excludeContentIds = (this.selectedCollection?.content || []).map(c => c.id);
+        const excludeIds = new Set(excludeContentIds || []);
+        if (excludeContentId) excludeIds.add(excludeContentId);
+        const results = recommendContentForRequired([requiredItem], this.collectionsData, excludeIds);
+        const newRow = results && results[0] && results[0].suggestedContent ? results[0] : null;
+        detail.setFindRequiredSuggestionAtIndex(index, newRow);
     }
 
     /**

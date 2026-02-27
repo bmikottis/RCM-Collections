@@ -1,4 +1,5 @@
 <template>
+    <div class="collection-detail-wrapper">
     <div class="collection-detail-container">
         
         <!-- Record Page Header -->
@@ -67,6 +68,46 @@
         
         <!-- Completeness Indicator (for template-based collections) -->
         <template lwc:if={isFromTemplate}>
+            <!-- Workflow path (Draft → Review → Approve → Archive) above Collection Readiness -->
+            <div class="workflow-path-section">
+                <div class="workflow-path" role="list" aria-label="Collection workflow">
+                    <div class={workflowStepDraftClass} role="listitem">
+                        <template lwc:if={isDraftStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Draft</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepReviewClass} role="listitem">
+                        <template lwc:if={isReviewStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Review</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepApproveClass} role="listitem">
+                        <template lwc:if={isApproveStepCompleted}>
+                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
+                        </template>
+                        <template lwc:else>
+                            <span class="workflow-step-label">Approve</span>
+                        </template>
+                    </div>
+                    <div class={workflowStepArchiveClass} role="listitem">
+                        <span class="workflow-step-label">Archive</span>
+                    </div>
+                </div>
+                <div class="workflow-path-actions">
+                    <lightning-button-menu label={workflowActionLabel} variant="neutral" alternative-text={workflowActionLabel} icon-name="utility:down" icon-position="right" menu-alignment="right">
+                        <template lwc:for-each={workflowActionMenuItems} lwc:for-item="item" lwc:key={item.value}>
+                            <lightning-menu-item value={item.value} label={item.label}></lightning-menu-item>
+                        </template>
+                    </lightning-button-menu>
+                </div>
+            </div>
+
             <div class="completeness-section">
                 <div class="completeness-ring-container">
                     <svg class="completeness-ring" viewBox="0 0 100 100">
@@ -105,46 +146,6 @@
                             <span class="breakdown-value">{approvalsSummary}</span>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Workflow path (Draft → Review → Approve → Archive) below completeness -->
-            <div class="workflow-path-section">
-                <div class="workflow-path" role="list" aria-label="Collection workflow">
-                    <div class={workflowStepDraftClass} role="listitem">
-                        <template lwc:if={isDraftStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Draft</span>
-                        </template>
-                    </div>
-                    <div class={workflowStepReviewClass} role="listitem">
-                        <template lwc:if={isReviewStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Review</span>
-                        </template>
-                    </div>
-                    <div class={workflowStepApproveClass} role="listitem">
-                        <template lwc:if={isApproveStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Approve</span>
-                        </template>
-                    </div>
-                    <div class={workflowStepArchiveClass} role="listitem">
-                        <span class="workflow-step-label">Archive</span>
-                    </div>
-                </div>
-                <div class="workflow-path-actions">
-                    <lightning-button-menu label={workflowActionLabel} variant="neutral" alternative-text={workflowActionLabel} icon-name="utility:down" icon-position="right" menu-alignment="right">
-                        <template lwc:for-each={workflowActionMenuItems} lwc:for-item="item" lwc:key={item.value}>
-                            <lightning-menu-item value={item.value} label={item.label}></lightning-menu-item>
-                        </template>
-                    </lightning-button-menu>
                 </div>
             </div>
         </template>
@@ -719,6 +720,96 @@
         </template>
     </div>
 
+    <!-- Find Required Content Modal -->
+    <template lwc:if={showFindRequiredModal}>
+        <div class="find-required-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="find-required-modal-title" onclick={handleFindRequiredBackdropClick}>
+            <div class="find-required-modal" onclick={handleFindRequiredModalClick}>
+                <header class="find-required-modal-header">
+                    <h2 id="find-required-modal-title" class="find-required-modal-title">Find Required Content</h2>
+                    <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Close" onclick={handleCloseFindRequiredModal} class="find-required-modal-close"></lightning-button-icon>
+                </header>
+                <div class="find-required-modal-body">
+                    <p class="find-required-modal-description">Based on your collection metadata and template requirements, we recommend the following content from across the system. Preview each suggestion, then approve or reject.</p>
+                    <template lwc:if={findRequiredLoading}>
+                        <div class="find-required-loading" role="status" aria-live="polite">
+                            <lightning-spinner alternative-text="Finding recommendations"></lightning-spinner>
+                            <span class="find-required-loading-text">Finding recommendations…</span>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <template lwc:if={hasFindRequiredSuggestions}>
+                            <div class="find-required-list" role="list">
+                                <template for:each={findRequiredSuggestions} for:item="row" for:index="idx">
+                                    <div key={row.requiredItem.id} class="find-required-row" role="listitem" data-index={idx}>
+                                        <div class="find-required-row-top">
+                                            <div class="find-required-cell find-required-cell-label">
+                                                <span class="find-required-label">Required</span>
+                                            </div>
+                                            <div class="find-required-cell find-required-cell-label">
+                                                <template lwc:if={row.suggestedContent}>
+                                                    <div class="find-required-label-row">
+                                                        <span class="find-required-label">Suggested</span>
+                                                        <span class={row.badgeClass}>{row.matchLabel}</span>
+                                                    </div>
+                                                </template>
+                                                <template lwc:else>
+                                                    <span class="find-required-label">Suggested</span>
+                                                </template>
+                                            </div>
+                                            <div class="find-required-cell find-required-cell-content">
+                                                <span class="find-required-item-name">{row.requiredItem.name}</span>
+                                                <template lwc:if={row.requiredItem.description}>
+                                                    <span class="find-required-item-desc">{row.requiredItem.description}</span>
+                                                </template>
+                                            </div>
+                                            <div class="find-required-cell find-required-cell-content">
+                                                <template lwc:if={row.suggestedContent}>
+                                                    <div class="find-required-name-with-preview">
+                                                        <span class="find-required-suggestion-name">{row.suggestedContent.name}</span>
+                                                        <lightning-button-icon icon-name="utility:preview" variant="bare" size="small" data-index={idx} onclick={handleFindRequiredPreview} alternative-text="Preview content" title="Preview content"></lightning-button-icon>
+                                                    </div>
+                                                    <span class="find-required-suggestion-meta">{row.suggestedContentTypeLabel} · {row.suggestedContentStatusLabel}</span>
+                                                </template>
+                                                <template lwc:else>
+                                                    <span class="find-required-no-match">No matching content found</span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="find-required-row-actions">
+                                            <template lwc:if={row.isPending}>
+                                                <lightning-button label="Reject" variant="neutral" size="small" data-index={idx} onclick={handleFindRequiredReject} title="Reject suggestion"></lightning-button>
+                                                <lightning-button label="Accept" variant="brand" size="small" data-index={idx} onclick={handleFindRequiredApprove} title="Accept suggestion"></lightning-button>
+                                            </template>
+                                            <template lwc:else>
+                                                <lightning-badge label={row.status} class={row.statusVariant}></lightning-badge>
+                                                <template lwc:if={row.isRejectedWithTryAgain}>
+                                                    <span class="find-required-try-again-text">Try again to find different content?</span>
+                                                    <lightning-button label="Try again" variant="neutral" size="small" data-index={idx} onclick={handleFindRequiredTryAgain} title="Try again to find a different suggestion"></lightning-button>
+                                                    <lightning-button label="No thanks" variant="bare" size="small" data-index={idx} onclick={handleFindRequiredDismissTryAgain} title="Dismiss"></lightning-button>
+                                                </template>
+                                                <template lwc:if={row.noOtherMatches}>
+                                                    <span class="find-required-no-other-matches">No other matches found.</span>
+                                                </template>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:else>
+                            <div class="find-required-empty" role="status">
+                                <p class="slds-text-color_weak">No recommendations available for the remaining required items.</p>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+                <footer class="find-required-modal-footer">
+                    <lightning-button label="Done" variant="brand" onclick={handleCloseFindRequiredModal} title="Close"></lightning-button>
+                </footer>
+            </div>
+        </div>
+    </template>
+
     <!-- Preview Modal -->
     <template lwc:if={showPreviewModal}>
         <div class="preview-modal-backdrop" onclick={handleModalClick}>
@@ -786,4 +877,5 @@
             </div>
         </div>
     </template>
+    </div>
 </template>

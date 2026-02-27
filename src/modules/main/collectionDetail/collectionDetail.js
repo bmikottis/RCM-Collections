@@ -21,6 +21,18 @@ function getContentTypeIcon(contentType) {
 }
 
 /**
+ * Display label for content type (e.g. "Case Study", "Email Promo") when contentTypeLabel is not set.
+ * @param {string} contentType - Raw type (e.g. pdf, word)
+ * @returns {string} Human-readable label
+ */
+function getContentTypeDisplayLabel(contentType) {
+    if (!contentType) return 'Document';
+    const t = (contentType || '').toLowerCase();
+    const labelMap = { pdf: 'Document', word: 'Document', excel: 'Spreadsheet', ppt: 'Presentation', image: 'Image', video: 'Video', html: 'Web Page' };
+    return labelMap[t] || (t.charAt(0).toUpperCase() + t.slice(1));
+}
+
+/**
  * Sample members data for prototype
  */
 const SAMPLE_MEMBERS = [
@@ -38,6 +50,80 @@ const WORKFLOW_STAGES = [
 ];
 
 /**
+ * Example suggestions for the Find Required Content modal (demo/example view)
+ */
+const EXAMPLE_FIND_REQUIRED_SUGGESTIONS = [
+    {
+        requiredItem: {
+            id: 'req-003',
+            name: 'Module 1 Administrative Documents',
+            contentType: 'pdf',
+            description: 'Regional administrative information'
+        },
+        suggestedContent: {
+            id: 'lib-001',
+            name: 'Module 1 Administrative Documents.pdf',
+            contentType: 'pdf',
+            contentTypeLabel: 'Regulatory Document',
+            sourceCollectionName: 'Content Library',
+            status: 'Approved'
+        },
+        confidence: 'high'
+    },
+    {
+        requiredItem: {
+            id: 'req-005',
+            name: 'Module 3 Quality Documentation',
+            contentType: 'pdf',
+            description: 'CMC documentation'
+        },
+        suggestedContent: {
+            id: 'lib-002',
+            name: 'Module 3 Quality Documentation.pdf',
+            contentType: 'pdf',
+            contentTypeLabel: 'Case Study',
+            sourceCollectionName: 'Content Library',
+            status: 'Approved'
+        },
+        confidence: 'high'
+    },
+    {
+        requiredItem: {
+            id: 'req-006',
+            name: 'Environmental Assessment',
+            contentType: 'pdf',
+            description: 'Environmental impact assessment'
+        },
+        suggestedContent: {
+            id: 'lib-003',
+            name: 'Environmental Assessment.pdf',
+            contentType: 'pdf',
+            contentTypeLabel: 'Email Promo',
+            sourceCollectionName: 'Cardiolex 50mg Regulatory Package',
+            status: 'Under Review'
+        },
+        confidence: 'medium'
+    },
+    {
+        requiredItem: {
+            id: 'req-013',
+            name: 'Medication Guide',
+            contentType: 'pdf',
+            description: 'FDA-required medication guide'
+        },
+        suggestedContent: {
+            id: 'cnt-012',
+            name: 'Medication Guide.pdf',
+            contentType: 'pdf',
+            contentTypeLabel: 'Patient-Facing Content',
+            sourceCollectionName: 'Patient Information Leaflet',
+            status: 'Draft'
+        },
+        confidence: 'high'
+    }
+];
+
+/**
  * Collection Detail component displays information about a selected collection
  * including its metadata, subcollections, and content items.
  */
@@ -45,12 +131,15 @@ export default class CollectionDetail extends LightningElement {
     @api collection;
     @api collectionType;
     @api completenessData;
-    
+
     @track activeRequirementsTab = 'content'; // 'content', 'tasks', or 'approvals'
     @track openContentMenuId = null;
     @track openAddedBadgeMenuId = null;
     @track showPreviewModal = false;
     @track previewContent = null;
+    @track showFindRequiredModal = false;
+    @track findRequiredSuggestions = []; // { requiredItem, suggestedContent, confidence, status: 'pending'|'approved'|'rejected' }
+    @track findRequiredLoading = false;
 
     /**
      * Check if Content tab is active
@@ -130,11 +219,166 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle Find Required Content button click (Agentic action)
+     * Handle Find Required Content button click – open modal immediately, then ask parent for AI recommendations
      */
     handleFindRequiredContent() {
-        // Placeholder for agentic find content functionality
-        console.log('Find Required Content clicked - Agentic action triggered');
+        this.setFindRequiredLoading();
+        const data = this.completenessData;
+        if (!data || !data.contentChecklist) {
+            this.setFindRequiredSuggestionsAndOpen([]);
+            return;
+        }
+        const pending = data.contentChecklist.filter(item => !item.isCompleted);
+        if (pending.length === 0) {
+            this.setFindRequiredSuggestionsAndOpen([]);
+            return;
+        }
+        const excludeContentIds = (this.collection?.content || []).map(c => c.id);
+        this._findRequiredTimeoutId = setTimeout(() => {
+            this._findRequiredTimeoutId = null;
+            if (this.findRequiredLoading && this.showFindRequiredModal) {
+                this.setFindRequiredSuggestionsAndOpen([]);
+            }
+        }, 3000);
+        this.dispatchEvent(new CustomEvent('findrequiredcontent', {
+            detail: { pendingRequiredItems: pending, excludeContentIds },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    _normalizeFindRequiredRow(r) {
+        const matchLabels = { high: 'High Match', medium: 'Mid Match', low: 'Low Match' };
+        return {
+            ...r,
+            status: 'pending',
+            statusVariant: '',
+            isPending: true,
+            isRejectedWithTryAgain: false,
+            dismissedTryAgain: false,
+            noOtherMatches: false,
+            matchLabel: matchLabels[r.confidence] || `${r.confidence} match`,
+            badgeClass: `find-required-match-badge find-required-confidence-${r.confidence || 'low'}`,
+            suggestedContentStatusLabel: r.suggestedContent?.status || 'Draft',
+            suggestedContentTypeLabel: r.suggestedContent?.contentTypeLabel || getContentTypeDisplayLabel(r.suggestedContent?.contentType)
+        };
+    }
+
+    /**
+     * Public method: set AI suggestions and open the Find Required Content modal (called by parent after running recommendations)
+     * @param {Array} suggestions - Array of { requiredItem, suggestedContent, confidence }
+     */
+    setFindRequiredSuggestionsAndOpen(suggestions) {
+        if (this._findRequiredTimeoutId) {
+            clearTimeout(this._findRequiredTimeoutId);
+            this._findRequiredTimeoutId = null;
+        }
+        const list = (suggestions && suggestions.length > 0) ? suggestions : EXAMPLE_FIND_REQUIRED_SUGGESTIONS;
+        this.findRequiredSuggestions = list.map(r => this._normalizeFindRequiredRow(r));
+        this.findRequiredLoading = false;
+        this.showFindRequiredModal = true;
+    }
+
+    /**
+     * Public method: replace suggestion at index (used after "Try again" returns a new recommendation).
+     * @param {number} index - Row index
+     * @param {Object|null} suggestionRow - New row { requiredItem, suggestedContent, confidence } or null if no other match
+     */
+    setFindRequiredSuggestionAtIndex(index, suggestionRow) {
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        const updated = [...this.findRequiredSuggestions];
+        if (suggestionRow && suggestionRow.requiredItem) {
+            updated[index] = this._normalizeFindRequiredRow(suggestionRow);
+        } else {
+            updated[index] = { ...updated[index], noOtherMatches: true, isRejectedWithTryAgain: false };
+        }
+        this.findRequiredSuggestions = updated;
+    }
+
+    /**
+     * Public method: show loading state for Find Required Content (called by parent when starting recommendation)
+     */
+    setFindRequiredLoading() {
+        this.findRequiredLoading = true;
+        this.showFindRequiredModal = true;
+    }
+
+    /**
+     * Close the Find Required Content modal
+     */
+    handleCloseFindRequiredModal() {
+        if (this._findRequiredTimeoutId) {
+            clearTimeout(this._findRequiredTimeoutId);
+            this._findRequiredTimeoutId = null;
+        }
+        this.showFindRequiredModal = false;
+        this.findRequiredSuggestions = [];
+    }
+
+    /**
+     * Prevent click inside Find Required modal from closing it (backdrop close is handled separately)
+     */
+    handleFindRequiredModalClick(event) {
+        event.stopPropagation();
+    }
+
+    /**
+     * Accept a suggestion (required item → suggested content). Removes the card from the list.
+     */
+    handleFindRequiredApprove(event) {
+        const index = parseInt(event.currentTarget.dataset.index, 10);
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        this.findRequiredSuggestions = this.findRequiredSuggestions.filter((_, i) => i !== index);
+    }
+
+    /**
+     * Reject a suggestion; show "Try again?" prompt.
+     */
+    handleFindRequiredReject(event) {
+        const index = parseInt(event.currentTarget.dataset.index, 10);
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        const updated = [...this.findRequiredSuggestions];
+        updated[index] = { ...updated[index], status: 'rejected', statusVariant: 'slds-theme_error', isPending: false, isRejectedWithTryAgain: true, dismissedTryAgain: false, noOtherMatches: false };
+        this.findRequiredSuggestions = updated;
+    }
+
+    /**
+     * Dismiss "Try again?" prompt on a rejected row.
+     */
+    handleFindRequiredDismissTryAgain(event) {
+        const index = parseInt(event.currentTarget.dataset.index, 10);
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        const updated = [...this.findRequiredSuggestions];
+        updated[index] = { ...updated[index], isRejectedWithTryAgain: false, dismissedTryAgain: true };
+        this.findRequiredSuggestions = updated;
+    }
+
+    /**
+     * Try again to find a suggestion for this required item; dispatches event to parent.
+     */
+    handleFindRequiredTryAgain(event) {
+        const index = parseInt(event.currentTarget.dataset.index, 10);
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        const row = this.findRequiredSuggestions[index];
+        if (!row?.requiredItem) return;
+        this.dispatchEvent(new CustomEvent('findrequiredcontent_tryagain', {
+            bubbles: true,
+            composed: true,
+            detail: { requiredItem: row.requiredItem, index, excludeContentId: row.suggestedContent?.id }
+        }));
+    }
+
+    /**
+     * Preview suggested content (reuses the main content preview modal)
+     */
+    handleFindRequiredPreview(event) {
+        const index = parseInt(event.currentTarget.dataset.index, 10);
+        if (isNaN(index) || index < 0 || index >= this.findRequiredSuggestions.length) return;
+        const row = this.findRequiredSuggestions[index];
+        if (row?.suggestedContent) {
+            this.previewContent = row.suggestedContent;
+            this.showPreviewModal = true;
+        }
     }
 
     /**
@@ -880,7 +1124,7 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle modal backdrop click
+     * Handle modal backdrop click (preview modal)
      * @param {Event} event
      */
     handleModalClick(event) {
@@ -888,6 +1132,23 @@ export default class CollectionDetail extends LightningElement {
             this.handleClosePreview();
         }
     }
+
+    /**
+     * Handle Find Required Content modal backdrop click
+     */
+    handleFindRequiredBackdropClick(event) {
+        if (event.target.classList.contains('find-required-modal-backdrop')) {
+            this.handleCloseFindRequiredModal();
+        }
+    }
+
+    /**
+     * Whether the Find Required Content modal has any suggestions to show
+     */
+    get hasFindRequiredSuggestions() {
+        return this.findRequiredSuggestions.length > 0;
+    }
+
 
     /**
      * Handle go to record from preview – open content record in a new console tab and close modal

@@ -823,3 +823,94 @@ export function addRootCollection(root, newCollection) {
     clonedRoot.children = [...(clonedRoot.children || []), newCollection];
     return clonedRoot;
 }
+
+/**
+ * Build a flat pool of all content in the system (from collections + content library)
+ * for AI-driven "Find Required Content" recommendations.
+ * @param {Object} root - The root collection tree (e.g. sampleCollections)
+ * @returns {Array<{ id: string, name: string, contentType: string, sourceCollectionName: string, description?: string }>}
+ */
+function buildSystemContentPool(root) {
+    const pool = [];
+    function walk(node, collectionName) {
+        const name = node.name || 'Unnamed';
+        if (node.content && node.content.length) {
+            const collectionStatus = node.metadata?.status || 'Draft';
+            node.content.forEach(c => {
+                pool.push({
+                    id: c.id,
+                    name: c.name,
+                    contentType: c.contentType || 'unknown',
+                    sourceCollectionName: collectionName,
+                    description: c.description || null,
+                    status: c.status || collectionStatus
+                });
+            });
+        }
+        (node.children || []).forEach(child => walk(child, child.name || name));
+    }
+    if (root.children) {
+        root.children.forEach(child => walk(child, child.name || ''));
+    }
+    // Add content library items (standalone documents that can be recommended)
+    const library = [
+        { id: 'lib-001', name: 'Module 1 Administrative Documents.pdf', contentType: 'pdf', contentTypeLabel: 'Regulatory Document', sourceCollectionName: 'Content Library', description: 'Regional administrative information', status: 'Approved' },
+        { id: 'lib-002', name: 'Module 3 Quality Documentation.pdf', contentType: 'pdf', contentTypeLabel: 'Case Study', sourceCollectionName: 'Content Library', description: 'CMC documentation', status: 'Approved' },
+        { id: 'lib-003', name: 'Environmental Assessment.pdf', contentType: 'pdf', contentTypeLabel: 'Email Promo', sourceCollectionName: 'Content Library', description: 'Environmental impact assessment', status: 'Under Review' },
+        { id: 'lib-004', name: 'Medication Guide - Draft.pdf', contentType: 'pdf', contentTypeLabel: 'Patient-Facing Content', sourceCollectionName: 'Content Library', description: 'FDA medication guide', status: 'Draft' },
+        { id: 'lib-005', name: 'Patient Package Insert.pdf', contentType: 'pdf', contentTypeLabel: 'Patient-Facing Content', sourceCollectionName: 'Content Library', description: 'Patient-facing leaflet', status: 'Approved' },
+        { id: 'lib-006', name: 'Highlights Section.pdf', contentType: 'pdf', contentTypeLabel: 'Regulatory Document', sourceCollectionName: 'Content Library', description: 'Key safety and efficacy highlights', status: 'Approved' },
+        { id: 'lib-007', name: 'Informed Consent Form Template.pdf', contentType: 'pdf', contentTypeLabel: 'Clinical Document', sourceCollectionName: 'Content Library', description: 'IRB-approved ICF template', status: 'Approved' },
+        { id: 'lib-008', name: 'Case Report Form Guidelines.pdf', contentType: 'pdf', contentTypeLabel: 'Clinical Document', sourceCollectionName: 'Content Library', description: 'CRF completion guidelines', status: 'Draft' },
+        { id: 'lib-009', name: 'Statistical Analysis Plan Template.pdf', contentType: 'pdf', contentTypeLabel: 'Case Study', sourceCollectionName: 'Content Library', description: 'Pre-specified SAP', status: 'In Progress' },
+        { id: 'lib-010', name: 'Risk Management Plan - Master.pdf', contentType: 'pdf', contentTypeLabel: 'Regulatory Document', sourceCollectionName: 'Content Library', description: 'EU RMP or US REMS', status: 'Approved' }
+    ];
+    library.forEach(l => pool.push(l));
+    return pool;
+}
+
+/**
+ * Recommend content from the system pool for each required content item (simulated AI matching).
+ * Uses collection metadata, required item name/description/contentType to pick best candidate.
+ * @param {Array<{ id: string, name: string, contentType: string, description?: string }>} requiredItems - Required content items (e.g. from template)
+ * @param {Object} root - The root collection tree to scrape content from
+ * @param {Set<string>} [excludeContentIds] - Content IDs to exclude (e.g. already in current collection)
+ * @returns {Array<{ requiredItem: Object, suggestedContent: Object, confidence: string }>}
+ */
+export function recommendContentForRequired(requiredItems, root, excludeContentIds = new Set()) {
+    const pool = buildSystemContentPool(root);
+    const used = new Set();
+    const results = [];
+    const normalize = (s) => (s || '').toLowerCase().replace(/\s+/g, ' ');
+    for (const req of requiredItems) {
+        const reqNorm = normalize(req.name);
+        const reqDescNorm = normalize(req.description);
+        const reqType = (req.contentType || '').toLowerCase();
+        let best = null;
+        let bestScore = -1;
+        for (const c of pool) {
+            if (excludeContentIds.has(c.id) || used.has(c.id)) continue;
+            let score = 0;
+            if (c.contentType === reqType) score += 10;
+            if (reqNorm && normalize(c.name).includes(reqNorm)) score += 8;
+            if (reqNorm && normalize(c.name).split(/\s/).some(w => reqNorm.includes(w) && w.length > 3)) score += 4;
+            if (reqDescNorm && c.description && normalize(c.description).includes(reqDescNorm)) score += 5;
+            if (reqDescNorm && c.description && reqDescNorm.split(/\s/).some(w => normalize(c.description).includes(w) && w.length > 3)) score += 3;
+            if (score > bestScore) {
+                bestScore = score;
+                best = c;
+            }
+        }
+        if (best) {
+            used.add(best.id);
+            results.push({
+                requiredItem: req,
+                suggestedContent: { ...best, id: best.id, name: best.name, contentType: best.contentType },
+                confidence: bestScore >= 10 ? 'high' : bestScore >= 5 ? 'medium' : 'low'
+            });
+        } else {
+            results.push({ requiredItem: req, suggestedContent: null, confidence: 'none' });
+        }
+    }
+    return results;
+}
