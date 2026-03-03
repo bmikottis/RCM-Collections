@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf node_modules __lwr_cache__ site",
-    "heroku-postbuild": "yarn build",
+    "heroku-postbuild": "yarn build:prod-compat",
     "dev": "lwr dev",
     "dev:port": "lwr dev -p 3001",
     "dev:compat": "lwr dev --mode compat",
@@ -19,7 +19,7 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.26.2",
     "lightning-base-components": "^1.27.2-alpha",
-    "lwc": "latest",
+    "lwc": "8.21.6",
     "lwr": "0.18.1"
   },
   "engines": {
