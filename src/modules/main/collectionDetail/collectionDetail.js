@@ -149,16 +149,6 @@ export default class CollectionDetail extends LightningElement {
     @track shareLinkTemplateId = 'standard';
     @track shareLinkCustomMessage = '';
 
-    /** Number of rows for the Recipients textarea (LWC template cannot use literal). */
-    get recipientsTextareaRows() {
-        return 2;
-    }
-
-    /** Number of rows for the Custom message textarea (LWC template cannot use literal). */
-    get customMessageTextareaRows() {
-        return 3;
-    }
-
     /**
      * Check if Content tab is active
      */
