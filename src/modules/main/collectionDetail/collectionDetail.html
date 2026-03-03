@@ -25,11 +25,13 @@
                 </div>
                 <div class="record-header-actions">
                     <lightning-button-group>
+                        <lightning-button label="Generate Share Link" variant="neutral" onclick={handleGenerateShareLink} title="Generate shareable link"></lightning-button>
+                        <lightning-button label="Download" variant="neutral" onclick={handleRecordDownload} title="Download collection"></lightning-button>
                         <lightning-button label="Edit" variant="neutral" onclick={handleRecordEdit} title="Edit collection"></lightning-button>
-                        <lightning-button label="Clone" variant="neutral" onclick={handleRecordClone} title="Clone collection"></lightning-button>
-                        <lightning-button label="Delete" variant="neutral" onclick={handleRecordDelete} title="Delete collection"></lightning-button>
                         <lightning-button-menu alternative-text="More actions" icon-name="utility:chevrondown" variant="border" menu-alignment="right" onselect={handleRecordMenuSelect}>
                             <lightning-menu-item value="view" label="View Details"></lightning-menu-item>
+                            <lightning-menu-item value="clone" label="Clone"></lightning-menu-item>
+                            <lightning-menu-item value="delete" label="Delete"></lightning-menu-item>
                         </lightning-button-menu>
                     </lightning-button-group>
                 </div>
@@ -805,6 +807,91 @@
                 </div>
                 <footer class="find-required-modal-footer">
                     <lightning-button label="Done" variant="brand" onclick={handleCloseFindRequiredModal} title="Close"></lightning-button>
+                </footer>
+            </div>
+        </div>
+    </template>
+
+    <!-- Generate Share Link Modal -->
+    <template lwc:if={showShareLinkModal}>
+        <div class="share-link-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="share-link-modal-title" onclick={handleShareLinkBackdropClick}>
+            <div class="share-link-modal" onclick={handleShareLinkModalClick}>
+                <header class="share-link-modal-header">
+                    <h2 id="share-link-modal-title" class="share-link-modal-title">Generate Share Link</h2>
+                    <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Close" onclick={handleCloseShareLinkModal} class="share-link-modal-close"></lightning-button-icon>
+                </header>
+                <div class="share-link-modal-body">
+                    <div class="slds-form slds-form_stacked share-link-form">
+                        <div class="slds-form-element">
+                            <main-rcm-textarea
+                                label="Recipients"
+                                name="emails"
+                                data-field="emails"
+                                placeholder="Enter email addresses (comma-separated)"
+                                supporting-text="Separate multiple emails with commas"
+                                value={shareLinkEmails}
+                                rows={2}
+                                onchange={handleShareLinkFieldChange}>
+                            </main-rcm-textarea>
+                        </div>
+                        <div class="slds-form-element">
+                            <main-rcm-combobox
+                                label="Link expires"
+                                name="expires"
+                                data-field="expires"
+                                placeholder="Select an option"
+                                options={shareLinkExpiryOptions}
+                                value={shareLinkExpires}
+                                onchange={handleShareLinkFieldChange}>
+                            </main-rcm-combobox>
+                        </div>
+                        <div class="slds-form-element">
+                            <main-rcm-input
+                                label="Password (optional)"
+                                type="password"
+                                name="password"
+                                data-field="password"
+                                placeholder="Set a password to access the link"
+                                value={shareLinkPassword}
+                                supporting-text="Recipients will need this password to open the shared link"
+                                onchange={handleShareLinkFieldChange}>
+                            </main-rcm-input>
+                        </div>
+                        <div class="slds-form-element share-link-form-element-toggle">
+                            <label class="slds-form-element__label" for="share-link-allow-download">Allow Download</label>
+                            <div class="slds-form-element__control">
+                                <lightning-input type="toggle" id="share-link-allow-download" name="allowDownload" data-field="allowDownload" variant="label-hidden" checked={shareLinkAllowDownload} onchange={handleShareLinkFieldChange} message-toggle-active="On" message-toggle-inactive="Off" aria-describedby="share-link-allow-download-helper"></lightning-input>
+                            </div>
+                            <div id="share-link-allow-download-helper" class="slds-form-element__help">Recipients can download the shared content when enabled</div>
+                        </div>
+                        <div class="slds-form-element">
+                            <main-rcm-combobox
+                                label="Email template"
+                                name="template"
+                                data-field="template"
+                                placeholder="Select an option"
+                                options={shareLinkTemplateOptions}
+                                value={shareLinkTemplateId}
+                                onchange={handleShareLinkFieldChange}>
+                            </main-rcm-combobox>
+                        </div>
+                        <div class="slds-form-element">
+                            <main-rcm-textarea
+                                label="Custom message (optional)"
+                                name="customMessage"
+                                data-field="customMessage"
+                                placeholder="Add a personal message to include in the email"
+                                supporting-text="This message will be included with the share notification"
+                                value={shareLinkCustomMessage}
+                                rows={3}
+                                onchange={handleShareLinkFieldChange}>
+                            </main-rcm-textarea>
+                        </div>
+                    </div>
+                </div>
+                <footer class="share-link-modal-footer">
+                    <lightning-button label="Cancel" variant="neutral" onclick={handleCloseShareLinkModal} title="Cancel"></lightning-button>
+                    <lightning-button label="Generate Link" variant="brand" onclick={handleShareLinkSubmit} title="Generate share link"></lightning-button>
                 </footer>
             </div>
         </div>

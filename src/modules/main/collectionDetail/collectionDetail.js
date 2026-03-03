@@ -141,6 +141,14 @@ export default class CollectionDetail extends LightningElement {
     @track findRequiredSuggestions = []; // { requiredItem, suggestedContent, confidence, status: 'pending'|'approved'|'rejected' }
     @track findRequiredLoading = false;
 
+    @track showShareLinkModal = false;
+    @track shareLinkEmails = '';
+    @track shareLinkExpires = '7';
+    @track shareLinkPassword = '';
+    @track shareLinkAllowDownload = true;
+    @track shareLinkTemplateId = 'standard';
+    @track shareLinkCustomMessage = '';
+
     /**
      * Check if Content tab is active
      */
@@ -1002,7 +1010,75 @@ export default class CollectionDetail extends LightningElement {
         const value = event.detail?.value;
         if (value === 'view') {
             this.handleOpenRecord();
+        } else if (value === 'clone') {
+            this.handleRecordClone();
+        } else if (value === 'delete') {
+            this.handleRecordDelete();
         }
+    }
+
+    get shareLinkExpiryOptions() {
+        return [
+            { label: '1 day', value: '1' },
+            { label: '7 days', value: '7' },
+            { label: '30 days', value: '30' },
+            { label: '90 days', value: '90' }
+        ];
+    }
+
+    get shareLinkTemplateOptions() {
+        return [
+            { label: 'Standard share', value: 'standard' },
+            { label: 'Confidential', value: 'confidential' },
+            { label: 'Review request', value: 'review' },
+            { label: 'Custom', value: 'custom' }
+        ];
+    }
+
+    handleGenerateShareLink() {
+        this.shareLinkEmails = '';
+        this.shareLinkExpires = '7';
+        this.shareLinkPassword = '';
+        this.shareLinkAllowDownload = true;
+        this.shareLinkTemplateId = 'standard';
+        this.shareLinkCustomMessage = '';
+        this.showShareLinkModal = true;
+    }
+
+    handleCloseShareLinkModal() {
+        this.showShareLinkModal = false;
+    }
+
+    handleShareLinkBackdropClick(event) {
+        if (event.target.classList.contains('share-link-modal-backdrop')) {
+            this.handleCloseShareLinkModal();
+        }
+    }
+
+    handleShareLinkModalClick(event) {
+        event.stopPropagation();
+    }
+
+    handleShareLinkFieldChange(event) {
+        const field = event.target?.dataset?.field || event.currentTarget?.dataset?.field;
+        if (!field) return;
+        const value = event.detail?.value;
+        const checked = event.target?.checked;
+        if (field === 'emails') this.shareLinkEmails = value ?? event.target?.value ?? '';
+        else if (field === 'expires') this.shareLinkExpires = value ?? '7';
+        else if (field === 'password') this.shareLinkPassword = value ?? event.target?.value ?? '';
+        else if (field === 'allowDownload') this.shareLinkAllowDownload = checked === true;
+        else if (field === 'template') this.shareLinkTemplateId = value ?? 'standard';
+        else if (field === 'customMessage') this.shareLinkCustomMessage = value ?? event.target?.value ?? '';
+    }
+
+    handleShareLinkSubmit() {
+        // TODO: Call API to generate share link with form data
+        this.handleCloseShareLinkModal();
+    }
+
+    handleRecordDownload() {
+        // TODO: Download collection
     }
 
     /**

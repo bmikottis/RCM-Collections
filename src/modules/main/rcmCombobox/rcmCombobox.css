@@ -1,0 +1,64 @@
+/* RCM Combobox – Figma Combobox picklist (node 1614:171138): label, combobox, supporting text */
+
+.rcm-combobox {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.rcm-combobox__label-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+}
+
+.rcm-combobox__required {
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    font-weight: 600;
+    line-height: 17px;
+    color: var(--slds-g-color-on-error-1, #b60554);
+    margin-right: 2px;
+}
+
+.rcm-combobox__label {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-size-base, 13px);
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    margin: 0;
+}
+
+.rcm-combobox__control {
+    width: 100%;
+    min-width: 0;
+}
+
+/* No extra top/bottom margin from base component (match Password / Allow Download spacing) */
+.rcm-combobox__control > lightning-combobox {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    display: block;
+}
+
+.rcm-combobox__field {
+    --slds-c-input-color-border: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-input-radius-border: var(--slds-g-radius-border-2, 8px);
+    --slds-c-input-spacing-inlinestart: var(--slds-g-spacing-2, 8px);
+    --slds-c-input-spacing-inlineend: var(--slds-g-spacing-2, 8px);
+    --slds-c-input-color-background: var(--slds-g-color-surface-container-1, #fff);
+    min-height: 32px;
+    width: 100%;
+    display: block;
+}
+
+.rcm-combobox__supporting {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    font-weight: 400;
+    line-height: 17px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    margin: 0;
+}

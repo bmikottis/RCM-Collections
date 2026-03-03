@@ -1,0 +1,53 @@
+<template>
+    <div class="rcm-lookup" role="combobox" aria-expanded={isOpen} aria-haspopup="listbox" aria-controls={listboxId} aria-disabled={disabled}>
+        <div class="rcm-lookup__label-row">
+            <template lwc:if={required}>
+                <span class="rcm-lookup__required" aria-hidden="true">*</span>
+            </template>
+            <label class="rcm-lookup__label" for={inputId}>{label}</label>
+        </div>
+        <div class="rcm-lookup__control">
+            <div class="rcm-lookup__input-wrap" data-input-wrap onclick={handleInputWrapClick}>
+                <input
+                    id={inputId}
+                    type="text"
+                    class="rcm-lookup__input"
+                    placeholder={placeholder}
+                    value={inputValue}
+                    disabled={disabled}
+                    autocomplete="off"
+                    aria-autocomplete="list"
+                    aria-expanded={isOpen}
+                    aria-controls={listboxId}
+                    aria-activedescendant={activeDescendantId}
+                    aria-describedby={supportingTextId}
+                    oninput={handleInput}
+                    onfocus={handleFocus}
+                    onblur={handleBlur}
+                    onkeydown={handleKeyDown}>
+                <lightning-icon icon-name="utility:search" size="x-small" class="rcm-lookup__icon" alternative-text="Search"></lightning-icon>
+            </div>
+            <template lwc:if={isOpenAndHasOptions}>
+                <ul id={listboxId} class="rcm-lookup__listbox" role="listbox" aria-label={label}>
+                    <template for:each={filteredOptions} for:item="opt">
+                        <li key={opt.value}
+                            id={opt.optionId}
+                            class={opt.optionClass}
+                            role="option"
+                            data-value={opt.value}
+                            aria-selected={opt.selected}
+                            onmousedown={handleOptionSelect}>
+                            <template lwc:if={opt.iconName}>
+                                <lightning-icon icon-name={opt.iconName} size="small" class="rcm-lookup__option-icon" alternative-text=""></lightning-icon>
+                            </template>
+                            <span class="rcm-lookup__option-label">{opt.label}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        <template lwc:if={hasSupportingText}>
+            <div id={supportingTextId} class={supportingClass} role="status">{supportingText}</div>
+        </template>
+    </div>
+</template>

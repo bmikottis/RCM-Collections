@@ -1,0 +1,139 @@
+/* RCM Lookup – Figma Combobox lookup (node 1614:171604): label, search input + icon, listbox */
+
+.rcm-lookup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 4px);
+    align-items: flex-start;
+    width: 100%;
+    position: relative;
+}
+
+.rcm-lookup__label-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+}
+
+.rcm-lookup__required {
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    font-weight: 600;
+    line-height: 17px;
+    color: var(--slds-g-color-on-error-1, #b60554);
+    margin-right: 2px;
+}
+
+.rcm-lookup__label {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-size-base, 13px);
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    margin: 0;
+}
+
+.rcm-lookup__control {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+}
+
+.rcm-lookup__input-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 8px);
+    height: 32px;
+    padding: 2px var(--slds-g-spacing-2, 8px);
+    background: var(--slds-g-color-surface-container-1, #fff);
+    border: 1px solid var(--slds-g-color-border-2, #5c5c5c);
+    border-radius: var(--slds-g-radius-border-2, 8px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rcm-lookup__input {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 20px;
+    border: none;
+    background: transparent;
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-size-base, 13px);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    padding: 0;
+    outline: none;
+}
+
+.rcm-lookup__input::placeholder {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.rcm-lookup__input:disabled {
+    cursor: not-allowed;
+    color: var(--slds-g-color-on-disabled-1, #757575);
+}
+
+.rcm-lookup__icon {
+    flex-shrink: 0;
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.rcm-lookup__listbox {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 2px 0 0;
+    padding: var(--slds-g-spacing-1, 4px) 0;
+    background: var(--slds-g-color-surface-container-1, #fff);
+    border-radius: var(--slds-g-radius-border-2, 8px);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.16), 0 3px 3px 0 rgba(0, 0, 0, 0.16), 0 -1px 2px 0 rgba(0, 0, 0, 0.09);
+    list-style: none;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.rcm-lookup__option {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 8px);
+    padding: 6px var(--slds-g-spacing-3, 12px);
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-size-base, 13px);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    cursor: pointer;
+    background: transparent;
+}
+
+.rcm-lookup__option:hover,
+.rcm-lookup__option.rcm-lookup__option_highlighted {
+    background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.rcm-lookup__option-icon {
+    flex-shrink: 0;
+}
+
+.rcm-lookup__option-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rcm-lookup__supporting {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    font-weight: 400;
+    line-height: 17px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    margin: 0;
+}
+
+.rcm-lookup__supporting_error {
+    color: var(--slds-g-color-error-1, #b60554);
+}

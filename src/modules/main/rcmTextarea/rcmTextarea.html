@@ -1,0 +1,29 @@
+<template>
+    <div class="rcm-textarea">
+        <div class="rcm-textarea__label-row">
+            <template lwc:if={required}>
+                <span class="rcm-textarea__required" aria-hidden="true">*</span>
+            </template>
+            <label class="rcm-textarea__label" for={textareaId}>{label}</label>
+        </div>
+        <div class="rcm-textarea__control">
+            <lightning-textarea
+                id={textareaId}
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                rows={rows}
+                disabled={disabled}
+                variant="label-hidden"
+                onchange={handleChange}
+                aria-describedby={supportingTextId}
+                class={textareaClass}
+                message-when-value-missing={messageWhenValueMissing}
+                max-length={maxLength}>
+            </lightning-textarea>
+        </div>
+        <template lwc:if={hasSupportingText}>
+            <div id={supportingTextId} class="rcm-textarea__supporting" role="status">{supportingText}</div>
+        </template>
+    </div>
+</template>

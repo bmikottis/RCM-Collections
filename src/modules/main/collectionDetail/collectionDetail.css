@@ -1477,3 +1477,150 @@
     padding: 1rem 1.25rem;
     border-top: 1px solid var(--slds-g-color-border-1, #e5e5e5);
 }
+
+/* ========================================
+   Generate Share Link Modal
+   ======================================== */
+.share-link-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.share-link-modal {
+    background: var(--slds-g-color-surface-1, #fff);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    max-width: 32rem;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.share-link-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+}
+
+.share-link-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.share-link-modal-close {
+    flex-shrink: 0;
+}
+
+.share-link-modal-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Consistent field label styling (match RCM Input / Figma); 8px gap below label */
+.share-link-form .slds-form-element__label {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-size-base, 13px);
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    margin: 0 0 8px 0;
+    display: block;
+}
+
+.share-link-form .slds-form-element__control {
+    margin-top: 0;
+    display: block;
+}
+
+/* Remove default margin/padding above inputs so our 8px control margin is the only gap.
+   Lightning base components add .slds-form-element to the host, which carries top margin. */
+.share-link-form .slds-form-element__control > lightning-input,
+.share-link-form .slds-form-element__control > lightning-combobox,
+.share-link-form .slds-form-element__control > lightning-textarea {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    display: block;
+}
+
+/* Override .slds-form-element margin when that class is on the component host */
+.share-link-form .slds-form-element__control > lightning-combobox.slds-form-element,
+.share-link-form .slds-form-element__control > lightning-textarea.slds-form-element {
+    margin-top: 0 !important;
+}
+
+/* RCM input (label inside component): same 4px gap via component’s internal gap */
+.share-link-form .slds-form-element > main-rcm-input,
+.share-link-form .slds-form-element > main-rcm-textarea,
+.share-link-form .slds-form-element > main-rcm-combobox {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Consistent help/supporting text (match RCM Input); 8px below input */
+.share-link-form .slds-form-element__help {
+    font-family: var(--slds-g-font-family-base, 'Salesforce Sans', sans-serif);
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    font-weight: 400;
+    line-height: 17px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* Rows with native base components (textarea, combobox, toggle): enforce 8px label-to-control gap.
+   Base component hosts add SLDS form-element spacing; we override by moving gap to the control. */
+.share-link-form .share-link-form-element-control-gap .slds-form-element__label,
+.share-link-form .share-link-form-element-toggle .slds-form-element__label {
+    margin-bottom: 0;
+}
+.share-link-form .share-link-form-element-control-gap .slds-form-element__control,
+.share-link-form .share-link-form-element-toggle .slds-form-element__control {
+    margin-top: 8px;
+}
+.share-link-form .slds-form-element__control > lightning-input[data-field="allowDownload"] {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 24px vertical spacing between form fields */
+.share-link-form .slds-form-element {
+    margin-bottom: 24px;
+}
+
+.share-link-form .slds-form-element:last-child {
+    margin-bottom: 0;
+}
+
+/* Combobox and textarea: align with RCM input design tokens */
+.share-link-form .slds-form-element__control lightning-combobox,
+.share-link-form .slds-form-element__control lightning-textarea {
+    --slds-c-input-color-border: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-input-radius-border: var(--slds-g-radius-border-2, 8px);
+    --slds-c-input-spacing-inlinestart: var(--slds-g-spacing-2, 8px);
+    --slds-c-input-spacing-inlineend: var(--slds-g-spacing-2, 8px);
+    --slds-c-input-color-background: var(--slds-g-color-surface-container-1, #fff);
+}
+
+.share-link-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+}
