@@ -2,6 +2,9 @@ node_modules
 __lwr_cache__
 dist
 
+# LWR static build output (regenerate with npm run build)
+site/
+
 .vscode
 .DS_Store
 
