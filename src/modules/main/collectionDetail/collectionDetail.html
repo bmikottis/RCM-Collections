@@ -476,18 +476,26 @@
                                     <ul class="slds-list_vertical">
                                         <template for:each={collectionContent} for:item="content">
                                             <li key={content.id} class="slds-list__item list-item">
-                                                <div class="slds-media slds-media_center content-item">
-                                                    <div class="slds-media__figure">
-                                                        <lightning-icon 
-                                                            icon-name={content.icon} 
+                                                <div class="content-item">
+                                                    <div
+                                                        class="content-item-main"
+                                                        data-id={content.id}
+                                                        role="link"
+                                                        tabindex="0"
+                                                        aria-label={content.openRecordAriaLabel}
+                                                        onclick={handleContentRowClick}
+                                                        onkeydown={handleContentRowKeyDown}>
+                                                        <lightning-icon
+                                                            class="content-item-icon slds-m-right_x-small"
+                                                            icon-name={content.icon}
                                                             size="small"
                                                             alternative-text={content.contentType}>
                                                         </lightning-icon>
+                                                        <div class="content-item-body slds-truncate">
+                                                            <span class="content-item-link">{content.name}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="slds-media__body">
-                                                        <a href="#" class="content-item-link" data-id={content.id} onclick={handleContentLinkClick}>{content.name}</a>
-                                                    </div>
-                                                    <div class="slds-media__figure slds-media__figure_reverse content-actions">
+                                                    <div class="content-actions">
                                                         <lightning-button-icon 
                                                             icon-name="utility:preview" 
                                                             alternative-text="Preview"
@@ -666,18 +674,26 @@
                                     <ul class="slds-list_vertical">
                                         <template for:each={collectionContent} for:item="content">
                                             <li key={content.id} class="slds-list__item list-item">
-                                                <div class="slds-media slds-media_center content-item">
-                                                    <div class="slds-media__figure">
-                                                        <lightning-icon 
-                                                            icon-name={content.icon} 
+                                                <div class="content-item">
+                                                    <div
+                                                        class="content-item-main"
+                                                        data-id={content.id}
+                                                        role="link"
+                                                        tabindex="0"
+                                                        aria-label={content.openRecordAriaLabel}
+                                                        onclick={handleContentRowClick}
+                                                        onkeydown={handleContentRowKeyDown}>
+                                                        <lightning-icon
+                                                            class="content-item-icon slds-m-right_x-small"
+                                                            icon-name={content.icon}
                                                             size="small"
                                                             alternative-text={content.contentType}>
                                                         </lightning-icon>
+                                                        <div class="content-item-body slds-truncate">
+                                                            <span class="content-item-link">{content.name}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="slds-media__body">
-                                                        <a href="#" class="content-item-link" data-id={content.id} onclick={handleContentLinkClick}>{content.name}</a>
-                                                    </div>
-                                                    <div class="slds-media__figure slds-media__figure_reverse content-actions">
+                                                    <div class="content-actions">
                                                         <lightning-button-icon 
                                                             icon-name="utility:preview" 
                                                             alternative-text="Preview"

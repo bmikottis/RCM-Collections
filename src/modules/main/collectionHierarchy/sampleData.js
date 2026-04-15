@@ -230,6 +230,17 @@ export const sampleCollections = {
                 status: 'In Progress'
             },
             content: [
+                {
+                    id: 'cnt-immunexis-demo',
+                    name: 'Immunexis Promotional Email.pdf',
+                    title: 'Promotional emailer to KOL for Immunexis',
+                    contentType: 'pdf',
+                    contentTypeLabel: 'Promotional Emailer',
+                    version: '0.1',
+                    status: 'Draft',
+                    effectiveDates: '01/01/2016 - 12/31/2036',
+                    fulfillsRequirement: 'req-001'
+                },
                 { id: 'cnt-001', name: 'Submission Cover Letter.pdf', contentType: 'pdf', fulfillsRequirement: 'req-001' },
                 { id: 'cnt-002', name: 'Product Summary.docx', contentType: 'word', fulfillsRequirement: 'req-002' },
                 { id: 'cnt-002b', name: 'Module 2 CTD Summaries.pdf', contentType: 'pdf', fulfillsRequirement: 'req-004' }

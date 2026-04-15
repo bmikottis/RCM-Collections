@@ -343,4 +343,49 @@ export default class CollectionTreeItem extends LightningElement {
             composed: true
         }));
     }
+
+    /**
+     * Open the Regulated Content record for a content item (left nav)
+     * @param {Event} event
+     */
+    handleContentClick(event) {
+        event.stopPropagation();
+        const el = event.currentTarget;
+        const contentId = el.dataset?.id || el.getAttribute('data-id');
+        const content = (this.item?.content || []).find((c) => c.id === contentId);
+        if (!content) {
+            return;
+        }
+        const detail = {
+            content: { ...content },
+            parentCollectionId: this.item.id,
+            parentCollectionName: this.item.name || ''
+        };
+        const evt = new CustomEvent('opencontentrecord', {
+            detail,
+            bubbles: true,
+            composed: true
+        });
+        // Prefer dispatch on the hierarchy host: bubbling through nested LWC + synthetic shadow
+        // often fails to reach listeners, so file-row clicks looked like no-ops.
+        if (typeof document !== 'undefined') {
+            const hierarchyHost = document.querySelector('main-collection-hierarchy');
+            if (hierarchyHost) {
+                hierarchyHost.dispatchEvent(evt);
+                return;
+            }
+        }
+        this.dispatchEvent(evt);
+    }
+
+    /**
+     * @param {KeyboardEvent} event
+     */
+    handleContentKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.handleContentClick(event);
+        }
+    }
 }

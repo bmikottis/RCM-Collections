@@ -1,9 +1,14 @@
 import { LightningElement, api, track } from 'lwc';
 
+const STORAGE_KEY_SIDEBAR = 'rcm-content-record-annotation-sidebar-px';
+const SIDEBAR_MIN_PX = 240;
+const MAIN_MIN_PX = 240;
+const SPLITTER_PX = 6;
+const SIDEBAR_DEFAULT_PX = 400;
+
 /**
- * Content Record Page – matches Figma: Regulated Content Version header,
- * workflow bar (Draft → Review → Approve → Archive), Document / Review & Approval /
- * Audit Trail / Related tabs, document viewer, and Annotations sidebar.
+ * Regulated Content record — layout aligned with Figma (page header, workflow path,
+ * document viewer + scoped annotation panel).
  */
 export default class ContentRecordPage extends LightningElement {
     @api content;
@@ -11,28 +16,194 @@ export default class ContentRecordPage extends LightningElement {
     @api parentCollectionId;
 
     @track activeTab = 'document';
+    /** Right sidebar scoped tabs: annotations | contentWorkItems */
+    @track scopedPanelTab = 'annotations';
     @track workflowStage = 'draft'; // draft | review | approve | archive
     @track expandedAnnotationIds = new Set(['001']);
     @track expandedLinkedClaimsIds = new Set();
     @track expandedCommentsIds = new Set();
     @track openMenuAnnotationId = null;
     @track anchorCheckedIds = new Set();
+    @track zoomLevel = '125';
+    @track currentPage = 1;
+
+    /** Resizable annotation column width (px); persisted in localStorage */
+    @track sidebarWidthPx = SIDEBAR_DEFAULT_PX;
+
+    @track _splitterMaxForAria = 1200;
+
+    _resizePointerId = null;
+
+    _boundResizeMove = (e) => this._handleResizePointerMove(e);
+
+    _boundResizeEnd = (e) => this._handleResizePointerEnd(e);
+
+    connectedCallback() {
+        this._boundWindowResize = () => {
+            this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
+            this._applySidebarWidth();
+        };
+        window.addEventListener('resize', this._boundWindowResize);
+        try {
+            const raw = window.localStorage.getItem(STORAGE_KEY_SIDEBAR);
+            if (raw != null) {
+                const n = parseInt(raw, 10);
+                if (!Number.isNaN(n) && n >= SIDEBAR_MIN_PX) {
+                    this.sidebarWidthPx = n;
+                }
+            }
+        } catch {
+            /* ignore */
+        }
+    }
+
+    disconnectedCallback() {
+        if (this._boundWindowResize) {
+            window.removeEventListener('resize', this._boundWindowResize);
+        }
+        this._removeGlobalResizeListeners();
+        this._clearResizeCursor();
+    }
+
+    renderedCallback() {
+        this._applySidebarWidth();
+    }
+
+    _isStackedLayout() {
+        return typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches;
+    }
+
+    _applySidebarWidth() {
+        const aside = this.template.querySelector('.content-record-doc-sidebar');
+        if (!aside) {
+            return;
+        }
+        if (this._isStackedLayout()) {
+            aside.style.width = '';
+            return;
+        }
+        const clamped = this._clampSidebarWidth(this.sidebarWidthPx);
+        if (clamped !== this.sidebarWidthPx) {
+            this.sidebarWidthPx = clamped;
+        }
+        aside.style.width = `${this.sidebarWidthPx}px`;
+    }
+
+    _getLayoutEl() {
+        return this.template.querySelector('.content-record-doc-layout');
+    }
+
+    _clampSidebarWidth(widthPx) {
+        const layout = this._getLayoutEl();
+        if (!layout) {
+            return Math.max(SIDEBAR_MIN_PX, widthPx);
+        }
+        const total = layout.getBoundingClientRect().width;
+        const maxSidebar = Math.max(SIDEBAR_MIN_PX, total - MAIN_MIN_PX - SPLITTER_PX);
+        return Math.min(maxSidebar, Math.max(SIDEBAR_MIN_PX, widthPx));
+    }
+
+    get sidebarWidthMin() {
+        return SIDEBAR_MIN_PX;
+    }
+
+    get sidebarWidthMaxAria() {
+        return this._splitterMaxForAria;
+    }
+
+    handleSplitterPointerDown(event) {
+        if (event.button !== 0) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        const layout = this._getLayoutEl();
+        if (layout) {
+            const total = layout.getBoundingClientRect().width;
+            this._splitterMaxForAria = Math.max(
+                SIDEBAR_MIN_PX,
+                Math.floor(total - MAIN_MIN_PX - SPLITTER_PX)
+            );
+        }
+        this._resizePointerId = event.pointerId;
+        this._resizeStartX = event.clientX;
+        this._resizeStartWidth = this.sidebarWidthPx;
+        document.addEventListener('pointermove', this._boundResizeMove);
+        document.addEventListener('pointerup', this._boundResizeEnd);
+        document.addEventListener('pointercancel', this._boundResizeEnd);
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    }
+
+    _handleResizePointerMove(event) {
+        if (event.pointerId !== this._resizePointerId) {
+            return;
+        }
+        const delta = event.clientX - this._resizeStartX;
+        const next = this._clampSidebarWidth(this._resizeStartWidth + delta);
+        this.sidebarWidthPx = next;
+        this._applySidebarWidth();
+    }
+
+    _handleResizePointerEnd(event) {
+        if (this._resizePointerId == null) {
+            return;
+        }
+        if (event && event.pointerId != null && event.pointerId !== this._resizePointerId) {
+            return;
+        }
+        this._removeGlobalResizeListeners();
+        this._clearResizeCursor();
+        this._resizePointerId = null;
+        try {
+            window.localStorage.setItem(STORAGE_KEY_SIDEBAR, String(this.sidebarWidthPx));
+        } catch {
+            /* ignore */
+        }
+    }
+
+    _removeGlobalResizeListeners() {
+        document.removeEventListener('pointermove', this._boundResizeMove);
+        document.removeEventListener('pointerup', this._boundResizeEnd);
+        document.removeEventListener('pointercancel', this._boundResizeEnd);
+    }
+
+    _clearResizeCursor() {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    }
+
+    handleSplitterKeyDown(event) {
+        const step = event.shiftKey ? 32 : 8;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            const dir = event.key === 'ArrowRight' ? 1 : -1;
+            this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx + dir * step);
+            this._applySidebarWidth();
+            try {
+                window.localStorage.setItem(STORAGE_KEY_SIDEBAR, String(this.sidebarWidthPx));
+            } catch {
+                /* ignore */
+            }
+        }
+    }
 
     get contentName() {
         return this.content?.name || 'Content';
     }
 
-    get contentId() {
-        return this.content?.id || null;
+    /** Primary page title (Figma: marketing / document title) */
+    get recordTitle() {
+        return this.content?.title || this.content?.name || 'Regulated Content';
     }
 
-    get recordId() {
-        const id = this.content?.id || 'cnt-00000';
-        return id.replace(/^cnt-/, 'RCV-').toUpperCase();
+    /** File name shown in the viewer toolbar */
+    get displayFileName() {
+        return this.contentName;
     }
 
     get contentVersion() {
-        return this.content?.version || '1.0';
+        return this.content?.version != null ? String(this.content.version) : '0.1';
     }
 
     get contentStatus() {
@@ -41,6 +212,21 @@ export default class ContentRecordPage extends LightningElement {
 
     get effectiveDates() {
         return this.content?.effectiveDates || '01/01/2016 - 12/31/2036';
+    }
+
+    /** Highlight field — human-readable type label */
+    get contentTypeDisplay() {
+        if (this.content?.contentTypeLabel) {
+            return this.content.contentTypeLabel;
+        }
+        const t = (this.content?.contentType || '').toLowerCase();
+        if (t === 'pdf') {
+            return 'PDF';
+        }
+        if (t === 'word' || t === 'docx') {
+            return 'Word Document';
+        }
+        return t ? t.charAt(0).toUpperCase() + t.slice(1) : '—';
     }
 
     get contentIcon() {
@@ -59,60 +245,59 @@ export default class ContentRecordPage extends LightningElement {
         return iconMap[type] || 'doctype:unknown';
     }
 
-    get isDocumentTabActive() {
-        return this.activeTab === 'document';
+    get totalPages() {
+        return this.content?.pageCount != null ? Number(this.content.pageCount) : 14;
     }
 
-    get isReviewTabActive() {
-        return this.activeTab === 'review';
+    get zoomOptions() {
+        return [
+            { label: '50%', value: '50' },
+            { label: '75%', value: '75' },
+            { label: '100%', value: '100' },
+            { label: '125%', value: '125' },
+            { label: '150%', value: '150' },
+            { label: '200%', value: '200' }
+        ];
     }
 
-    get isAuditTabActive() {
-        return this.activeTab === 'audit';
+    handleZoomChange(event) {
+        this.zoomLevel = event.detail.value;
     }
 
-    get isRelatedTabActive() {
-        return this.activeTab === 'related';
+    handleMainTabActive(event) {
+        const v = event.target && event.target.value;
+        if (v) {
+            this.activeTab = v;
+        }
     }
 
-    get documentTabClass() {
-        return this.isDocumentTabActive ? 'content-record-tab is-active' : 'content-record-tab';
+    handleScopedTabActive(event) {
+        const v = event.target && event.target.value;
+        if (v) {
+            this.scopedPanelTab = v;
+        }
     }
 
-    get reviewTabClass() {
-        return this.isReviewTabActive ? 'content-record-tab is-active' : 'content-record-tab';
+    get pathDraftClass() {
+        return this._pathSegClass('draft');
     }
 
-    get auditTabClass() {
-        return this.isAuditTabActive ? 'content-record-tab is-active' : 'content-record-tab';
+    get pathReviewClass() {
+        return this._pathSegClass('review');
     }
 
-    get relatedTabClass() {
-        return this.isRelatedTabActive ? 'content-record-tab is-active' : 'content-record-tab';
+    get pathApproveClass() {
+        return this._pathSegClass('approve');
     }
 
-    get draftStageClass() {
-        return this.workflowStage === 'draft'
-            ? 'content-record-workflow-stage is-current'
-            : 'content-record-workflow-stage';
+    get pathArchiveClass() {
+        return this._pathSegClass('archive');
     }
 
-    get reviewStageClass() {
-        return this.workflowStage === 'review'
-            ? 'content-record-workflow-stage is-current'
-            : 'content-record-workflow-stage';
-    }
-
-    get approveStageClass() {
-        return this.workflowStage === 'approve'
-            ? 'content-record-workflow-stage is-current'
-            : 'content-record-workflow-stage';
-    }
-
-    get archiveStageClass() {
-        return this.workflowStage === 'archive'
-            ? 'content-record-workflow-stage is-current'
-            : 'content-record-workflow-stage';
+    /** Figma path: chevron segments (514:114938) — active = inverse surface, inactive = container-3 */
+    _pathSegClass(stage) {
+        const active = this.workflowStage === stage;
+        return active ? 'content-path-seg content-path-seg_is-active' : 'content-path-seg';
     }
 
     get annotationItems() {
@@ -121,51 +306,85 @@ export default class ContentRecordPage extends LightningElement {
                 id: '001',
                 createdBy: 'Brittany Smith',
                 timeAgo: '2h ago',
-                snippet: '...new outcome data showing how Immunexis is helping patients regain control faster....',
+                snippet:
+                    '...new outcome data showing how Immunexis is helping patients regain control faster....',
                 linkedClaimsCount: 0,
                 commentsCount: 0,
                 statusLabel: 'Pending',
                 isResolved: false
             },
-            { id: '002', createdBy: 'Brittany Smith', timeAgo: '1d ago', snippet: '', linkedClaimsCount: 0, commentsCount: 0, statusLabel: 'Resolved', isResolved: true },
-            { id: '003', createdBy: 'Brittany Smith', timeAgo: '2d ago', snippet: '', linkedClaimsCount: 0, commentsCount: 0, statusLabel: 'Pending', isResolved: false }
+            {
+                id: '002',
+                createdBy: 'Brittany Smith',
+                timeAgo: '1d ago',
+                snippet: '',
+                linkedClaimsCount: 0,
+                commentsCount: 0,
+                statusLabel: 'Resolved',
+                isResolved: true
+            },
+            {
+                id: '003',
+                createdBy: 'Brittany Smith',
+                timeAgo: '2d ago',
+                snippet: '',
+                linkedClaimsCount: 0,
+                commentsCount: 0,
+                statusLabel: 'Pending',
+                isResolved: false
+            }
         ];
-        return items.map((item) => ({
-            ...item,
-            expanded: this.expandedAnnotationIds.has(item.id),
-            expandedIcon: this.expandedAnnotationIds.has(item.id) ? 'utility:chevrondown' : 'utility:chevronright',
-            expandLabel: this.expandedAnnotationIds.has(item.id) ? 'Collapse annotation' : 'Expand annotation',
-            linkedClaimsExpanded: this.expandedLinkedClaimsIds.has(item.id),
-            commentsExpanded: this.expandedCommentsIds.has(item.id),
-            linkedClaimsChevron: this.expandedLinkedClaimsIds.has(item.id) ? 'utility:chevrondown' : 'utility:chevronright',
-            commentsChevron: this.expandedCommentsIds.has(item.id) ? 'utility:chevrondown' : 'utility:chevronright',
-            menuOpen: this.openMenuAnnotationId === item.id,
-            anchorChecked: this.anchorCheckedIds.has(item.id)
-        }));
+        return items.map((item) => {
+            const expanded = this.expandedAnnotationIds.has(item.id);
+            return {
+                ...item,
+                expanded,
+                cardClass: expanded
+                    ? 'content-record-annotation-card content-record-annotation-card_is-expanded'
+                    : 'content-record-annotation-card',
+                expandedIcon: expanded ? 'utility:chevrondown' : 'utility:chevronright',
+                expandLabel: expanded ? 'Collapse annotation' : 'Expand annotation',
+                linkedClaimsExpanded: this.expandedLinkedClaimsIds.has(item.id),
+                commentsExpanded: this.expandedCommentsIds.has(item.id),
+                linkedClaimsChevron: this.expandedLinkedClaimsIds.has(item.id)
+                    ? 'utility:chevrondown'
+                    : 'utility:chevronright',
+                commentsChevron: this.expandedCommentsIds.has(item.id)
+                    ? 'utility:chevrondown'
+                    : 'utility:chevronright',
+                menuOpen: this.openMenuAnnotationId === item.id,
+                anchorChecked: this.anchorCheckedIds.has(item.id)
+            };
+        });
     }
 
     get annotationsCount() {
         return this.annotationItems.length;
     }
 
+    get annotationsTabLabel() {
+        return `Annotations (${this.annotationsCount})`;
+    }
+
+    get contentWorkItemsTabLabel() {
+        return `Content Work items (${this.contentWorkItemsCount})`;
+    }
+
+    /** Placeholder work items for Content Work items scoped tab (Figma 514:115046) */
+    get contentWorkItems() {
+        return [
+            { id: 'cwi-001', name: 'Verify PI against approved claims', status: 'In Progress', due: 'Apr 20, 2026' },
+            { id: 'cwi-002', name: 'Medical–Legal review sign-off', status: 'Not Started', due: 'Apr 28, 2026' },
+            { id: 'cwi-003', name: 'Archive prior version in RCM', status: 'Completed', due: '—' }
+        ];
+    }
+
+    get contentWorkItemsCount() {
+        return this.contentWorkItems.length;
+    }
+
     get hasNoAnnotations() {
         return this.annotationItems.length === 0;
-    }
-
-    handleDocumentTabClick() {
-        this.activeTab = 'document';
-    }
-
-    handleReviewTabClick() {
-        this.activeTab = 'review';
-    }
-
-    handleAuditTabClick() {
-        this.activeTab = 'audit';
-    }
-
-    handleRelatedTabClick() {
-        this.activeTab = 'related';
     }
 
     handleAnnotationToggle(event) {
@@ -182,14 +401,12 @@ export default class ContentRecordPage extends LightningElement {
     handleAuthorClick(event) {
         event.preventDefault();
         const author = event.currentTarget.dataset.author;
-        // Filter annotations by author or navigate to user profile
         console.log('View profile/filter by author:', author);
     }
 
     handleStatusClick(event) {
         event.preventDefault();
         const id = event.currentTarget.dataset.id;
-        // Open status dropdown or filter by status
         console.log('Change/view status for annotation:', id);
     }
 
@@ -266,24 +483,50 @@ export default class ContentRecordPage extends LightningElement {
         }
     }
 
-    handleCloseMoreMenu() {
-        this.openMenuAnnotationId = null;
-    }
-
     handleEdit() {
         // Placeholder
     }
 
+    /**
+     * Whether we can navigate back to the parent collection in the workspace
+     * @returns {boolean}
+     */
+    get showBackToCollection() {
+        return Boolean(this.parentCollectionId);
+    }
+
+    /**
+     * Return to main workspace with the parent collection selected (tree + detail)
+     */
+    navigateToParentCollection() {
+        if (!this.parentCollectionId) {
+            return;
+        }
+        const detail = {
+            collectionId: this.parentCollectionId,
+            focusWorkspace: true
+        };
+        const evt = new CustomEvent('viewcollection', {
+            detail,
+            bubbles: true,
+            composed: true
+        });
+        if (typeof document !== 'undefined') {
+            const hierarchyHost = document.querySelector('main-collection-hierarchy');
+            if (hierarchyHost) {
+                hierarchyHost.dispatchEvent(evt);
+                return;
+            }
+        }
+        this.dispatchEvent(evt);
+    }
+
+    handleBackToCollectionClick() {
+        this.navigateToParentCollection();
+    }
+
     handleParentCollectionClick(event) {
         event.preventDefault();
-        if (this.parentCollectionId) {
-            this.dispatchEvent(
-                new CustomEvent('viewcollection', {
-                    detail: { collectionId: this.parentCollectionId },
-                    bubbles: true,
-                    composed: true
-                })
-            );
-        }
+        this.navigateToParentCollection();
     }
 }

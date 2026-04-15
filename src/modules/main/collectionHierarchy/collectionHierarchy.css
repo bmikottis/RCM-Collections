@@ -1225,6 +1225,16 @@
     background-color: #ffffff;
 }
 
+/* Content record fills the detail column when a content-record console tab is active */
+.detail-content-record-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0.5rem 1rem 1rem;
+}
+
 /* Breadcrumb Bar */
 .breadcrumb-bar {
     padding: 0.75rem 1rem;

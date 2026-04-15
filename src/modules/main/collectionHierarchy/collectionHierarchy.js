@@ -56,10 +56,28 @@ export default class CollectionHierarchy extends LightningElement {
         description: ''
     };
 
+    /** @type {((e: Event) => void) | null} */
+    _boundOpenContentRecordHost = null;
+
+    connectedCallback() {
+        this._boundOpenContentRecordHost = (e) => {
+            this.handleOpenContentRecord(e);
+        };
+        // Host listener: tree items also dispatch directly on this element so navigation works with synthetic shadow
+        this.addEventListener('opencontentrecord', this._boundOpenContentRecordHost);
+    }
+
     renderedCallback() {
         const selectAll = this.template.querySelector('.list-view-checkbox[data-select="all"]');
         if (selectAll) {
             selectAll.indeterminate = this.isSomeTemplatesSelected;
+        }
+    }
+
+    disconnectedCallback() {
+        if (this._boundOpenContentRecordHost) {
+            this.removeEventListener('opencontentrecord', this._boundOpenContentRecordHost);
+            this._boundOpenContentRecordHost = null;
         }
     }
 
@@ -820,11 +838,18 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Check if browser view should be shown (main tab active, not templates list)
+     * Tree + detail split workspace: main tab (collections) or a content-record console tab (keeps left nav visible).
      * @returns {boolean}
      */
-    get showBrowserView() {
-        return this.activeTabId === 'main' && !this.showTemplatesList;
+    get showCollectionTreeWorkspace() {
+        if (this.showTemplatesListView) {
+            return false;
+        }
+        if (this.showRecordPage) {
+            return false;
+        }
+        const activeTab = this.consoleTabs.find((t) => t.id === this.activeTabId);
+        return Boolean(activeTab && (activeTab.type === 'main' || activeTab.type === 'content-record'));
     }
 
     /**
@@ -1113,30 +1138,43 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Handle view collection from record page (to navigate to another collection)
+     * Handle view collection from record pages.
+     * - focusWorkspace: true — return to main workspace, select collection in tree + detail (content record “back”).
+     * - otherwise — open/switch collection record tab (nested collection from collection record page).
      * @param {CustomEvent} event
      */
     handleViewCollection(event) {
-        const { collectionId } = event.detail;
+        const { collectionId, focusWorkspace } = event.detail || {};
         const collection = findCollectionById(this.collectionsData, collectionId);
 
-        if (collection) {
-            const existingTab = this.consoleTabs.find(tab => tab.collectionId === collectionId);
+        if (!collection) {
+            return;
+        }
 
-            if (existingTab) {
-                this.activeTabId = existingTab.id;
-            } else {
-                const newTabId = `record-${collectionId}`;
-                const newTab = {
-                    id: newTabId,
-                    label: collection.name.length > 20 ? collection.name.substring(0, 20) + '...' : collection.name,
-                    type: 'record',
-                    collectionId: collectionId,
-                    closable: true
-                };
-                this.consoleTabs = [...this.consoleTabs, newTab];
-                this.activeTabId = newTabId;
-            }
+        if (focusWorkspace) {
+            this.showTemplatesList = false;
+            this.showMainTabDropdown = false;
+            this.expandPathToCollection(collectionId);
+            this.selectedCollectionId = collectionId;
+            this.activeTabId = 'main';
+            return;
+        }
+
+        const existingTab = this.consoleTabs.find(tab => tab.collectionId === collectionId);
+
+        if (existingTab) {
+            this.activeTabId = existingTab.id;
+        } else {
+            const newTabId = `record-${collectionId}`;
+            const newTab = {
+                id: newTabId,
+                label: collection.name.length > 20 ? collection.name.substring(0, 20) + '...' : collection.name,
+                type: 'record',
+                collectionId: collectionId,
+                closable: true
+            };
+            this.consoleTabs = [...this.consoleTabs, newTab];
+            this.activeTabId = newTabId;
         }
     }
 
@@ -1186,6 +1224,11 @@ export default class CollectionHierarchy extends LightningElement {
     handleOpenContentRecord(event) {
         const { content, parentCollectionId, parentCollectionName } = event.detail || {};
         if (!content?.id) return;
+
+        if (parentCollectionId) {
+            this.expandPathToCollection(parentCollectionId);
+            this.selectedCollectionId = parentCollectionId;
+        }
 
         const contentId = content.id;
         const existingTab = this.consoleTabs.find(

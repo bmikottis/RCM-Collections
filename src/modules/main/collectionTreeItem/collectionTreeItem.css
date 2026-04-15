@@ -110,13 +110,14 @@
     border-left: 1px solid #e5e5e5;
 }
 
-/* Content item row styling */
+/* Content item row styling — clickable to open content record */
 .content-item-row {
     display: flex;
     align-items: center;
     padding: 6px 8px;
     border-radius: 4px;
     margin-bottom: 8px;
+    cursor: pointer;
 }
 
 .content-item-row:last-child {
@@ -125,6 +126,11 @@
 
 .content-item-row:hover {
     background-color: #f3f3f3;
+}
+
+.content-item-row:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--slds-g-color-border-brand-1, #0176d3);
 }
 
 /* Content label styling */
@@ -173,13 +179,14 @@
     --slds-c-icon-color-foreground-default: #ffffff;
 }
 
-/* Folder icon styling - 16px size */
+/* Folder icon styling - 16px size; pointer-events none so row receives click */
 .content-item-row lightning-icon {
     flex-shrink: 0;
     margin-right: 8px;
     width: 16px;
     height: 16px;
     --slds-c-icon-size-x-small: 16px;
+    pointer-events: none;
 }
 
 /* Folder icon */

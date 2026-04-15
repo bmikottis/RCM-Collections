@@ -816,7 +816,8 @@ export default class CollectionDetail extends LightningElement {
         return this.collection.content.map(item => ({
             ...item,
             icon: 'doctype:unknown',
-            showMenu: this.openContentMenuId === item.id
+            showMenu: this.openContentMenuId === item.id,
+            openRecordAriaLabel: `Open regulated content record for ${item.name || 'document'}`
         }));
     }
 
@@ -1086,6 +1087,7 @@ export default class CollectionDetail extends LightningElement {
      * @param {Event} event
      */
     handleContentMenuToggle(event) {
+        event.stopPropagation();
         const contentId = event.currentTarget.dataset.id;
         if (this.openContentMenuId === contentId) {
             this.openContentMenuId = null;
@@ -1150,15 +1152,24 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Handle click on content link – open content record in a new console tab
+     * Open content record from Collection Content row (icon + title region)
      * @param {Event} event
      */
-    handleContentLinkClick(event) {
-        event.preventDefault();
+    handleContentRowClick(event) {
         const contentId = event.currentTarget.dataset.id;
         const content = this.collectionContent.find(c => c.id === contentId);
         if (content) {
             this.dispatchOpenContentRecord(content);
+        }
+    }
+
+    /**
+     * @param {KeyboardEvent} event
+     */
+    handleContentRowKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.handleContentRowClick(event);
         }
     }
 
@@ -1183,6 +1194,7 @@ export default class CollectionDetail extends LightningElement {
      * @param {Event} event
      */
     handlePreviewContent(event) {
+        event.stopPropagation();
         const contentId = event.currentTarget.dataset.id;
         const content = this.collectionContent.find(c => c.id === contentId);
         if (content) {

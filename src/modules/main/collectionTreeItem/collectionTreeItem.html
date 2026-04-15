@@ -91,15 +91,23 @@
                 
                 <!-- Content Items -->
                 <template for:each={contentItems} for:item="content">
-                    <div key={content.id} class="content-item-row" role="treeitem">
+                    <div
+                        key={content.id}
+                        class="content-item-row"
+                        role="treeitem"
+                        tabindex="0"
+                        data-id={content.id}
+                        onclick={handleContentClick}
+                        onkeydown={handleContentKeyDown}
+                        title={content.name}>
                         <span class="slds-m-right_x-small tree-spacer"></span>
-                        <lightning-icon 
-                            icon-name={content.icon} 
+                        <lightning-icon
+                            icon-name={content.icon}
                             size="x-small"
                             class="slds-m-right_small"
                             alternative-text={content.contentType}>
                         </lightning-icon>
-                        <span class="slds-truncate tree-item-label content-label" title={content.name}>
+                        <span class="slds-truncate tree-item-label content-label">
                             {content.name}
                         </span>
                     </div>

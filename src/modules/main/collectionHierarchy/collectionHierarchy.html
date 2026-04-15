@@ -84,8 +84,8 @@
         <!-- Main Content Area -->
         <div class="collection-hierarchy-container">
         
-        <!-- Browser View (Main Tab) -->
-        <template lwc:if={showBrowserView}>
+        <!-- Tree + detail workspace (collections list or content record tab — keeps left nav) -->
+        <template lwc:if={showCollectionTreeWorkspace}>
         <!-- Content Card (Tree + Preview) -->
         <div class="browser-content-card">
             
@@ -290,6 +290,7 @@
                 
                 <!-- Tree Content (hidden when filter panel is shown) -->
                 <template lwc:if={showTreeContent}>
+                    <!-- opencontentrecord: listener attached in renderedCallback (bubbles from any depth) -->
                     <div class="tree-nav-content" role="tree" aria-label="Collection hierarchy">
                         <template for:each={rootCollections} for:item="collection">
                             <main-collection-tree-item
@@ -331,7 +332,17 @@
                     </nav>
                 </template>
                 
-                <template lwc:if={hasSelectedCollection}>
+                <template lwc:if={showContentRecordPage}>
+                    <div class="detail-content-record-wrap">
+                        <main-content-record-page
+                            content={activeContentRecordData}
+                            parent-collection-name={activeContentRecordParentName}
+                            parent-collection-id={activeContentRecordParentId}
+                            onviewcollection={handleViewCollection}>
+                        </main-content-record-page>
+                    </div>
+                </template>
+                <template lwc:elseif={hasSelectedCollection}>
                     <main-collection-detail
                         collection={selectedCollection}
                         collection-type={selectedCollectionType}
@@ -343,7 +354,6 @@
                         onopencontentrecord={handleOpenContentRecord}>
                     </main-collection-detail>
                 </template>
-                
                 <template lwc:else>
                     <!-- Empty State -->
                     <div class="empty-state">
@@ -453,17 +463,6 @@
             </div>
         </template>
 
-        <!-- Content Record Page View (opened from Collection Content link) -->
-        <template lwc:if={showContentRecordPage}>
-            <div class="record-page-wrapper">
-                <main-content-record-page
-                    content={activeContentRecordData}
-                    parent-collection-name={activeContentRecordParentName}
-                    parent-collection-id={activeContentRecordParentId}
-                    onviewcollection={handleViewCollection}>
-                </main-content-record-page>
-            </div>
-        </template>
         </div>
     </div>
 
