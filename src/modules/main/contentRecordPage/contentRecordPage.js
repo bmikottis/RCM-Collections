@@ -6,6 +6,63 @@ const MAIN_MIN_PX = 240;
 const SPLITTER_PX = 6;
 const SIDEBAR_DEFAULT_PX = 400;
 
+/** Demo annotation rows — shared by getter and expand/collapse behavior */
+const ANNOTATION_DEMO_ITEMS = [
+    {
+        id: '001',
+        createdBy: 'Brittany Smith',
+        timeAgo: '2h ago',
+        snippet:
+            '...new outcome data showing how Immunexis is helping patients regain control faster....',
+        statusLabel: 'Pending',
+        isResolved: false,
+        flagged: false,
+        linkedClaims: [
+            { code: 'RCS-0001', warn: false },
+            { code: 'RCS-0002', warn: true },
+            { code: 'RCS-0003', warn: false }
+        ],
+        comments: [
+            {
+                id: 'cm-1',
+                author: 'Brittany Smith',
+                timeAgo: '1h ago',
+                body: 'Comment text would go here for the annotation. And it will vary in length.',
+                tone: 'brand'
+            },
+            {
+                id: 'cm-2',
+                author: 'Ujjwal Dubey',
+                timeAgo: '2h ago',
+                body: 'Comment text would go here for the annotation. And it will vary in length.',
+                tone: 'violet'
+            }
+        ]
+    },
+    {
+        id: '002',
+        createdBy: 'Brittany Smith',
+        timeAgo: '1d ago',
+        snippet: '',
+        statusLabel: 'Resolved',
+        isResolved: true,
+        flagged: false,
+        linkedClaims: [],
+        comments: []
+    },
+    {
+        id: '003',
+        createdBy: 'Brittany Smith',
+        timeAgo: '2d ago',
+        snippet: '',
+        statusLabel: 'Pending',
+        isResolved: false,
+        flagged: true,
+        linkedClaims: [],
+        comments: []
+    }
+];
+
 /**
  * Regulated Content record — layout aligned with Figma (page header, workflow path,
  * document viewer + scoped annotation panel).
@@ -20,10 +77,12 @@ export default class ContentRecordPage extends LightningElement {
     @track scopedPanelTab = 'annotations';
     @track workflowStage = 'draft'; // draft | review | approve | archive
     @track expandedAnnotationIds = new Set(['001']);
-    @track expandedLinkedClaimsIds = new Set();
-    @track expandedCommentsIds = new Set();
+    @track expandedLinkedClaimsIds = new Set(['001']);
+    @track expandedCommentsIds = new Set(['001']);
     @track openMenuAnnotationId = null;
     @track anchorCheckedIds = new Set();
+    /** Draft text per annotation id for comment composer */
+    @track commentDrafts = {};
     @track zoomLevel = '125';
     @track currentPage = 1;
 
@@ -301,44 +360,30 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     get annotationItems() {
-        const items = [
-            {
-                id: '001',
-                createdBy: 'Brittany Smith',
-                timeAgo: '2h ago',
-                snippet:
-                    '...new outcome data showing how Immunexis is helping patients regain control faster....',
-                linkedClaimsCount: 0,
-                commentsCount: 0,
-                statusLabel: 'Pending',
-                isResolved: false
-            },
-            {
-                id: '002',
-                createdBy: 'Brittany Smith',
-                timeAgo: '1d ago',
-                snippet: '',
-                linkedClaimsCount: 0,
-                commentsCount: 0,
-                statusLabel: 'Resolved',
-                isResolved: true
-            },
-            {
-                id: '003',
-                createdBy: 'Brittany Smith',
-                timeAgo: '2d ago',
-                snippet: '',
-                linkedClaimsCount: 0,
-                commentsCount: 0,
-                statusLabel: 'Pending',
-                isResolved: false
-            }
-        ];
-        return items.map((item) => {
+        return ANNOTATION_DEMO_ITEMS.map((item) => {
             const expanded = this.expandedAnnotationIds.has(item.id);
+            const linkedClaims = item.linkedClaims || [];
+            const comments = item.comments || [];
+            const linkedClaimsCount = linkedClaims.length;
+            const commentsCount = comments.length;
+            const commentsWithUi = comments.map((c) => ({
+                ...c,
+                avatarClass:
+                    c.tone === 'violet'
+                        ? 'content-record-annotation-comment-avatar content-record-annotation-comment-avatar_violet'
+                        : 'content-record-annotation-comment-avatar content-record-annotation-comment-avatar_brand'
+            }));
             return {
                 ...item,
+                linkedClaims,
+                comments: commentsWithUi,
+                linkedClaimsCount,
+                commentsCount,
+                displayAnnId: `ANN-${item.id}`,
+                commentDraftValue: this.commentDrafts[item.id] ?? '',
+                showAnchorIcon: this.anchorCheckedIds.has(item.id),
                 expanded,
+                isCollapsed: !expanded,
                 cardClass: expanded
                     ? 'content-record-annotation-card content-record-annotation-card_is-expanded'
                     : 'content-record-annotation-card',
@@ -346,6 +391,8 @@ export default class ContentRecordPage extends LightningElement {
                 expandLabel: expanded ? 'Collapse annotation' : 'Expand annotation',
                 linkedClaimsExpanded: this.expandedLinkedClaimsIds.has(item.id),
                 commentsExpanded: this.expandedCommentsIds.has(item.id),
+                hasLinkedClaims: linkedClaims.length > 0,
+                hasComments: comments.length > 0,
                 linkedClaimsChevron: this.expandedLinkedClaimsIds.has(item.id)
                     ? 'utility:chevrondown'
                     : 'utility:chevronright',
@@ -392,10 +439,78 @@ export default class ContentRecordPage extends LightningElement {
         const next = new Set(this.expandedAnnotationIds);
         if (next.has(id)) {
             next.delete(id);
+            const lk = new Set(this.expandedLinkedClaimsIds);
+            lk.delete(id);
+            this.expandedLinkedClaimsIds = lk;
+            const cm = new Set(this.expandedCommentsIds);
+            cm.delete(id);
+            this.expandedCommentsIds = cm;
         } else {
             next.add(id);
+            const seed = ANNOTATION_DEMO_ITEMS.find((row) => row.id === id);
+            if (seed) {
+                const nLinked = (seed.linkedClaims || []).length;
+                const nComments = (seed.comments || []).length;
+                if (nLinked > 0) {
+                    const lk = new Set(this.expandedLinkedClaimsIds);
+                    lk.add(id);
+                    this.expandedLinkedClaimsIds = lk;
+                }
+                if (nComments > 0) {
+                    const cm = new Set(this.expandedCommentsIds);
+                    cm.add(id);
+                    this.expandedCommentsIds = cm;
+                }
+            }
         }
         this.expandedAnnotationIds = next;
+    }
+
+    /**
+     * Collapsed footer pills: expand card and open linked or comments section (Figma)
+     * @param {Event} event
+     */
+    handleCollapsedSummaryClick(event) {
+        event.stopPropagation();
+        const id = event.currentTarget.dataset.id;
+        const jump = event.currentTarget.dataset.jump;
+        const nextAnn = new Set(this.expandedAnnotationIds);
+        nextAnn.add(id);
+        this.expandedAnnotationIds = nextAnn;
+        if (jump === 'linked') {
+            const n = new Set(this.expandedLinkedClaimsIds);
+            n.add(id);
+            this.expandedLinkedClaimsIds = n;
+        } else if (jump === 'comments') {
+            const n = new Set(this.expandedCommentsIds);
+            n.add(id);
+            this.expandedCommentsIds = n;
+        }
+    }
+
+    handleSaveCommentClick(event) {
+        const id = event.currentTarget.dataset.id;
+        console.log('Save comment for annotation:', id);
+    }
+
+    handleLinkedClaimMenuClick(event) {
+        event.stopPropagation();
+        const code = event.currentTarget.dataset.code;
+        console.log('Linked claim menu:', code);
+    }
+
+    handleCommentMenuClick(event) {
+        event.stopPropagation();
+        const commentId = event.currentTarget.dataset.commentId;
+        console.log('Comment menu:', commentId);
+    }
+
+    handleCommentDraftChange(event) {
+        const id = event.target?.dataset?.id;
+        if (!id) {
+            return;
+        }
+        this.commentDrafts = { ...this.commentDrafts, [id]: event.detail.value };
     }
 
     handleAuthorClick(event) {

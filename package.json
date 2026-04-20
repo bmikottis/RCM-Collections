@@ -8,6 +8,7 @@
     "clean": "rimraf node_modules __lwr_cache__ site",
     "heroku-postbuild": "npm run build:prod-compat",
     "dev": "lwr dev",
+    "dev:fresh": "node -e \"try{require('fs').rmSync('__lwr_cache__',{recursive:true,force:true})}catch(e){}\" && lwr dev",
     "dev:port": "lwr dev -p 3001",
     "dev:compat": "lwr dev --mode compat",
     "build": "lwr build --clean",
