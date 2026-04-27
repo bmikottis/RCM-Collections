@@ -462,34 +462,41 @@
                                                                     </div>
                                                                 </template>
                                                                 <div class="content-record-annotation-expandable-slot">
-                                                                    <div class="content-record-annotation-expandable-row">
-                                                                        <div class="content-record-annotation-expandable-main">
-                                                                            <div class={ann.linkedClaimsSectionClass}>
-                                                                                <h3 class="content-record-annotation-section-heading">
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="content-record-annotation-section-toggle"
-                                                                                        aria-expanded={ann.linkedClaimsExpanded}
-                                                                                        aria-controls={ann.linkedClaimsPanelId}
-                                                                                        id={ann.linkedClaimsToggleId}
-                                                                                        data-id={ann.id}
-                                                                                        onclick={handleLinkedClaimsToggle}>
-                                                                                        <lightning-icon
-                                                                                            class="content-record-annotation-section-toggle-icon"
-                                                                                            icon-name={ann.linkedClaimsChevron}
-                                                                                            size="x-small"
-                                                                                            alternative-text="">
-                                                                                        </lightning-icon>
-                                                                                        <span class="content-record-annotation-section-heading-text">
-                                                                                            Linked Claims ({ann.linkedClaimsCount})
-                                                                                        </span>
-                                                                                    </button>
-                                                                                </h3>
-                                                                                <div
-                                                                                    id={ann.linkedClaimsPanelId}
-                                                                                    class="content-record-annotation-section-panel"
-                                                                                    role="region"
-                                                                                    aria-labelledby={ann.linkedClaimsToggleId}>
+                                                                    <div class={ann.linkedClaimsSectionClass}>
+                                                                        <h3 class="content-record-annotation-section-heading">
+                                                                            <div class="content-record-annotation-section-bar">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="content-record-annotation-section-toggle"
+                                                                                    aria-expanded={ann.linkedClaimsExpanded}
+                                                                                    aria-controls={ann.linkedClaimsPanelId}
+                                                                                    id={ann.linkedClaimsToggleId}
+                                                                                    data-id={ann.id}
+                                                                                    onclick={handleLinkedClaimsToggle}>
+                                                                                    <lightning-icon
+                                                                                        class="content-record-annotation-section-toggle-icon"
+                                                                                        icon-name={ann.linkedClaimsChevron}
+                                                                                        size="x-small"
+                                                                                        alternative-text="">
+                                                                                    </lightning-icon>
+                                                                                    <span class="content-record-annotation-section-heading-text">
+                                                                                        Linked Claims ({ann.linkedClaimsCount})
+                                                                                    </span>
+                                                                                </button>
+                                                                                <a
+                                                                                    href="#"
+                                                                                    class="content-record-annotation-section-link content-record-annotation-section-link_bar"
+                                                                                    data-id={ann.id}
+                                                                                    onclick={handleLinkClaimClick}>
+                                                                                    Link Claim
+                                                                                </a>
+                                                                            </div>
+                                                                        </h3>
+                                                                        <div
+                                                                            id={ann.linkedClaimsPanelId}
+                                                                            class="content-record-annotation-section-panel"
+                                                                            role="region"
+                                                                            aria-labelledby={ann.linkedClaimsToggleId}>
                                                                                     <template lwc:if={ann.linkedClaimsExpanded}>
                                                                                         <template lwc:if={ann.hasLinkedClaims}>
                                                                                             <div class="content-record-annotation-linked-list">
@@ -509,12 +516,16 @@
                                                                                                             {lc.code}
                                                                                                         </a>
                                                                                                         <template lwc:if={lc.warn}>
-                                                                                                            <lightning-icon
-                                                                                                                icon-name="utility:warning"
-                                                                                                                size="xx-small"
-                                                                                                                class="content-record-annotation-linked-warn"
-                                                                                                                alternative-text="Warning">
-                                                                                                            </lightning-icon>
+                                                                                                            <span
+                                                                                                                class="content-record-annotation-linked-warn-badge"
+                                                                                                                title="Unapproved claim">
+                                                                                                                <lightning-icon
+                                                                                                                    icon-name="utility:warning"
+                                                                                                                    size="xx-small"
+                                                                                                                    class="content-record-annotation-linked-warn"
+                                                                                                                    alternative-text="Warning">
+                                                                                                                </lightning-icon>
+                                                                                                            </span>
                                                                                                         </template>
                                                                                                         <span class="content-record-annotation-linked-spacer"></span>
                                                                                                         <button
@@ -540,48 +551,44 @@
                                                                                         </template>
                                                                                     </template>
                                                                                 </div>
-                                                                            </div>
                                                                         </div>
-                                                                        <div class="content-record-annotation-expandable-actions">
-                                                                            <a
-                                                                                href="#"
-                                                                                class="content-record-annotation-section-link"
-                                                                                data-id={ann.id}
-                                                                                onclick={handleLinkClaimClick}>
-                                                                                Link Claim
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
                                                                 </div>
                                                                 <div class="content-record-annotation-expandable-slot">
-                                                                    <div class="content-record-annotation-expandable-row">
-                                                                        <div class="content-record-annotation-expandable-main">
-                                                                            <div class={ann.commentsSectionClass}>
-                                                                                <h3 class="content-record-annotation-section-heading">
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="content-record-annotation-section-toggle"
-                                                                                        aria-expanded={ann.commentsExpanded}
-                                                                                        aria-controls={ann.commentsPanelId}
-                                                                                        id={ann.commentsToggleId}
-                                                                                        data-id={ann.id}
-                                                                                        onclick={handleCommentsToggle}>
-                                                                                        <lightning-icon
-                                                                                            class="content-record-annotation-section-toggle-icon"
-                                                                                            icon-name={ann.commentsChevron}
-                                                                                            size="x-small"
-                                                                                            alternative-text="">
-                                                                                        </lightning-icon>
-                                                                                        <span class="content-record-annotation-section-heading-text">
-                                                                                            Comments ({ann.commentsCount})
-                                                                                        </span>
-                                                                                    </button>
-                                                                                </h3>
-                                                                                <div
-                                                                                    id={ann.commentsPanelId}
-                                                                                    class="content-record-annotation-section-panel"
-                                                                                    role="region"
-                                                                                    aria-labelledby={ann.commentsToggleId}>
+                                                                    <div class={ann.commentsSectionClass}>
+                                                                        <h3 class="content-record-annotation-section-heading">
+                                                                            <div class="content-record-annotation-section-bar">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="content-record-annotation-section-toggle"
+                                                                                    aria-expanded={ann.commentsExpanded}
+                                                                                    aria-controls={ann.commentsPanelId}
+                                                                                    id={ann.commentsToggleId}
+                                                                                    data-id={ann.id}
+                                                                                    onclick={handleCommentsToggle}>
+                                                                                    <lightning-icon
+                                                                                        class="content-record-annotation-section-toggle-icon"
+                                                                                        icon-name={ann.commentsChevron}
+                                                                                        size="x-small"
+                                                                                        alternative-text="">
+                                                                                    </lightning-icon>
+                                                                                    <span class="content-record-annotation-section-heading-text">
+                                                                                        Comments ({ann.commentsCount})
+                                                                                    </span>
+                                                                                </button>
+                                                                                <a
+                                                                                    href="#"
+                                                                                    class="content-record-annotation-section-link content-record-annotation-section-link_bar"
+                                                                                    data-id={ann.id}
+                                                                                    onclick={handleAddCommentClick}>
+                                                                                    Add Comment
+                                                                                </a>
+                                                                            </div>
+                                                                        </h3>
+                                                                        <div
+                                                                            id={ann.commentsPanelId}
+                                                                            class="content-record-annotation-section-panel"
+                                                                            role="region"
+                                                                            aria-labelledby={ann.commentsToggleId}>
                                                                                     <template lwc:if={ann.commentsExpanded}>
                                                                                         <template lwc:if={ann.hasComments}>
                                                                                             <div class="content-record-annotation-comments-list">
@@ -650,18 +657,7 @@
                                                                                         </div>
                                                                                     </template>
                                                                                 </div>
-                                                                            </div>
                                                                         </div>
-                                                                        <div class="content-record-annotation-expandable-actions">
-                                                                            <a
-                                                                                href="#"
-                                                                                class="content-record-annotation-section-link"
-                                                                                data-id={ann.id}
-                                                                                onclick={handleAddCommentClick}>
-                                                                                Add Comment
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
                                                                 </div>
                                                                 <div class="content-record-annotation-anchor">
                                                                     <div class="content-record-anchor-checkbox-wrap">

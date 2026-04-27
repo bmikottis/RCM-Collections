@@ -572,38 +572,41 @@
     padding: var(--slds-g-spacing-xx-small, 0.25rem);
 }
 
+/* Annotation card — Figma RCM Component Library node 276:18379 */
 .content-record-annotation-card {
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    background-color: var(--slds-g-color-surface-container-1, #ffffff);
     border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    border-radius: var(--slds-g-radius-border-3, 0.5rem);
+    border-radius: var(--slds-g-radius-border-3, 0.75rem);
     overflow: visible;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 0 2px rgba(0, 0, 0, 0.18),
+        0 2px 2px rgba(0, 0, 0, 0.18),
+        0 -1px 2px rgba(0, 0, 0, 0.1);
     transition:
         box-shadow 0.15s ease,
-        border-color 0.15s ease,
-        outline-color 0.15s ease;
+        border-color 0.15s ease;
 }
 
-/* Expanded: neutral frame + brand left rail */
 .content-record-annotation-card_is-expanded {
-    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    border-left: 3px solid var(--slds-g-color-border-brand-1, #0176d3);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-color: var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
-/* Selected: full-card brand ring (outline + shadow — shadow survives scroll clipping better) */
+/* Selected state: 2px accent border (matches Figma Annotation Card selection chrome) */
 .content-record-annotation-card_is-selected {
-    outline: 2px solid var(--slds-g-color-border-brand-1, #0176d3);
-    outline-offset: 0;
-    box-shadow: 0 0 0 2px var(--slds-g-color-border-brand-1, #0176d3);
+    border: 2px solid var(--slds-g-color-accent-container-1, #066afe);
+    box-shadow:
+        0 0 2px rgba(0, 0, 0, 0.18),
+        0 2px 2px rgba(0, 0, 0, 0.18),
+        0 -1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .content-record-annotation-header {
     display: flex;
     align-items: flex-start;
-    padding: var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-x-small, 0.5rem);
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    gap: var(--slds-g-spacing-small, 0.5rem);
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem)
+        var(--slds-g-spacing-small, 0.5rem);
+    background-color: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 .content-record-annotation-chevron {
@@ -611,15 +614,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1rem;
+    height: 1rem;
     margin-top: 0.125rem;
     padding: 0;
-    background: var(--slds-g-color-surface-2, #f3f3f3);
+    background: transparent;
     border: none;
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    border-radius: var(--slds-g-radius-border-circle, 50%);
     cursor: pointer;
-    color: var(--slds-g-color-on-surface-2, #706e6b);
+    color: var(--slds-g-color-on-surface-2, #747474);
 }
 
 .content-record-annotation-chevron:hover {
@@ -658,15 +661,15 @@
 
 .content-record-annotation-ann-code {
     margin: 0;
-    font-size: 0.8125rem;
-    font-weight: var(--slds-g-font-weight-6, 600);
-    line-height: 1.25rem;
-    color: var(--slds-g-color-on-surface-2, #3e3e3c);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.0625rem;
+    color: var(--slds-g-color-on-surface-3, #001e5b);
 }
 
 .content-record-annotation-card_is-expanded .content-record-annotation-ann-code {
-    font-size: var(--slds-g-font-scale-3, 1rem);
-    line-height: var(--slds-g-font-lineheight-4, 1.5rem);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.0625rem;
 }
 
 .content-record-annotation-more-wrap {
@@ -699,17 +702,18 @@
     outline-offset: 1px;
 }
 
+/* Figma: 16px bordered overflow (⚡ Button Icon - Bordered) */
 .content-record-annotation-more_circle {
-    width: 2rem;
-    height: 2rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: var(--slds-g-radius-border-circle, 50%);
-    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-2, #5c5c5c);
+    background-color: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 .content-record-annotation-card_is-expanded .content-record-annotation-more_circle {
-    width: 2.375rem;
-    height: 2.375rem;
+    width: 1rem;
+    height: 1rem;
 }
 
 .content-record-annotation-collapsed-footer {
@@ -758,8 +762,11 @@
 }
 
 .content-record-annotation-body {
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    padding-bottom: var(--slds-g-spacing-x-small, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-3, 0.75rem);
+    border-top: none;
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-3, 0.75rem);
 }
 
 .content-record-annotation-dropdown {
@@ -800,13 +807,11 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.25rem;
-    row-gap: 0.125rem;
-    font-size: 0.6875rem;
-    line-height: 1rem;
-    color: var(--slds-g-color-on-surface-2, #706e6b);
-    padding: 0 var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-x-small, 0.5rem);
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    gap: var(--slds-g-spacing-xx-small, 0.25rem);
+    min-height: 1rem;
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-small, 0.5rem);
+    border-top: none;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
 .content-record-annotation-user-icon {
@@ -815,9 +820,10 @@
 }
 
 .content-record-annotation-author {
-    color: var(--slds-g-color-brand-base-50, #0176d3);
+    color: var(--slds-g-color-accent-2, #0250d9);
     text-decoration: none;
-    font-size: 0.6875rem;
+    font-size: var(--slds-g-font-size-2, 0.75rem);
+    line-height: 1.125rem;
 }
 
 .content-record-annotation-author_comment {
@@ -834,12 +840,15 @@
 }
 
 .content-record-annotation-time {
-    font-style: italic;
+    font-style: normal;
+    font-size: 0.625rem;
+    line-height: 1rem;
 }
 
 .content-record-annotation-status-text {
-    color: var(--slds-g-color-on-surface-2, #706e6b);
-    font-size: 0.6875rem;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-size: 0.625rem;
+    line-height: 1rem;
 }
 
 .content-record-annotation-section-body {
@@ -852,38 +861,46 @@
     border-radius: var(--slds-g-radius-border-2, 0.25rem);
 }
 
-/* Quote highlight: left accent only (no filled “warning card”) — inset bar reads clearly in shadow/LWR */
+/* AnnotationHighlightText — Figma: warning-base-95 fill, warning-base-70 4px left */
 .content-record-annotation-card .content-record-annotation-snippet {
-    margin: var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-small, 0.75rem)
-        var(--slds-g-spacing-x-small, 0.5rem);
-    padding: var(--slds-g-spacing-small, 0.75rem);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
+    padding: var(--slds-g-spacing-small, 0.5rem) var(--slds-g-spacing-4, 1rem);
+    background-color: var(--slds-g-color-warning-base-95, #fbf3e0);
     border: none;
-    border-radius: 0;
-    border-left: 4px solid var(--slds-g-color-border-warning-2, #e5b318);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    border-left: 4px solid var(--slds-g-color-warning-base-70, #e4a201);
     outline: none;
-    color: var(--slds-g-color-on-surface-3, #181818);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
 }
 
 .content-record-annotation-snippet-quote {
     display: block;
-    font-size: var(--slds-g-font-size-2, 0.75rem);
-    line-height: 1.25rem;
+    font-size: var(--slds-g-font-size-3, 0.8125rem);
+    line-height: 1.125rem;
     font-weight: var(--slds-g-font-weight-4, 400);
-    color: var(--slds-g-color-on-surface-3, #181818);
-    font-style: italic;
+    font-style: normal;
 }
 
 .content-record-annotation-linked-list {
     border-top: none;
 }
 
+.content-record-annotation-linked-warn-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.5625rem;
+    padding: 0 var(--slds-g-spacing-xx-small, 0.25rem);
+    background-color: var(--slds-g-color-warning-container-1, #f9e3b6);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
 .content-record-annotation-linked-row {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
-    min-height: 2.25rem;
-    padding: var(--slds-g-spacing-x-small, 0.5rem) var(--slds-g-spacing-small, 0.75rem);
+    gap: var(--slds-g-spacing-xx-small, 0.25rem);
+    min-height: 2rem;
+    padding: var(--slds-g-spacing-xx-small, 0.25rem) var(--slds-g-spacing-small, 0.5rem);
     border-bottom: none;
 }
 
@@ -897,9 +914,9 @@
 }
 
 .content-record-annotation-linked-code {
-    font-size: var(--slds-g-font-size-2, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
-    color: var(--slds-g-color-brand-base-50, #0176d3);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-accent-3, #022ac0);
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 2px;
@@ -924,12 +941,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1rem;
+    height: 1rem;
     padding: 0;
-    border: none;
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
-    background: transparent;
+    border: 1px solid var(--slds-g-color-border-2, #5c5c5c);
+    border-radius: var(--slds-g-radius-border-circle, 50%);
+    background: var(--slds-g-color-surface-container-1, #ffffff);
     cursor: pointer;
     color: var(--slds-g-color-on-surface-2, #706e6b);
 }
@@ -940,11 +957,11 @@
 }
 
 .content-record-annotation-comments-list {
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-top: none;
 }
 
 .content-record-annotation-comment {
-    padding: var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-small, 0.75rem) 0;
+    padding: var(--slds-g-spacing-small, 0.5rem) var(--slds-g-spacing-small, 0.5rem) 0;
 }
 
 .content-record-annotation-comment-hdr {
@@ -959,20 +976,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: var(--slds-g-radius-border-circle, 50%);
     flex-shrink: 0;
 }
 
 .content-record-annotation-comment-avatar_brand {
-    background-color: var(--slds-g-color-brand-base-95, #eaf5fe);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-brand-base-50, #0176d3);
+    background-color: #1b96ff;
+    --slds-c-icon-color-foreground-default: #ffffff;
 }
 
 .content-record-annotation-comment-avatar_violet {
-    background-color: #f3f0ff;
-    --slds-c-icon-color-foreground-default: #9050e9;
+    background-color: var(--slds-g-color-palette-purple-50, #9050e9);
+    --slds-c-icon-color-foreground-default: #ffffff;
 }
 
 .content-record-annotation-comment-spacer {
@@ -985,12 +1002,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1rem;
+    height: 1rem;
     padding: 0;
-    border: none;
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
-    background: transparent;
+    border: 1px solid var(--slds-g-color-border-2, #5c5c5c);
+    border-radius: var(--slds-g-radius-border-circle, 50%);
+    background: var(--slds-g-color-surface-container-1, #ffffff);
     cursor: pointer;
     color: var(--slds-g-color-on-surface-2, #706e6b);
 }
@@ -1001,7 +1018,8 @@
 
 .content-record-annotation-comment-body {
     margin: 0;
-    font-size: var(--slds-g-font-size-2, 0.75rem);
+    padding: 0 var(--slds-g-spacing-small, 0.5rem);
+    font-size: var(--slds-g-font-size-3, 0.8125rem);
     line-height: 1.25rem;
     color: var(--slds-g-color-on-surface-3, #181818);
 }
@@ -1032,59 +1050,50 @@
     margin-top: var(--slds-g-spacing-x-small, 0.5rem);
 }
 
-/* Linked Claims / Comments — fully scoped (no reliance on global .slds-grid / .slds-button in shadow) */
+/* Linked Claims / Comments — Figma 276:18379 expandable sections */
 .content-record-annotation-expandable-slot {
-    margin-top: var(--slds-g-spacing-xx-small, 0.25rem);
+    margin: 0;
 }
 
-.content-record-annotation-expandable-row {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--slds-g-spacing-x-small);
-}
-
-.content-record-annotation-expandable-main {
-    flex: 1;
-    min-width: 0;
-}
-
-.content-record-annotation-expandable-actions {
-    flex-shrink: 0;
-    align-self: flex-start;
-    padding-top: var(--slds-g-spacing-xx-small, 0.25rem);
-    padding-left: var(--slds-g-spacing-x-small, 0.5rem);
-}
-
-/* Grey expandable shell (Linked Claims / Comments) — full chrome so it does not rely on global SLDS */
 .content-record-annotation-section-shell {
-    margin-block: var(--slds-g-spacing-xx-small, 0.25rem);
-    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
-    background-color: var(--slds-g-color-surface-container-2, #ecebea);
-    overflow: hidden;
+    margin: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
 }
 
 .content-record-annotation-section-heading {
     margin: 0;
 }
 
+/* Single grey bar: chevron + title (left), Link / Add Comment (right) */
+.content-record-annotation-section-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--slds-g-spacing-small, 0.5rem);
+    min-height: 2rem;
+    padding: var(--slds-g-spacing-xx-small, 0.25rem) var(--slds-g-spacing-small, 0.5rem);
+    background-color: var(--slds-g-color-surface-container-2, #f3f3f3);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+
 .content-record-annotation-section-toggle {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small);
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 2.25rem;
-    padding: 0 var(--slds-g-spacing-small);
+    gap: var(--slds-g-spacing-small, 0.5rem);
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 2rem;
+    padding: 0;
+    margin: 0;
     text-align: left;
     cursor: pointer;
-    color: var(--slds-g-color-on-surface-3, #181818);
-    font-size: var(--slds-g-font-scale-2, 0.875rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
-    line-height: 1.875rem;
     font-family: inherit;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.0625rem;
     background-color: transparent;
     border: none;
     border-radius: 0;
@@ -1093,7 +1102,7 @@
 .content-record-annotation-section-toggle:hover,
 .content-record-annotation-section-toggle:focus {
     color: inherit;
-    background-color: var(--slds-g-color-surface-container-3, #e5e5e5);
+    background-color: transparent;
 }
 
 .content-record-annotation-section-toggle:focus {
@@ -1116,9 +1125,9 @@
     visibility: visible;
     opacity: 1;
     height: auto;
-    padding-top: var(--slds-g-spacing-x-small);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    padding-top: var(--slds-g-spacing-small, 0.5rem);
+    background-color: transparent;
+    border-top: none;
 }
 
 .content-record-annotation-section-shell.content-record-annotation-section-shell_open
@@ -1139,7 +1148,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: var(--slds-g-font-weight-6, 600);
+    font-weight: var(--slds-g-font-weight-4, 400);
 }
 
 .content-record-annotation-section-toggle-icon {
@@ -1149,10 +1158,15 @@
 
 .content-record-annotation-section-link {
     flex-shrink: 0;
-    font-size: 0.75rem;
-    font-weight: var(--slds-g-font-weight-4, 400);
-    color: var(--slds-g-color-brand-base-50, #0176d3);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: 1.0625rem;
+    color: var(--slds-g-color-accent-2, #0250d9);
     text-decoration: none;
+}
+
+.content-record-annotation-section-link_bar {
+    align-self: center;
 }
 
 .content-record-annotation-section-link:hover {

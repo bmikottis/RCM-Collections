@@ -477,7 +477,7 @@ export default class ContentRecordPage extends LightningElement {
                     : 'utility:chevronright',
                 menuOpen: this.openMenuAnnotationId === item.id,
                 anchorChecked: this.anchorCheckedIds.has(item.id),
-                headerMenuIconSize: expanded ? 'small' : 'x-small'
+                headerMenuIconSize: 'xx-small'
             };
         });
     }
