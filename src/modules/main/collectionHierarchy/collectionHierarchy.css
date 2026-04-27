@@ -1257,6 +1257,12 @@
 .breadcrumb-link {
     color: #0176d3;
     text-decoration: none;
+    background: none;
+    border: none;
+    font: inherit;
+    padding: 0;
+    cursor: pointer;
+    text-align: start;
 }
 
 .breadcrumb-link:hover {

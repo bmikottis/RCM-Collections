@@ -290,7 +290,6 @@
                 
                 <!-- Tree Content (hidden when filter panel is shown) -->
                 <template lwc:if={showTreeContent}>
-                    <!-- opencontentrecord: listener attached in renderedCallback (bubbles from any depth) -->
                     <div class="tree-nav-content" role="tree" aria-label="Collection hierarchy">
                         <template for:each={rootCollections} for:item="collection">
                             <main-collection-tree-item
@@ -299,7 +298,6 @@
                                 selected-id={selectedCollectionId}
                                 selected-collection-ids={selectedCollectionIds}
                                 expanded-ids={expandedIdsArray}
-                                onselect={handleCollectionSelect}
                                 oncollectioncheck={handleCollectionCheck}>
                             </main-collection-tree-item>
                         </template>
@@ -320,10 +318,15 @@
                             <template for:each={breadcrumbs} for:item="crumb">
                                 <span key={crumb.id} class="breadcrumb-item">
                                     <template lwc:if={crumb.isLast}>
-                                        <span class="breadcrumb-current">{crumb.name}</span>
+                                        <template lwc:if={showContentRecordPage}>
+                                            <button type="button" class="breadcrumb-link" onclick={handleBreadcrumbClick} data-id={crumb.id}>{crumb.name}</button>
+                                        </template>
+                                        <template lwc:else>
+                                            <span class="breadcrumb-current">{crumb.name}</span>
+                                        </template>
                                     </template>
                                     <template lwc:else>
-                                        <a href="#" class="breadcrumb-link" onclick={handleBreadcrumbClick} data-id={crumb.id}>{crumb.name}</a>
+                                        <button type="button" class="breadcrumb-link" onclick={handleBreadcrumbClick} data-id={crumb.id}>{crumb.name}</button>
                                         <span class="breadcrumb-separator">›</span>
                                     </template>
                                 </span>
@@ -337,8 +340,7 @@
                         <main-content-record-page
                             content={activeContentRecordData}
                             parent-collection-name={activeContentRecordParentName}
-                            parent-collection-id={activeContentRecordParentId}
-                            onviewcollection={handleViewCollection}>
+                            parent-collection-id={activeContentRecordParentId}>
                         </main-content-record-page>
                     </div>
                 </template>
@@ -457,8 +459,7 @@
             <div class="record-page-wrapper">
                 <main-collection-record-page
                     collection={activeRecordCollection}
-                    collection-type={activeRecordCollectionType}
-                    onviewcollection={handleViewCollection}>
+                    collection-type={activeRecordCollectionType}>
                 </main-collection-record-page>
             </div>
         </template>

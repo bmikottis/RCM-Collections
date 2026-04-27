@@ -1,5 +1,8 @@
 import { LightningElement, api, track } from 'lwc';
 
+/** Must match collectionHierarchy.js */
+const RCM_VIEW_COLLECTION = 'rcm-view-collection';
+
 const STORAGE_KEY_SIDEBAR = 'rcm-content-record-annotation-sidebar-px';
 const SIDEBAR_MIN_PX = 240;
 const MAIN_MIN_PX = 240;
@@ -617,23 +620,18 @@ export default class ContentRecordPage extends LightningElement {
         if (!this.parentCollectionId) {
             return;
         }
-        const detail = {
-            collectionId: this.parentCollectionId,
-            focusWorkspace: true
-        };
-        const evt = new CustomEvent('viewcollection', {
-            detail,
-            bubbles: true,
-            composed: true
-        });
         if (typeof document !== 'undefined') {
-            const hierarchyHost = document.querySelector('main-collection-hierarchy');
-            if (hierarchyHost) {
-                hierarchyHost.dispatchEvent(evt);
-                return;
-            }
+            document.dispatchEvent(
+                new CustomEvent(RCM_VIEW_COLLECTION, {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        collectionId: this.parentCollectionId,
+                        focusWorkspace: true
+                    }
+                })
+            );
         }
-        this.dispatchEvent(evt);
     }
 
     handleBackToCollectionClick() {

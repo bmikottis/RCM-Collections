@@ -11,6 +11,73 @@ import {
     recommendContentForRequired
 } from './sampleData';
 
+/** App-wide bridge: LWR synthetic shadow blocks normal DOM events from tree → hierarchy. */
+const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
+const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
+const RCM_VIEW_COLLECTION = 'rcm-view-collection';
+
+/** Current mounted hierarchy — global listeners delegate here so HMR/old instances never handle nav. */
+let rcmHierarchyTarget = null;
+
+let rcmDocumentListenersInstalled = false;
+
+function rcmNavSelectCollection(e) {
+    const host = rcmHierarchyTarget;
+    if (!host || typeof host.isConnected !== 'boolean' || !host.isConnected) {
+        return;
+    }
+    const id = e?.detail?.id;
+    if (!id) {
+        return;
+    }
+    host.expandPathToCollection(id);
+    host.selectedCollectionId = id;
+    host.focusMainConsoleTab();
+    // Second tick: LWC batching occasionally leaves content-record tab active until next flush
+    queueMicrotask(() => {
+        const h = rcmHierarchyTarget;
+        if (!h || !h.isConnected) {
+            return;
+        }
+        h.focusMainConsoleTab();
+    });
+}
+
+function rcmNavOpenContentRecord(e) {
+    const host = rcmHierarchyTarget;
+    if (!host || !host.isConnected) {
+        return;
+    }
+    const detail = e?.detail;
+    if (!detail?.content?.id) {
+        return;
+    }
+    host.handleOpenContentRecord({ detail });
+}
+
+function rcmNavViewCollection(e) {
+    const host = rcmHierarchyTarget;
+    if (!host || !host.isConnected) {
+        return;
+    }
+    const d = e?.detail;
+    if (!d?.collectionId) {
+        return;
+    }
+    host.handleViewCollection({ detail: d });
+}
+
+function rcmEnsureDocumentNavListeners() {
+    if (typeof document === 'undefined' || rcmDocumentListenersInstalled) {
+        return;
+    }
+    // document + capture: stable with LWR/synthetic shadow (window-only dispatch can miss listeners in some setups)
+    document.addEventListener(RCM_TREE_SELECT_COLLECTION, rcmNavSelectCollection, true);
+    document.addEventListener(RCM_TREE_OPEN_CONTENT_RECORD, rcmNavOpenContentRecord, true);
+    document.addEventListener(RCM_VIEW_COLLECTION, rcmNavViewCollection, true);
+    rcmDocumentListenersInstalled = true;
+}
+
 /**
  * Main Collection Hierarchy component providing a split-view layout
  * with tree navigation on the left and detail panel on the right.
@@ -59,12 +126,24 @@ export default class CollectionHierarchy extends LightningElement {
     /** @type {((e: Event) => void) | null} */
     _boundOpenContentRecordHost = null;
 
+    /** @type {((e: Event) => void) | null} */
+    _boundViewCollectionHost = null;
+
     connectedCallback() {
         this._boundOpenContentRecordHost = (e) => {
             this.handleOpenContentRecord(e);
         };
-        // Host listener: tree items also dispatch directly on this element so navigation works with synthetic shadow
+        // Collection detail panel still dispatches opencontentrecord on this host (same subtree).
         this.addEventListener('opencontentrecord', this._boundOpenContentRecordHost);
+
+        // Child pages dispatch viewcollection with bubbles/composed; navigateToParentCollection also dispatches
+        // on this host — template onviewcollection on descendants does not receive host-targeted events.
+        this._boundViewCollectionHost = (e) => this.handleViewCollection(e);
+        this.addEventListener('viewcollection', this._boundViewCollectionHost);
+
+        // Document bridge: tree / breadcrumbs / content record use CustomEvents; listeners delegate to rcmHierarchyTarget.
+        rcmHierarchyTarget = this;
+        rcmEnsureDocumentNavListeners();
     }
 
     renderedCallback() {
@@ -75,9 +154,16 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     disconnectedCallback() {
+        if (rcmHierarchyTarget === this) {
+            rcmHierarchyTarget = null;
+        }
         if (this._boundOpenContentRecordHost) {
             this.removeEventListener('opencontentrecord', this._boundOpenContentRecordHost);
             this._boundOpenContentRecordHost = null;
+        }
+        if (this._boundViewCollectionHost) {
+            this.removeEventListener('viewcollection', this._boundViewCollectionHost);
+            this._boundViewCollectionHost = null;
         }
     }
 
@@ -378,12 +464,12 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Handle collection selection from tree
-     * @param {CustomEvent} event
+     * Switch console focus to the main tab so the collection workspace (tree + detail) renders.
+     * Always applied when navigating via tree/breadcrumb — avoids stale tab lookups and stuck content-record UI.
      */
-    handleCollectionSelect(event) {
-        const { id } = event.detail;
-        this.selectedCollectionId = id;
+    focusMainConsoleTab() {
+        this.activeTabId = 'main';
+        this.consoleTabs = [...this.consoleTabs];
     }
 
     handleCollectionCheck(event) {
@@ -400,8 +486,19 @@ export default class CollectionHierarchy extends LightningElement {
      */
     handleBreadcrumbClick(event) {
         event.preventDefault();
-        const collectionId = event.currentTarget.dataset.id;
-        this.selectedCollectionId = collectionId;
+        const collectionId =
+            event.currentTarget.dataset?.id ||
+            event.currentTarget.getAttribute('data-id');
+        if (!collectionId || typeof document === 'undefined') {
+            return;
+        }
+        document.dispatchEvent(
+            new CustomEvent(RCM_TREE_SELECT_COLLECTION, {
+                bubbles: true,
+                composed: true,
+                detail: { id: collectionId }
+            })
+        );
     }
 
     /**

@@ -1,8 +1,8 @@
 <template>
     <div class={itemContainerClass} role="treeitem" aria-expanded={isExpanded} aria-level={item.level}>
         
-        <!-- Tree Item Row -->
-        <div class={itemRowClass} onclick={handleSelect} onkeydown={handleKeyDown} tabindex="0">
+        <!-- Tree Item Row: folder click → document bridge (see collectionHierarchy RCM_TREE_* constants) -->
+        <div class={itemRowClass} onclick={handleFolderRowClick} onkeydown={handleKeyDown} tabindex="0" data-collection-id={item.id}>
             
             <!-- Checkbox (collections only; content items rendered elsewhere have no checkbox) -->
             <span class="tree-item-checkbox-wrap" onclick={handleCheckboxClick}>
@@ -84,8 +84,7 @@
                         item={child}
                         selected-id={selectedId}
                         selected-collection-ids={selectedCollectionIds}
-                        expanded-ids={expandedIds}
-                        onselect={handleChildSelect}>
+                        expanded-ids={expandedIds}>
                     </main-collection-tree-item>
                 </template>
                 

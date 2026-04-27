@@ -1,5 +1,9 @@
 import { LightningElement, api, track } from 'lwc';
 
+/** Must match collectionHierarchy.js — bypasses LWR synthetic shadow */
+const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
+const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
+
 /**
  * Generic document icon for all content items
  */
@@ -235,24 +239,32 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
-     * Handle item selection
-     * @param {Event} event
+     * Notify hierarchy to show collection workspace (folder row). Uses window — reliable under synthetic shadow.
      */
-    handleSelect(event) {
-        event.stopPropagation();
-        
-        this.dispatchEvent(new CustomEvent('select', {
-            detail: { 
-                id: this.item.id,
-                item: this.item
-            },
-            bubbles: true,
-            composed: true
-        }));
+    dispatchSelectCollectionWindow() {
+        if (typeof document === 'undefined') {
+            return;
+        }
+        document.dispatchEvent(
+            new CustomEvent(RCM_TREE_SELECT_COLLECTION, {
+                bubbles: true,
+                composed: true,
+                detail: { id: this.item.id }
+            })
+        );
     }
 
     /**
-     * Handle keyboard navigation
+     * Click folder row (not toggle/checkbox — those stopPropagation).
+     * @param {Event} event
+     */
+    handleFolderRowClick(event) {
+        event.stopPropagation();
+        this.dispatchSelectCollectionWindow();
+    }
+
+    /**
+     * Keyboard: Enter/Space selects folder; arrows expand/collapse.
      * @param {KeyboardEvent} event
      */
     handleKeyDown(event) {
@@ -260,7 +272,7 @@ export default class CollectionTreeItem extends LightningElement {
             case 'Enter':
             case ' ':
                 event.preventDefault();
-                this.handleSelect(event);
+                this.dispatchSelectCollectionWindow();
                 break;
             case 'ArrowRight':
                 if (this.hasChildren && !this.isExpanded) {
@@ -274,15 +286,9 @@ export default class CollectionTreeItem extends LightningElement {
                     this.isExpanded = false;
                 }
                 break;
+            default:
+                break;
         }
-    }
-
-    /**
-     * Handle selection events from child items
-     * @param {CustomEvent} event
-     */
-    handleChildSelect(event) {
-        // Event bubbles up, no need to re-dispatch
     }
 
     /**
@@ -361,21 +367,15 @@ export default class CollectionTreeItem extends LightningElement {
             parentCollectionId: this.item.id,
             parentCollectionName: this.item.name || ''
         };
-        const evt = new CustomEvent('opencontentrecord', {
-            detail,
-            bubbles: true,
-            composed: true
-        });
-        // Prefer dispatch on the hierarchy host: bubbling through nested LWC + synthetic shadow
-        // often fails to reach listeners, so file-row clicks looked like no-ops.
         if (typeof document !== 'undefined') {
-            const hierarchyHost = document.querySelector('main-collection-hierarchy');
-            if (hierarchyHost) {
-                hierarchyHost.dispatchEvent(evt);
-                return;
-            }
+            document.dispatchEvent(
+                new CustomEvent(RCM_TREE_OPEN_CONTENT_RECORD, {
+                    bubbles: true,
+                    composed: true,
+                    detail
+                })
+            );
         }
-        this.dispatchEvent(evt);
     }
 
     /**
