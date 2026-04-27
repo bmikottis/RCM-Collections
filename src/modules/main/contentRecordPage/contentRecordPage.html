@@ -249,7 +249,12 @@
                                             </div>
                                             <div class="content-record-annotations-list">
                                                 <template for:each={annotationItems} for:item="ann">
-                                                    <div key={ann.id} class={ann.cardClass} role="article">
+                                                    <div
+                                                        key={ann.id}
+                                                        class={ann.cardClass}
+                                                        role="article"
+                                                        data-id={ann.id}
+                                                        onclick={handleAnnotationCardActivate}>
                                                         <div class="content-record-annotation-header">
                                                             <button
                                                                 type="button"
@@ -304,7 +309,7 @@
                                                                     data-id={ann.id}>
                                                                     <lightning-icon
                                                                         icon-name="utility:threedots"
-                                                                        size="x-small"
+                                                                        size={ann.headerMenuIconSize}
                                                                         alternative-text="">
                                                                     </lightning-icon>
                                                                 </button>
@@ -456,166 +461,208 @@
                                                                         <span class="content-record-annotation-snippet-quote">"{ann.snippet}"</span>
                                                                     </div>
                                                                 </template>
-                                                                <div class="content-record-annotation-section">
-                                                                    <button
-                                                                        type="button"
-                                                                        class="content-record-annotation-section-row"
-                                                                        data-id={ann.id}
-                                                                        onclick={handleLinkedClaimsToggle}>
-                                                                        <lightning-icon
-                                                                            icon-name={ann.linkedClaimsChevron}
-                                                                            size="xx-small"
-                                                                            class="content-record-annotation-section-chevron"
-                                                                            alternative-text="">
-                                                                        </lightning-icon>
-                                                                        <span class="content-record-annotation-section-label">Linked Claims ({ann.linkedClaimsCount})</span>
-                                                                    </button>
-                                                                    <a
-                                                                        href="#"
-                                                                        class="content-record-annotation-section-link"
-                                                                        data-id={ann.id}
-                                                                        onclick={handleLinkClaimClick}>
-                                                                        Link Claim
-                                                                    </a>
-                                                                </div>
-                                                                <template lwc:if={ann.linkedClaimsExpanded}>
-                                                                    <template lwc:if={ann.hasLinkedClaims}>
-                                                                        <div class="content-record-annotation-linked-list">
-                                                                            <template for:each={ann.linkedClaims} for:item="lc">
-                                                                                <div key={lc.code} class="content-record-annotation-linked-row">
-                                                                                    <lightning-icon
-                                                                                        icon-name="utility:new_window"
-                                                                                        size="xx-small"
-                                                                                        class="content-record-annotation-linked-ext"
-                                                                                        alternative-text="Opens in new context">
-                                                                                    </lightning-icon>
-                                                                                    <a
-                                                                                        href="#"
-                                                                                        class="content-record-annotation-linked-code"
-                                                                                        onclick={handleLinkClaimClick}
-                                                                                        data-id={ann.id}>
-                                                                                        {lc.code}
-                                                                                    </a>
-                                                                                    <template lwc:if={lc.warn}>
-                                                                                        <lightning-icon
-                                                                                            icon-name="utility:warning"
-                                                                                            size="xx-small"
-                                                                                            class="content-record-annotation-linked-warn"
-                                                                                            alternative-text="Warning">
-                                                                                        </lightning-icon>
-                                                                                    </template>
-                                                                                    <span class="content-record-annotation-linked-spacer"></span>
+                                                                <div class="content-record-annotation-expandable-slot">
+                                                                    <div class="content-record-annotation-expandable-row">
+                                                                        <div class="content-record-annotation-expandable-main">
+                                                                            <div class={ann.linkedClaimsSectionClass}>
+                                                                                <h3 class="content-record-annotation-section-heading">
                                                                                     <button
                                                                                         type="button"
-                                                                                        class="content-record-annotation-linked-more"
-                                                                                        aria-label="Linked claim options"
-                                                                                        data-code={lc.code}
-                                                                                        onclick={handleLinkedClaimMenuClick}>
+                                                                                        class="content-record-annotation-section-toggle"
+                                                                                        aria-expanded={ann.linkedClaimsExpanded}
+                                                                                        aria-controls={ann.linkedClaimsPanelId}
+                                                                                        id={ann.linkedClaimsToggleId}
+                                                                                        data-id={ann.id}
+                                                                                        onclick={handleLinkedClaimsToggle}>
                                                                                         <lightning-icon
-                                                                                            icon-name="utility:threedots"
-                                                                                            size="xx-small"
+                                                                                            class="content-record-annotation-section-toggle-icon"
+                                                                                            icon-name={ann.linkedClaimsChevron}
+                                                                                            size="x-small"
                                                                                             alternative-text="">
                                                                                         </lightning-icon>
+                                                                                        <span class="content-record-annotation-section-heading-text">
+                                                                                            Linked Claims ({ann.linkedClaimsCount})
+                                                                                        </span>
                                                                                     </button>
+                                                                                </h3>
+                                                                                <div
+                                                                                    id={ann.linkedClaimsPanelId}
+                                                                                    class="content-record-annotation-section-panel"
+                                                                                    role="region"
+                                                                                    aria-labelledby={ann.linkedClaimsToggleId}>
+                                                                                    <template lwc:if={ann.linkedClaimsExpanded}>
+                                                                                        <template lwc:if={ann.hasLinkedClaims}>
+                                                                                            <div class="content-record-annotation-linked-list">
+                                                                                                <template for:each={ann.linkedClaims} for:item="lc">
+                                                                                                    <div key={lc.code} class={lc.rowClass}>
+                                                                                                        <lightning-icon
+                                                                                                            icon-name="utility:new_window"
+                                                                                                            size="xx-small"
+                                                                                                            class="content-record-annotation-linked-ext"
+                                                                                                            alternative-text="Opens in new context">
+                                                                                                        </lightning-icon>
+                                                                                                        <a
+                                                                                                            href="#"
+                                                                                                            class="content-record-annotation-linked-code"
+                                                                                                            onclick={handleLinkClaimClick}
+                                                                                                            data-id={ann.id}>
+                                                                                                            {lc.code}
+                                                                                                        </a>
+                                                                                                        <template lwc:if={lc.warn}>
+                                                                                                            <lightning-icon
+                                                                                                                icon-name="utility:warning"
+                                                                                                                size="xx-small"
+                                                                                                                class="content-record-annotation-linked-warn"
+                                                                                                                alternative-text="Warning">
+                                                                                                            </lightning-icon>
+                                                                                                        </template>
+                                                                                                        <span class="content-record-annotation-linked-spacer"></span>
+                                                                                                        <button
+                                                                                                            type="button"
+                                                                                                            class="content-record-annotation-linked-more"
+                                                                                                            aria-label="Linked claim options"
+                                                                                                            data-code={lc.code}
+                                                                                                            onclick={handleLinkedClaimMenuClick}>
+                                                                                                            <lightning-icon
+                                                                                                                icon-name="utility:threedots"
+                                                                                                                size="xx-small"
+                                                                                                                alternative-text="">
+                                                                                                            </lightning-icon>
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                </template>
+                                                                                            </div>
+                                                                                        </template>
+                                                                                        <template lwc:else>
+                                                                                            <div class="content-record-annotation-section-body">
+                                                                                                No linked claims. Use &quot;Link Claim&quot; to add one.
+                                                                                            </div>
+                                                                                        </template>
+                                                                                    </template>
                                                                                 </div>
-                                                                            </template>
+                                                                            </div>
                                                                         </div>
-                                                                    </template>
-                                                                    <template lwc:else>
-                                                                        <div class="content-record-annotation-section-body">
-                                                                            No linked claims. Use &quot;Link Claim&quot; to add one.
-                                                                        </div>
-                                                                    </template>
-                                                                </template>
-                                                                <div class="content-record-annotation-section">
-                                                                    <button
-                                                                        type="button"
-                                                                        class="content-record-annotation-section-row"
-                                                                        data-id={ann.id}
-                                                                        onclick={handleCommentsToggle}>
-                                                                        <lightning-icon
-                                                                            icon-name={ann.commentsChevron}
-                                                                            size="xx-small"
-                                                                            class="content-record-annotation-section-chevron"
-                                                                            alternative-text="">
-                                                                        </lightning-icon>
-                                                                        <span class="content-record-annotation-section-label">Comments ({ann.commentsCount})</span>
-                                                                    </button>
-                                                                    <a
-                                                                        href="#"
-                                                                        class="content-record-annotation-section-link"
-                                                                        data-id={ann.id}
-                                                                        onclick={handleAddCommentClick}>
-                                                                        Add Comment
-                                                                    </a>
-                                                                </div>
-                                                                <template lwc:if={ann.commentsExpanded}>
-                                                                    <template lwc:if={ann.hasComments}>
-                                                                        <div class="content-record-annotation-comments-list">
-                                                                            <template for:each={ann.comments} for:item="cm">
-                                                                                <div key={cm.id} class="content-record-annotation-comment">
-                                                                                    <div class="content-record-annotation-comment-hdr">
-                                                                                        <div class={cm.avatarClass} aria-hidden="true">
-                                                                                            <lightning-icon
-                                                                                                icon-name="utility:user"
-                                                                                                size="xx-small"
-                                                                                                alternative-text="">
-                                                                                            </lightning-icon>
-                                                                                        </div>
-                                                                                        <a
-                                                                                            href="#"
-                                                                                            class="content-record-annotation-author content-record-annotation-author_comment"
-                                                                                            data-author={cm.author}
-                                                                                            onclick={handleAuthorClick}>
-                                                                                            {cm.author}
-                                                                                        </a>
-                                                                                        <span class="content-record-annotation-dot" aria-hidden="true">·</span>
-                                                                                        <span class="content-record-annotation-time">{cm.timeAgo}</span>
-                                                                                        <span class="content-record-annotation-comment-spacer"></span>
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="content-record-annotation-comment-more"
-                                                                                            aria-label="Comment options"
-                                                                                            data-comment-id={cm.id}
-                                                                                            onclick={handleCommentMenuClick}>
-                                                                                            <lightning-icon
-                                                                                                icon-name="utility:threedots"
-                                                                                                size="xx-small"
-                                                                                                alternative-text="">
-                                                                                            </lightning-icon>
-                                                                                        </button>
-                                                                                    </div>
-                                                                                    <p class="content-record-annotation-comment-body">{cm.body}</p>
-                                                                                    <div class="content-record-annotation-comment-divider" role="separator"></div>
-                                                                                </div>
-                                                                            </template>
-                                                                        </div>
-                                                                    </template>
-                                                                    <template lwc:else>
-                                                                        <div class="content-record-annotation-section-body">
-                                                                            No comments yet. Use &quot;Add Comment&quot; to add one.
-                                                                        </div>
-                                                                    </template>
-                                                                    <div class="content-record-annotation-composer">
-                                                                        <lightning-textarea
-                                                                            label="Comment"
-                                                                            variant="label-hidden"
-                                                                            placeholder="Comment text..."
-                                                                            value={ann.commentDraftValue}
-                                                                            data-id={ann.id}
-                                                                            onchange={handleCommentDraftChange}
-                                                                            class="content-record-annotation-composer-field">
-                                                                        </lightning-textarea>
-                                                                        <div class="content-record-annotation-composer-actions">
-                                                                            <lightning-button
-                                                                                label="Save"
-                                                                                variant="brand"
+                                                                        <div class="content-record-annotation-expandable-actions">
+                                                                            <a
+                                                                                href="#"
+                                                                                class="content-record-annotation-section-link"
                                                                                 data-id={ann.id}
-                                                                                onclick={handleSaveCommentClick}>
-                                                                            </lightning-button>
+                                                                                onclick={handleLinkClaimClick}>
+                                                                                Link Claim
+                                                                            </a>
                                                                         </div>
                                                                     </div>
-                                                                </template>
+                                                                </div>
+                                                                <div class="content-record-annotation-expandable-slot">
+                                                                    <div class="content-record-annotation-expandable-row">
+                                                                        <div class="content-record-annotation-expandable-main">
+                                                                            <div class={ann.commentsSectionClass}>
+                                                                                <h3 class="content-record-annotation-section-heading">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="content-record-annotation-section-toggle"
+                                                                                        aria-expanded={ann.commentsExpanded}
+                                                                                        aria-controls={ann.commentsPanelId}
+                                                                                        id={ann.commentsToggleId}
+                                                                                        data-id={ann.id}
+                                                                                        onclick={handleCommentsToggle}>
+                                                                                        <lightning-icon
+                                                                                            class="content-record-annotation-section-toggle-icon"
+                                                                                            icon-name={ann.commentsChevron}
+                                                                                            size="x-small"
+                                                                                            alternative-text="">
+                                                                                        </lightning-icon>
+                                                                                        <span class="content-record-annotation-section-heading-text">
+                                                                                            Comments ({ann.commentsCount})
+                                                                                        </span>
+                                                                                    </button>
+                                                                                </h3>
+                                                                                <div
+                                                                                    id={ann.commentsPanelId}
+                                                                                    class="content-record-annotation-section-panel"
+                                                                                    role="region"
+                                                                                    aria-labelledby={ann.commentsToggleId}>
+                                                                                    <template lwc:if={ann.commentsExpanded}>
+                                                                                        <template lwc:if={ann.hasComments}>
+                                                                                            <div class="content-record-annotation-comments-list">
+                                                                                                <template for:each={ann.comments} for:item="cm">
+                                                                                                    <div key={cm.id} class="content-record-annotation-comment">
+                                                                                                        <div class="content-record-annotation-comment-hdr">
+                                                                                                            <div class={cm.avatarClass} aria-hidden="true">
+                                                                                                                <lightning-icon
+                                                                                                                    icon-name="utility:user"
+                                                                                                                    size="xx-small"
+                                                                                                                    alternative-text="">
+                                                                                                                </lightning-icon>
+                                                                                                            </div>
+                                                                                                            <a
+                                                                                                                href="#"
+                                                                                                                class="content-record-annotation-author content-record-annotation-author_comment"
+                                                                                                                data-author={cm.author}
+                                                                                                                onclick={handleAuthorClick}>
+                                                                                                                {cm.author}
+                                                                                                            </a>
+                                                                                                            <span class="content-record-annotation-dot" aria-hidden="true">·</span>
+                                                                                                            <span class="content-record-annotation-time">{cm.timeAgo}</span>
+                                                                                                            <span class="content-record-annotation-comment-spacer"></span>
+                                                                                                            <button
+                                                                                                                type="button"
+                                                                                                                class="content-record-annotation-comment-more"
+                                                                                                                aria-label="Comment options"
+                                                                                                                data-comment-id={cm.id}
+                                                                                                                onclick={handleCommentMenuClick}>
+                                                                                                                <lightning-icon
+                                                                                                                    icon-name="utility:threedots"
+                                                                                                                    size="xx-small"
+                                                                                                                    alternative-text="">
+                                                                                                                </lightning-icon>
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                        <p class="content-record-annotation-comment-body">{cm.body}</p>
+                                                                                                        <div class="content-record-annotation-comment-divider" role="separator"></div>
+                                                                                                    </div>
+                                                                                                </template>
+                                                                                            </div>
+                                                                                        </template>
+                                                                                        <template lwc:else>
+                                                                                            <div class="content-record-annotation-section-body">
+                                                                                                No comments yet. Use &quot;Add Comment&quot; to add one.
+                                                                                            </div>
+                                                                                        </template>
+                                                                                        <div class="content-record-annotation-composer">
+                                                                                            <lightning-textarea
+                                                                                                label="Comment"
+                                                                                                variant="label-hidden"
+                                                                                                placeholder="Comment text..."
+                                                                                                value={ann.commentDraftValue}
+                                                                                                data-id={ann.id}
+                                                                                                onchange={handleCommentDraftChange}
+                                                                                                class="content-record-annotation-composer-field">
+                                                                                            </lightning-textarea>
+                                                                                            <div class="content-record-annotation-composer-actions">
+                                                                                                <lightning-button
+                                                                                                    label="Save"
+                                                                                                    variant="brand"
+                                                                                                    data-id={ann.id}
+                                                                                                    onclick={handleSaveCommentClick}>
+                                                                                                </lightning-button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </template>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="content-record-annotation-expandable-actions">
+                                                                            <a
+                                                                                href="#"
+                                                                                class="content-record-annotation-section-link"
+                                                                                data-id={ann.id}
+                                                                                onclick={handleAddCommentClick}>
+                                                                                Add Comment
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="content-record-annotation-anchor">
                                                                     <div class="content-record-anchor-checkbox-wrap">
                                                                         <lightning-input

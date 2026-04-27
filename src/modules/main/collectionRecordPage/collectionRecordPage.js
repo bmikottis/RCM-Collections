@@ -1,5 +1,21 @@
 import { LightningElement, api, track } from 'lwc';
 
+function getContentTypeIcon(contentType) {
+    const iconMap = {
+        pdf: 'doctype:pdf',
+        word: 'doctype:word',
+        excel: 'doctype:excel',
+        ppt: 'doctype:ppt',
+        image: 'doctype:image',
+        video: 'doctype:video',
+        html: 'doctype:html',
+        zip: 'doctype:zip',
+        unknown: 'doctype:unknown'
+    };
+    const t = (contentType || '').toLowerCase();
+    return iconMap[t] || 'doctype:unknown';
+}
+
 export default class CollectionRecordPage extends LightningElement {
     @api collection;
     @api collectionType;
@@ -74,9 +90,9 @@ export default class CollectionRecordPage extends LightningElement {
     }
 
     get contentItems() {
-        return (this.collection?.content || []).map(item => ({
+        return (this.collection?.content || []).map((item) => ({
             ...item,
-            icon: 'doctype:unknown'
+            icon: getContentTypeIcon(item.contentType)
         }));
     }
 
@@ -113,8 +129,28 @@ export default class CollectionRecordPage extends LightningElement {
         }));
     }
 
+    /**
+     * Open the same Regulated Content record (main-content-record-page) as the collection detail and tree.
+     * Bubbles to collection-hierarchy for handleOpenContentRecord.
+     * @param {Event} event
+     */
     handleContentClick(event) {
+        event.preventDefault();
         const contentId = event.currentTarget.dataset.id;
-        console.log('Content clicked:', contentId);
+        const content = (this.collection?.content || []).find((c) => c.id === contentId);
+        if (!content) {
+            return;
+        }
+        this.dispatchEvent(
+            new CustomEvent('opencontentrecord', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    content: { ...content },
+                    parentCollectionId: this.collection?.id || null,
+                    parentCollectionName: this.collection?.name || ''
+                }
+            })
+        );
     }
 }

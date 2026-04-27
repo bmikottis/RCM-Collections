@@ -275,7 +275,7 @@
 /* Draggable splitter between document viewer and annotation panel */
 .content-record-splitter {
     flex-shrink: 0;
-    width: var(--cr-splitter-width, 6px);
+    width: var(--cr-splitter-width, 8px);
     align-self: stretch;
     cursor: col-resize;
     touch-action: none;
@@ -303,8 +303,8 @@
 }
 
 .content-record-doc-sidebar {
-    /* width set in JS (renderedCallback) — default matches SIDEBAR_DEFAULT_PX */
-    min-width: 0;
+    /* width set in JS; min-width prevents flex from visually collapsing before/without JS */
+    min-width: var(--cr-annotation-sidebar-min, 240px);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -568,6 +568,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--slds-g-spacing-small, 0.75rem);
+    /* Room for selection ring/outline so scroll container does not clip it */
+    padding: var(--slds-g-spacing-xx-small, 0.25rem);
 }
 
 .content-record-annotation-card {
@@ -578,14 +580,22 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     transition:
         box-shadow 0.15s ease,
-        border-color 0.15s ease;
+        border-color 0.15s ease,
+        outline-color 0.15s ease;
 }
 
-/* Figma: neutral frame + brand left rail (not full brand outline) */
+/* Expanded: neutral frame + brand left rail */
 .content-record-annotation-card_is-expanded {
     border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
     border-left: 3px solid var(--slds-g-color-border-brand-1, #0176d3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Selected: full-card brand ring (outline + shadow — shadow survives scroll clipping better) */
+.content-record-annotation-card_is-selected {
+    outline: 2px solid var(--slds-g-color-border-brand-1, #0176d3);
+    outline-offset: 0;
+    box-shadow: 0 0 0 2px var(--slds-g-color-border-brand-1, #0176d3);
 }
 
 .content-record-annotation-header {
@@ -654,6 +664,11 @@
     color: var(--slds-g-color-on-surface-2, #3e3e3c);
 }
 
+.content-record-annotation-card_is-expanded .content-record-annotation-ann-code {
+    font-size: var(--slds-g-font-scale-3, 1rem);
+    line-height: var(--slds-g-font-lineheight-4, 1.5rem);
+}
+
 .content-record-annotation-more-wrap {
     position: relative;
     flex-shrink: 0;
@@ -690,6 +705,11 @@
     border-radius: var(--slds-g-radius-border-circle, 50%);
     border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
     background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.content-record-annotation-card_is-expanded .content-record-annotation-more_circle {
+    width: 2.375rem;
+    height: 2.375rem;
 }
 
 .content-record-annotation-collapsed-footer {
@@ -832,14 +852,16 @@
     border-radius: var(--slds-g-radius-border-2, 0.25rem);
 }
 
-.content-record-annotation-snippet {
+/* Quote highlight: left accent only (no filled “warning card”) — inset bar reads clearly in shadow/LWR */
+.content-record-annotation-card .content-record-annotation-snippet {
     margin: var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-small, 0.75rem)
         var(--slds-g-spacing-x-small, 0.5rem);
     padding: var(--slds-g-spacing-small, 0.75rem);
-    background-color: var(--slds-g-color-warning-container-1, #fef9e7);
-    border: 1px solid var(--slds-g-color-border-warning-1, #f4e4b4);
-    border-left: 3px solid var(--slds-g-color-border-warning-2, #e5b318);
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border: none;
+    border-radius: 0;
+    border-left: 4px solid var(--slds-g-color-border-warning-2, #e5b318);
+    outline: none;
     color: var(--slds-g-color-on-surface-3, #181818);
 }
 
@@ -853,7 +875,7 @@
 }
 
 .content-record-annotation-linked-list {
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-top: none;
 }
 
 .content-record-annotation-linked-row {
@@ -862,7 +884,11 @@
     gap: var(--slds-g-spacing-x-small, 0.5rem);
     min-height: 2.25rem;
     padding: var(--slds-g-spacing-x-small, 0.5rem) var(--slds-g-spacing-small, 0.75rem);
-    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-bottom: none;
+}
+
+.content-record-annotation-linked-row_is-stacked {
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
 .content-record-annotation-linked-ext {
@@ -986,6 +1012,10 @@
     background-color: var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
+.content-record-annotation-comment:last-child .content-record-annotation-comment-divider {
+    display: none;
+}
+
 .content-record-annotation-composer {
     padding: var(--slds-g-spacing-small, 0.75rem);
     border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
@@ -1002,45 +1032,119 @@
     margin-top: var(--slds-g-spacing-x-small, 0.5rem);
 }
 
-.content-record-annotation-section {
+/* Linked Claims / Comments — fully scoped (no reliance on global .slds-grid / .slds-button in shadow) */
+.content-record-annotation-expandable-slot {
+    margin-top: var(--slds-g-spacing-xx-small, 0.25rem);
+}
+
+.content-record-annotation-expandable-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--slds-g-spacing-x-small);
+}
+
+.content-record-annotation-expandable-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.content-record-annotation-expandable-actions {
+    flex-shrink: 0;
+    align-self: flex-start;
+    padding-top: var(--slds-g-spacing-xx-small, 0.25rem);
+    padding-left: var(--slds-g-spacing-x-small, 0.5rem);
+}
+
+/* Grey expandable shell (Linked Claims / Comments) — full chrome so it does not rely on global SLDS */
+.content-record-annotation-section-shell {
+    margin-block: var(--slds-g-spacing-xx-small, 0.25rem);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    background-color: var(--slds-g-color-surface-container-2, #ecebea);
+    overflow: hidden;
+}
+
+.content-record-annotation-section-heading {
+    margin: 0;
+}
+
+.content-record-annotation-section-toggle {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: var(--slds-g-spacing-x-small);
+    width: 100%;
+    box-sizing: border-box;
     min-height: 2.25rem;
-    padding: var(--slds-g-spacing-x-small, 0.5rem) var(--slds-g-spacing-small, 0.75rem);
-    gap: var(--slds-g-spacing-small, 0.75rem);
+    padding: 0 var(--slds-g-spacing-small);
+    text-align: left;
+    cursor: pointer;
+    color: var(--slds-g-color-on-surface-3, #181818);
+    font-size: var(--slds-g-font-scale-2, 0.875rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: 1.875rem;
+    font-family: inherit;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.content-record-annotation-section-toggle:hover,
+.content-record-annotation-section-toggle:focus {
+    color: inherit;
+    background-color: var(--slds-g-color-surface-container-3, #e5e5e5);
+}
+
+.content-record-annotation-section-toggle:focus {
+    outline: 2px solid var(--slds-g-color-border-brand-1, #0176d3);
+    outline-offset: 2px;
+}
+
+.content-record-annotation-section-shell:not(.content-record-annotation-section-shell_open)
+    .content-record-annotation-section-panel {
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    padding-top: 0;
+}
+
+.content-record-annotation-section-shell.content-record-annotation-section-shell_open
+    .content-record-annotation-section-panel {
+    overflow: visible;
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+    padding-top: var(--slds-g-spacing-x-small);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
     border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
-.content-record-annotation-section-row {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
+.content-record-annotation-section-shell.content-record-annotation-section-shell_open
+    .content-record-annotation-section-toggle-icon {
+    transform: rotate(0deg);
+    transform-origin: 45%;
+}
+
+.content-record-annotation-section-shell:not(.content-record-annotation-section-shell_open)
+    .content-record-annotation-section-toggle-icon {
+    transform: rotate(-90deg);
+    transform-origin: 45%;
+}
+
+.content-record-annotation-section-heading-text {
     flex: 1;
     min-width: 0;
-    background: none;
-    border: none;
-    font-size: 0.75rem;
-    font-weight: var(--slds-g-font-weight-4, 400);
-    color: var(--slds-g-color-on-surface-3, #181818);
-    cursor: pointer;
-    padding: 0;
-    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--slds-g-font-weight-6, 600);
 }
 
-.content-record-annotation-section-row:hover {
-    color: var(--slds-g-color-brand-base-50, #0176d3);
-}
-
-.content-record-annotation-section-chevron {
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #706e6b);
+.content-record-annotation-section-toggle-icon {
+    display: inline-flex;
     flex-shrink: 0;
-}
-
-.content-record-annotation-section-label {
-    flex: 1;
-    min-width: 0;
-    font-weight: var(--slds-g-font-weight-5, 500);
 }
 
 .content-record-annotation-section-link {

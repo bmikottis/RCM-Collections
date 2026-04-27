@@ -3,10 +3,12 @@ import { LightningElement, api, track } from 'lwc';
 /** Must match collectionHierarchy.js */
 const RCM_VIEW_COLLECTION = 'rcm-view-collection';
 
-const STORAGE_KEY_SIDEBAR = 'rcm-content-record-annotation-sidebar-px';
+/** v2: resets everyone once (fixes narrow persisted widths); drag delta sign fixed in pointer move */
+const STORAGE_KEY_SIDEBAR = 'rcm-content-record-annotation-sidebar-px-v2';
+const STORAGE_KEY_SIDEBAR_LEGACY = 'rcm-content-record-annotation-sidebar-px';
 const SIDEBAR_MIN_PX = 240;
 const MAIN_MIN_PX = 240;
-const SPLITTER_PX = 6;
+const SPLITTER_PX = 8;
 const SIDEBAR_DEFAULT_PX = 400;
 
 /** Demo annotation rows — shared by getter and expand/collapse behavior */
@@ -82,6 +84,8 @@ export default class ContentRecordPage extends LightningElement {
     @track expandedAnnotationIds = new Set(['001']);
     @track expandedLinkedClaimsIds = new Set(['001']);
     @track expandedCommentsIds = new Set(['001']);
+    /** Which annotation card shows the full blue selection outline (Figma) */
+    @track selectedAnnotationId = '001';
     @track openMenuAnnotationId = null;
     @track anchorCheckedIds = new Set();
     /** Draft text per annotation id for comment composer */
@@ -96,6 +100,8 @@ export default class ContentRecordPage extends LightningElement {
 
     _resizePointerId = null;
 
+    _layoutResizeObserver = null;
+
     _boundResizeMove = (e) => this._handleResizePointerMove(e);
 
     _boundResizeEnd = (e) => this._handleResizePointerEnd(e);
@@ -105,8 +111,13 @@ export default class ContentRecordPage extends LightningElement {
             this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
             this._applySidebarWidth();
         };
+        this._boundLayoutResize = () => {
+            this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
+            this._applySidebarWidth();
+        };
         window.addEventListener('resize', this._boundWindowResize);
         try {
+            window.localStorage.removeItem(STORAGE_KEY_SIDEBAR_LEGACY);
             const raw = window.localStorage.getItem(STORAGE_KEY_SIDEBAR);
             if (raw != null) {
                 const n = parseInt(raw, 10);
@@ -123,12 +134,35 @@ export default class ContentRecordPage extends LightningElement {
         if (this._boundWindowResize) {
             window.removeEventListener('resize', this._boundWindowResize);
         }
+        if (this._layoutResizeObserver) {
+            this._layoutResizeObserver.disconnect();
+            this._layoutResizeObserver = null;
+        }
         this._removeGlobalResizeListeners();
         this._clearResizeCursor();
     }
 
     renderedCallback() {
+        this._scheduleSidebarLayoutApply();
+        const layout = this._getLayoutEl();
+        if (layout && typeof ResizeObserver !== 'undefined' && !this._layoutResizeObserver) {
+            this._layoutResizeObserver = new ResizeObserver(() => {
+                this._boundLayoutResize();
+            });
+            this._layoutResizeObserver.observe(layout);
+        }
+    }
+
+    /** Apply width after layout (first paint often measures 0px wide until flex settles). */
+    _scheduleSidebarLayoutApply() {
         this._applySidebarWidth();
+        if (typeof requestAnimationFrame === 'undefined') {
+            return;
+        }
+        requestAnimationFrame(() => {
+            this._applySidebarWidth();
+            requestAnimationFrame(() => this._applySidebarWidth());
+        });
     }
 
     _isStackedLayout() {
@@ -190,6 +224,11 @@ export default class ContentRecordPage extends LightningElement {
         this._resizePointerId = event.pointerId;
         this._resizeStartX = event.clientX;
         this._resizeStartWidth = this.sidebarWidthPx;
+        try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+        } catch {
+            /* ignore */
+        }
         document.addEventListener('pointermove', this._boundResizeMove);
         document.addEventListener('pointerup', this._boundResizeEnd);
         document.addEventListener('pointercancel', this._boundResizeEnd);
@@ -201,7 +240,8 @@ export default class ContentRecordPage extends LightningElement {
         if (event.pointerId !== this._resizePointerId) {
             return;
         }
-        const delta = event.clientX - this._resizeStartX;
+        /* Splitter is left of sidebar: moving the handle left (smaller clientX) widens the right panel */
+        const delta = this._resizeStartX - event.clientX;
         const next = this._clampSidebarWidth(this._resizeStartWidth + delta);
         this.sidebarWidthPx = next;
         this._applySidebarWidth();
@@ -239,7 +279,8 @@ export default class ContentRecordPage extends LightningElement {
         const step = event.shiftKey ? 32 : 8;
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
-            const dir = event.key === 'ArrowRight' ? 1 : -1;
+            /* Align with mouse: left widens annotations column, right narrows */
+            const dir = event.key === 'ArrowLeft' ? 1 : -1;
             this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx + dir * step);
             this._applySidebarWidth();
             try {
@@ -365,7 +406,13 @@ export default class ContentRecordPage extends LightningElement {
     get annotationItems() {
         return ANNOTATION_DEMO_ITEMS.map((item) => {
             const expanded = this.expandedAnnotationIds.has(item.id);
-            const linkedClaims = item.linkedClaims || [];
+            const linkedClaims = (item.linkedClaims || []).map((lc, i) => ({
+                ...lc,
+                rowClass:
+                    i === 0
+                        ? 'content-record-annotation-linked-row'
+                        : 'content-record-annotation-linked-row content-record-annotation-linked-row_is-stacked'
+            }));
             const comments = item.comments || [];
             const linkedClaimsCount = linkedClaims.length;
             const commentsCount = comments.length;
@@ -387,9 +434,35 @@ export default class ContentRecordPage extends LightningElement {
                 showAnchorIcon: this.anchorCheckedIds.has(item.id),
                 expanded,
                 isCollapsed: !expanded,
-                cardClass: expanded
-                    ? 'content-record-annotation-card content-record-annotation-card_is-expanded'
-                    : 'content-record-annotation-card',
+                cardClass: [
+                    'content-record-annotation-card',
+                    expanded ? 'content-record-annotation-card_is-expanded' : '',
+                    this.selectedAnnotationId === item.id
+                        ? 'content-record-annotation-card_is-selected'
+                        : ''
+                ]
+                    .filter(Boolean)
+                    .join(' '),
+                linkedClaimsPanelId: `annotation-linked-panel-${item.id}`,
+                linkedClaimsToggleId: `annotation-linked-toggle-${item.id}`,
+                commentsPanelId: `annotation-comments-panel-${item.id}`,
+                commentsToggleId: `annotation-comments-toggle-${item.id}`,
+                linkedClaimsSectionClass: [
+                    'content-record-annotation-section-shell',
+                    this.expandedLinkedClaimsIds.has(item.id)
+                        ? 'content-record-annotation-section-shell_open'
+                        : ''
+                ]
+                    .filter(Boolean)
+                    .join(' '),
+                commentsSectionClass: [
+                    'content-record-annotation-section-shell',
+                    this.expandedCommentsIds.has(item.id)
+                        ? 'content-record-annotation-section-shell_open'
+                        : ''
+                ]
+                    .filter(Boolean)
+                    .join(' '),
                 expandedIcon: expanded ? 'utility:chevrondown' : 'utility:chevronright',
                 expandLabel: expanded ? 'Collapse annotation' : 'Expand annotation',
                 linkedClaimsExpanded: this.expandedLinkedClaimsIds.has(item.id),
@@ -403,7 +476,8 @@ export default class ContentRecordPage extends LightningElement {
                     ? 'utility:chevrondown'
                     : 'utility:chevronright',
                 menuOpen: this.openMenuAnnotationId === item.id,
-                anchorChecked: this.anchorCheckedIds.has(item.id)
+                anchorChecked: this.anchorCheckedIds.has(item.id),
+                headerMenuIconSize: expanded ? 'small' : 'x-small'
             };
         });
     }
@@ -450,6 +524,7 @@ export default class ContentRecordPage extends LightningElement {
             this.expandedCommentsIds = cm;
         } else {
             next.add(id);
+            this.selectedAnnotationId = id;
             const seed = ANNOTATION_DEMO_ITEMS.find((row) => row.id === id);
             if (seed) {
                 const nLinked = (seed.linkedClaims || []).length;
@@ -473,10 +548,38 @@ export default class ContentRecordPage extends LightningElement {
      * Collapsed footer pills: expand card and open linked or comments section (Figma)
      * @param {Event} event
      */
+    /**
+     * Select annotation card for focus styling; ignores clicks from nested controls.
+     * @param {MouseEvent} event
+     */
+    handleAnnotationCardActivate(event) {
+        const path =
+            typeof event.composedPath === 'function' ? event.composedPath() : [event.target];
+        for (const node of path) {
+            if (!node || !node.tagName) {
+                continue;
+            }
+            const t = node.tagName.toLowerCase();
+            if (t === 'button' || t === 'a' || t === 'textarea' || t === 'input') {
+                return;
+            }
+            if (t.startsWith('lightning-')) {
+                return;
+            }
+        }
+        const id = event.currentTarget.dataset.id;
+        if (id) {
+            this.selectedAnnotationId = id;
+        }
+    }
+
     handleCollapsedSummaryClick(event) {
         event.stopPropagation();
         const id = event.currentTarget.dataset.id;
         const jump = event.currentTarget.dataset.jump;
+        if (id) {
+            this.selectedAnnotationId = id;
+        }
         const nextAnn = new Set(this.expandedAnnotationIds);
         nextAnn.add(id);
         this.expandedAnnotationIds = nextAnn;
@@ -529,6 +632,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     handleLinkedClaimsToggle(event) {
+        event.stopPropagation();
         const id = event.currentTarget.dataset.id;
         const next = new Set(this.expandedLinkedClaimsIds);
         if (next.has(id)) {
@@ -546,6 +650,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     handleCommentsToggle(event) {
+        event.stopPropagation();
         const id = event.currentTarget.dataset.id;
         const next = new Set(this.expandedCommentsIds);
         if (next.has(id)) {
