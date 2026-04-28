@@ -19,10 +19,11 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
+    /* Let hero + article define natural height so the parent wrap can scroll and sticky can engage */
+    min-height: min-content;
     width: 100%;
     box-sizing: border-box;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     /* Matches header surface so no white sliver around the page-header block */
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
@@ -40,7 +41,8 @@
     z-index: 2;
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    /* Do not flex-fill the column or the page never overflows the scrollport and sticky does nothing */
+    flex: 0 0 auto;
     min-width: 0;
     width: 100%;
     min-height: 0;
@@ -437,7 +439,8 @@
 
 /* —— Main tabset —— */
 .content-record-main-tabset {
-    flex: 1 1 auto;
+    /* Content-sized: article column no longer flex-fills the viewport (enables parent scroll + sticky) */
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -460,8 +463,8 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    min-height: 0;
-    height: 100%;
+    /* Definite height for doc + sidebar: no longer rely on parent flex filling the column */
+    min-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
     max-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
     overflow: hidden;
 }
