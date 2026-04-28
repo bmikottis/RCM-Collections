@@ -92,7 +92,7 @@
                 <template for:each={contentItems} for:item="content">
                     <div
                         key={content.id}
-                        class="content-item-row"
+                        class={content.rowClass}
                         role="treeitem"
                         tabindex="0"
                         data-id={content.id}

@@ -712,6 +712,24 @@ lightning-tabset.content-record-scoped-tabset
     padding-bottom: var(--slds-g-spacing-small, 0.75rem);
 }
 
+/* HTML preview: block + text highlight tools (injected script in same-origin iframe) */
+.content-record-html-annotate-row {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--slds-g-spacing-small, 0.75rem);
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    padding-top: var(--slds-g-spacing-x-small, 0.5rem);
+    padding-bottom: var(--slds-g-spacing-x-small, 0.5rem);
+}
+
+.content-record-html-annotate-hint {
+    flex: 1 1 12rem;
+    min-width: 0;
+    max-width: 44rem;
+}
+
 .content-record-file-title {
     display: flex;
     align-items: center;
@@ -792,6 +810,33 @@ lightning-tabset.content-record-scoped-tabset
     display: flex;
     flex-direction: column;
     align-self: stretch;
+}
+
+/* HTML preview: scroll the panel; iframe is sized to document height (see handleHtmlFrameLoad) */
+.content-record-html-preview-scroll {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    align-self: stretch;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+.content-record-html-preview-scroll .content-record-html-preview-frame {
+    display: block;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: min(75dvh, 52rem);
+    height: auto;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
 .content-record-pdf-host > * {

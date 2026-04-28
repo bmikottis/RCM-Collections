@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cordim — Interactive deck</title>
+    <style>
+        :root { color-scheme: light; }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            font-family: "Salesforce Sans", system-ui, -apple-system, sans-serif;
+            background: var(--slds-g-color-surface-2, #f3f3f3);
+            color: #181818;
+        }
+        .cordim-toolbar {
+            flex: 0 0 auto;
+            background: var(--slds-g-color-surface-1, #ffffff);
+            border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+            padding: 0.5rem 0.75rem 0.65rem;
+            box-sizing: border-box;
+        }
+        .cordim-toolbar h1 {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem;
+            color: #032d60;
+        }
+        .cordim-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.35rem;
+            align-items: center;
+            font-size: 0.8125rem;
+            line-height: 1.4;
+        }
+        .cordim-nav .sep {
+            color: #706e6b;
+            user-select: none;
+        }
+        .cordim-nav a {
+            color: #0176d3;
+            text-decoration: none;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.2rem;
+        }
+        .cordim-nav a:hover,
+        .cordim-nav a:focus {
+            text-decoration: underline;
+        }
+        .cordim-nav a:focus {
+            outline: 2px solid #0176d3;
+            outline-offset: 1px;
+        }
+        .cordim-nav a[aria-current="true"] {
+            font-weight: 600;
+            color: #014486;
+            background: #eef4ff;
+        }
+        .cordim-frame-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--slds-g-color-border-base-1, #e5e5e5);
+        }
+        #cordim-deck-frame {
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: min(75dvh, 52rem);
+            border: 0;
+            background: var(--slds-g-color-surface-1, #ffffff);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="cordim-toolbar">
+        <h1>Cordim — interactive deck</h1>
+        <nav class="cordim-nav" id="cordim-nav" aria-label="Cordim sections">
+            <a href="#" data-src="Patients with arterial hypertension.html" aria-current="true">Start</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Risks and prevalence.html">Risks</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Graph.html">Graph</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Survey.html">Survey</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Benefits of Cordim.html">Benefits</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Cordim coverage.html">Coverage</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Drugs comparison.html">Competitors</a>
+            <span class="sep" aria-hidden="true">·</span>
+            <a href="#" data-src="Guidelines.html">Guidelines</a>
+        </nav>
+    </header>
+    <div class="cordim-frame-wrap">
+        <iframe
+            id="cordim-deck-frame"
+            title="Cordim section"
+            src="Patients with arterial hypertension.html"></iframe>
+    </div>
+    <script>
+        (function () {
+            var frame = document.getElementById('cordim-deck-frame');
+            var nav = document.getElementById('cordim-nav');
+            if (!frame || !nav) {
+                return;
+            }
+            function setActive(anchor) {
+                var links = nav.querySelectorAll('a[data-src]');
+                for (var i = 0; i < links.length; i++) {
+                    links[i].removeAttribute('aria-current');
+                }
+                if (anchor) {
+                    anchor.setAttribute('aria-current', 'true');
+                }
+            }
+            function go(href, anchor) {
+                if (!href) {
+                    return;
+                }
+                try {
+                    frame.src = new URL(href, window.location.href).href;
+                } catch (e) {
+                    frame.src = href;
+                }
+                setActive(anchor);
+            }
+            nav.addEventListener('click', function (e) {
+                var a = e.target.closest('a[data-src]');
+                if (!a) {
+                    return;
+                }
+                e.preventDefault();
+                go(a.getAttribute('data-src'), a);
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -591,6 +591,33 @@ export function findCollectionById(root, id) {
 }
 
 /**
+ * Find a content item by id and the collection node that contains it.
+ * @param {Object} root
+ * @param {string} contentId
+ * @returns {{ content: object, parentCollection: object } | null}
+ */
+export function findContentWithParentById(root, contentId) {
+    if (!contentId || !root) {
+        return null;
+    }
+    const visit = (col) => {
+        for (const c of col.content || []) {
+            if (c.id === contentId) {
+                return { content: c, parentCollection: col };
+            }
+        }
+        for (const ch of col.children || []) {
+            const r = visit(ch);
+            if (r) {
+                return r;
+            }
+        }
+        return null;
+    };
+    return visit(root);
+}
+
+/**
  * Helper function to get the path to a collection (for breadcrumbs)
  * @param {Object} root - The root collection object
  * @param {string} id - The target collection ID

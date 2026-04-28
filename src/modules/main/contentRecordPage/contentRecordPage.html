@@ -144,6 +144,37 @@
                                             </lightning-button-icon>
                                         </div>
                                     </div>
+                                    <template lwc:if={hasHtmlPreview}>
+                                        <div
+                                            class="content-record-viewer-toolbar-row content-record-html-annotate-row"
+                                            role="toolbar"
+                                            aria-label="HTML preview annotation tools">
+                                            <span
+                                                class="content-record-html-annotate-hint slds-text-body_small slds-text-color_weak slds-m-right_x-small">
+                                                Same-origin preview: choose Blocks and click a region, or Text then select and use Add highlight.
+                                            </span>
+                                            <lightning-button-group>
+                                                <lightning-button
+                                                    label="Off"
+                                                    variant={htmlModeNoneVariant}
+                                                    title="Clear annotation tool"
+                                                    onclick={handleHtmlAnnotateModeNone}>
+                                                </lightning-button>
+                                                <lightning-button
+                                                    label="Blocks"
+                                                    variant={htmlModeBlockVariant}
+                                                    title="Click a content block in the page to add a section annotation"
+                                                    onclick={handleHtmlAnnotateModeBlock}>
+                                                </lightning-button>
+                                                <lightning-button
+                                                    label="Text"
+                                                    variant={htmlModeHighlightVariant}
+                                                    title="Select text in the page, then click Add highlight"
+                                                    onclick={handleHtmlAnnotateModeHighlight}>
+                                                </lightning-button>
+                                            </lightning-button-group>
+                                        </div>
+                                    </template>
                                     <div
                                         lwc:if={showLwcDocumentToolbarPagingRow}
                                         class="content-record-viewer-toolbar-row content-record-viewer-toolbar-row_paging">
@@ -220,11 +251,17 @@
                                         </template>
                                     </template>
                                     <template lwc:elseif={hasHtmlPreview}>
-                                        <iframe
-                                            class="content-record-pdf-frame content-record-html-preview-frame"
-                                            title={contentName}
-                                            src={previewDocumentUrl}
-                                            sandbox="allow-same-origin allow-scripts"></iframe>
+                                        <div
+                                            class="content-record-html-preview-scroll"
+                                            role="region"
+                                            aria-label="HTML content preview">
+                                            <iframe
+                                                class="content-record-html-preview-frame"
+                                                title={contentName}
+                                                src={previewDocumentUrl}
+                                                sandbox="allow-same-origin allow-scripts"
+                                                onload={handleHtmlFrameLoad}></iframe>
+                                        </div>
                                     </template>
                                     <template lwc:else>
                                         <div class="content-record-preview-placeholder">

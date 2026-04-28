@@ -110,6 +110,19 @@
     border-left: 1px solid #e5e5e5;
 }
 
+.content-item-row.slds-is-selected {
+    background-color: #eef4ff;
+}
+
+.content-item-row.slds-is-selected:hover {
+    background-color: #e0ebff;
+}
+
+.content-item-row.slds-is-selected .content-label {
+    font-weight: 600;
+    color: #181818;
+}
+
 /* Content item row styling — clickable to open content record */
 .content-item-row {
     display: flex;

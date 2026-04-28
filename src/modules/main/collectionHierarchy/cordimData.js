@@ -1,12 +1,12 @@
 /**
- * Cordim collection — HTML documents and asset folders under src/assets/cordim (lwr localAssets).
- * Root HTML files reference sibling folders (e.g. 01_…/) for css/js/images.
- * Video module removed from the collection and disk to save ~18MB; in-deck links to Video may no longer resolve.
+ * Cordim collection — HTML under src/assets/cordim (lwr localAssets).
+ * Individual slide HTML files stay next to their asset folders (01_…, 02_…); only the app tree is split.
+ * Master hub: cordim-master.html (links open each slide in a content-record tab via postMessage).
  */
 const CORDIM_ASSET_BASE = '/public/assets/cordim';
 
 /** @type {{ id: string, file: string, title: string, contentTypeLabel: string }[]} */
-const CORDIM_HTML_CONTENT = [
+const CORDIM_INDIVIDUAL_SLIDES = [
     {
         id: 'cnt-cordim-01-patients',
         file: 'Patients with arterial hypertension.html',
@@ -61,7 +61,7 @@ const CORDIM_HTML_CONTENT = [
  * @returns {Object} Root child collection for sampleCollections
  */
 export function getCordimCollection() {
-    const content = CORDIM_HTML_CONTENT.map((row) => ({
+    const individualSlideContent = CORDIM_INDIVIDUAL_SLIDES.map((row) => ({
         id: row.id,
         name: row.file,
         title: row.title,
@@ -85,8 +85,37 @@ export function getCordimCollection() {
             region: 'US',
             status: 'In Progress'
         },
-        content,
+        content: [
+            {
+                id: 'cnt-cordim-hub',
+                name: 'cordim-master.html',
+                title: 'Cordim — Interactive deck (all sections)',
+                contentType: 'html',
+                contentTypeLabel: 'Web Page',
+                version: '1.0',
+                status: 'Draft',
+                effectiveDates: '01/01/2025 - 12/31/2026',
+                previewUrl: `${CORDIM_ASSET_BASE}/cordim-master.html`
+            }
+        ],
         completedTasks: [],
-        children: []
+        children: [
+            {
+                id: 'col-cordim-001-001',
+                name: 'Individual Slides',
+                typeId: 'ct-007',
+                parentId: 'col-cordim-001',
+                level: 2,
+                isFromTemplate: true,
+                metadata: {
+                    owner: 'Regulatory',
+                    region: 'US',
+                    status: 'In Progress'
+                },
+                content: individualSlideContent,
+                completedTasks: [],
+                children: []
+            }
+        ]
     };
 }

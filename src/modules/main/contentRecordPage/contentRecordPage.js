@@ -1,4 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
+import { getHtmlAnnotationBridgeIife } from './htmlAnnotationBridge.js';
 
 /** Vendored from @embedpdf/snippet/dist (copy-embedpdf-assets.mjs). Public URL, not an npm import — avoids LWR3009. */
 const EMBED_PDF_ENTRY_PATH = '/public/assets/vendor/embedpdf-snippet/embedpdf.js';
@@ -24,6 +25,8 @@ const SIDEBAR_MIN_PX = 240;
 const MAIN_MIN_PX = 240;
 const SPLITTER_PX = 8;
 const SIDEBAR_DEFAULT_PX = 400;
+/** localStorage: HTML preview annotations (block + text highlight) per Regulated Content id */
+const htmlAnnStorageKey = (contentId) => `rcm-html-ann-${contentId || 'unknown'}`;
 
 /** Salesforce Lightning brand blues for EmbedPDF theme (matches SLDS/Figma accents) */
 const EMBED_PDF_SLDS_THEME = {
@@ -165,6 +168,26 @@ export default class ContentRecordPage extends LightningElement {
 
     @track _splitterMaxForAria = 1200;
 
+    /**
+     * Same-origin HTML preview: Off | pick a block/region | select text and "Add highlight" in the iframe.
+     * @type {string}
+     */
+    @track htmlAnnotateMode = 'none';
+
+    /**
+     * User-created HTML annotations (persisted in localStorage per `content.id`).
+     * @type {Array<{
+     *   id: string,
+     *   kind: 'block'|'highlight',
+     *   text?: string,
+     *   tagName?: string,
+     *   textPrefix?: string,
+     *   snippet: string,
+     *   createdAt: number
+     * }>}
+     */
+    @track _htmlUserAnnotations = [];
+
     _resizePointerId = null;
 
     _layoutResizeObserver = null;
@@ -285,6 +308,10 @@ export default class ContentRecordPage extends LightningElement {
         if (typeof document !== 'undefined' && this._boundDocumentPointerDown) {
             document.addEventListener('pointerdown', this._boundDocumentPointerDown, true);
         }
+        this._boundHtmlMessage = (e) => this._onWindowMessageForHtmlPreview(e);
+        if (typeof window !== 'undefined' && this._boundHtmlMessage) {
+            window.addEventListener('message', this._boundHtmlMessage, false);
+        }
     }
 
     disconnectedCallback() {
@@ -302,6 +329,10 @@ export default class ContentRecordPage extends LightningElement {
         if (typeof document !== 'undefined' && this._boundDocumentPointerDown) {
             document.removeEventListener('pointerdown', this._boundDocumentPointerDown, true);
             this._boundDocumentPointerDown = null;
+        }
+        if (typeof window !== 'undefined' && this._boundHtmlMessage) {
+            window.removeEventListener('message', this._boundHtmlMessage, false);
+            this._boundHtmlMessage = null;
         }
     }
 
@@ -326,6 +357,8 @@ export default class ContentRecordPage extends LightningElement {
         this.openMenuAnnotationId = null;
         this.commentDrafts = {};
         this.anchorCheckedIds = new Set();
+        this.htmlAnnotateMode = 'none';
+        this._loadHtmlUserAnnotations();
     }
 
     _syncPdfViewerForContent() {
@@ -666,6 +699,46 @@ export default class ContentRecordPage extends LightningElement {
         this.zoomLevel = event.detail.value;
     }
 
+    /**
+     * Size the HTML preview iframe to the embedded document height (same-origin) so the outer
+     * panel can scroll when content is taller than the view. Runs after load + one rAF for layout.
+     * @param {Event} event
+     */
+    handleHtmlFrameLoad(event) {
+        if (!this.hasHtmlPreview) {
+            return;
+        }
+        const iframe = event.currentTarget;
+        if (!iframe) {
+            return;
+        }
+        const apply = () => {
+            const doc = iframe.contentDocument;
+            if (!doc) {
+                return;
+            }
+            const h = Math.max(
+                doc.documentElement ? doc.documentElement.scrollHeight : 0,
+                doc.body ? doc.body.scrollHeight : 0,
+                doc.documentElement ? doc.documentElement.offsetHeight : 0
+            );
+            if (h > 0) {
+                const minPx = 320;
+                const maxPx = 2000000;
+                const next = Math.min(Math.max(h, minPx), maxPx);
+                iframe.style.height = `${next}px`;
+            }
+            this._ensureHtmlAnnotationBridge(iframe);
+        };
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(apply);
+            });
+        } else {
+            apply();
+        }
+    }
+
     handleMainTabActive(event) {
         const v = event.target && event.target.value;
         if (v) {
@@ -715,8 +788,291 @@ export default class ContentRecordPage extends LightningElement {
         });
     }
 
+    /**
+     * Raw rows for the annotation list: user HTML annotations (when preview is HTML) plus demo rows.
+     * @returns {Array<Object>}
+     */
+    get _annotationBaseRows() {
+        if (this.hasHtmlPreview) {
+            const user = (this._htmlUserAnnotations || [])
+                .map((r) => this._mapHtmlAnnotationToRow(r))
+                .filter((row) => row != null);
+            return user.concat(ANNOTATION_DEMO_ITEMS);
+        }
+        return ANNOTATION_DEMO_ITEMS;
+    }
+
+    /**
+     * @param {Object} r
+     * @returns {Object|null}
+     */
+    _mapHtmlAnnotationToRow(r) {
+        if (!r || !r.id) {
+            return null;
+        }
+        const text = (r.text || r.snippet || r.textPrefix || '').replace(/\s+/g, ' ').trim();
+        const snippet =
+            r.kind === 'highlight'
+                ? (text ? `"${text.length > 180 ? text.substring(0, 180) + '…' : text}"` : '')
+                : (r.snippet || r.textPrefix || text || '(section)').replace(/\s+/g, ' ').trim();
+        return {
+            id: r.id,
+            createdBy: 'You',
+            timeAgo: this._timeAgoLabel(r.createdAt),
+            snippet: snippet ? snippet.substring(0, 220) : '…',
+            statusLabel: 'Pending',
+            isResolved: false,
+            flagged: false,
+            linkedClaims: [],
+            comments: []
+        };
+    }
+
+    /**
+     * @param {number|undefined} createdAt
+     * @returns {string}
+     */
+    _timeAgoLabel(createdAt) {
+        if (createdAt == null || typeof createdAt !== 'number' || Number.isNaN(createdAt)) {
+            return 'just now';
+        }
+        const sec = Math.floor((Date.now() - createdAt) / 1000);
+        if (sec < 8) {
+            return 'just now';
+        }
+        if (sec < 60) {
+            return `${sec}s ago`;
+        }
+        const m = Math.floor(sec / 60);
+        if (m < 60) {
+            return `${m}m ago`;
+        }
+        const h = Math.floor(m / 60);
+        if (h < 24) {
+            return `${h}h ago`;
+        }
+        return `${Math.floor(h / 24)}d ago`;
+    }
+
+    _loadHtmlUserAnnotations() {
+        this._htmlUserAnnotations = [];
+        const id = this.content?.id;
+        if (!id || typeof window === 'undefined' || !window.localStorage) {
+            return;
+        }
+        try {
+            const raw = window.localStorage.getItem(htmlAnnStorageKey(id));
+            if (raw) {
+                const arr = JSON.parse(raw);
+                this._htmlUserAnnotations = Array.isArray(arr) ? arr : [];
+            }
+        } catch {
+            /* ignore */
+        }
+    }
+
+    _persistHtmlUserAnnotations() {
+        const id = this.content?.id;
+        if (!id || typeof window === 'undefined' || !window.localStorage) {
+            return;
+        }
+        try {
+            window.localStorage.setItem(htmlAnnStorageKey(id), JSON.stringify(this._htmlUserAnnotations));
+        } catch {
+            /* ignore */
+        }
+    }
+
+    _getHtmlRestorePayload() {
+        return (this._htmlUserAnnotations || []).map((r) => {
+            if (r.kind === 'highlight') {
+                return { id: r.id, kind: 'highlight', text: r.text || '' };
+            }
+            if (r.kind === 'block') {
+                return {
+                    id: r.id,
+                    kind: 'block',
+                    blockTag: r.tagName || 'DIV',
+                    blockTextPrefix: (r.textPrefix || '').replace(/\s+/g, ' ').trim()
+                };
+            }
+            return { id: r.id, kind: r.kind, text: '', blockTag: 'DIV', blockTextPrefix: '' };
+        });
+    }
+
+    _getHtmlAnnotationStyleCss() {
+        return (
+            'mark.rcm-html-mark{ background: rgba(254, 220, 102, 0.45) !important; ' +
+            'box-decoration-break: clone; } ' +
+            '.rcm-html-block-outlined{ outline: 2px solid #0176d3 !important; ' +
+            'outline-offset: 2px; border-radius: 2px; } ' +
+            '.rcm-html-float-btn{ font-family: "Salesforce Sans", Arial, sans-serif; ' +
+            'font-size: 12px; line-height: 1.5; background: #0176d3; color: #fff; ' +
+            'border: none; border-radius: 4px; padding: 4px 8px; ' +
+            'box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer; } ' +
+            '.rcm-html-float-btn:hover, .rcm-html-float-btn:focus{ background: #014486; }'
+        );
+    }
+
+    _postToHtmlFrame(data) {
+        if (typeof window === 'undefined' || !data) {
+            return;
+        }
+        const f = this.template && this.template.querySelector('.content-record-html-preview-frame');
+        if (f && f.contentWindow) {
+            f.contentWindow.postMessage(data, window.location.origin);
+        }
+    }
+
+    _doPostHtmlRestore() {
+        this._postToHtmlFrame({ type: 'rcm-html-restore', annotations: this._getHtmlRestorePayload() });
+    }
+
+    _postHtmlFrameRestore() {
+        if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
+            this._doPostHtmlRestore();
+            return;
+        }
+        window.requestAnimationFrame(() => {
+            this._doPostHtmlRestore();
+        });
+    }
+
+    _postHtmlModeToFrame() {
+        this._postToHtmlFrame({ type: 'rcm-html-set-mode', mode: this.htmlAnnotateMode || 'none' });
+    }
+
+    /**
+     * Injects one-time style + script into the HTML preview document (same-origin only).
+     * @param {HTMLIFrameElement} iframe
+     */
+    _ensureHtmlAnnotationBridge(iframe) {
+        let doc;
+        try {
+            doc = iframe && iframe.contentDocument;
+        } catch (e) {
+            doc = null;
+        }
+        if (!doc || !doc.body) {
+            this._postHtmlFrameRestore();
+            this._postHtmlModeToFrame();
+            return;
+        }
+        try {
+            if (doc.getElementById('rcm-html-ann-injected-style')) {
+                this._postHtmlFrameRestore();
+                this._postHtmlModeToFrame();
+                return;
+            }
+            const st = doc.createElement('style');
+            st.id = 'rcm-html-ann-injected-style';
+            st.textContent = this._getHtmlAnnotationStyleCss();
+            if (doc.head) {
+                doc.head.appendChild(st);
+            } else {
+                doc.body.appendChild(st);
+            }
+            const sc = doc.createElement('script');
+            sc.setAttribute('data-rcm-ann', '1');
+            sc.textContent = getHtmlAnnotationBridgeIife();
+            (doc.head || doc.body).appendChild(sc);
+        } catch (e) {
+            if (typeof console !== 'undefined' && console.warn) {
+                // eslint-disable-next-line no-console
+                console.warn('contentRecordPage: HTML annotation bridge not available', e);
+            }
+        }
+        this._postHtmlFrameRestore();
+        this._postHtmlModeToFrame();
+    }
+
+    /**
+     * @param {MessageEvent} event
+     */
+    _onWindowMessageForHtmlPreview(event) {
+        if (!this.hasHtmlPreview) {
+            return;
+        }
+        if (!event || event.source == null) {
+            return;
+        }
+        if (typeof window === 'undefined' || event.origin !== window.location.origin) {
+            return;
+        }
+        const f = this.template && this.template.querySelector('.content-record-html-preview-frame');
+        if (!f || f.contentWindow !== event.source) {
+            return;
+        }
+        const d = event.data;
+        if (!d || d.type !== 'rcm-html-annotation' || !d.kind) {
+            return;
+        }
+        const id = `h-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        if (d.kind === 'block' && d.tagName) {
+            const next = {
+                id,
+                kind: 'block',
+                tagName: d.tagName,
+                textPrefix: d.textPrefix != null ? String(d.textPrefix) : '',
+                snippet: d.snippet != null ? String(d.snippet) : String(d.textPrefix || ''),
+                createdAt: Date.now()
+            };
+            this._htmlUserAnnotations = (this._htmlUserAnnotations || []).concat([next]);
+            this._persistHtmlUserAnnotations();
+        } else if (d.kind === 'highlight' && d.text) {
+            const t = String(d.text);
+            const next = {
+                id,
+                kind: 'highlight',
+                text: t,
+                snippet: t.length > 500 ? t.substring(0, 500) : t,
+                createdAt: Date.now()
+            };
+            this._htmlUserAnnotations = (this._htmlUserAnnotations || []).concat([next]);
+            this._persistHtmlUserAnnotations();
+        } else {
+            return;
+        }
+        this._postHtmlFrameRestore();
+        this._postHtmlModeToFrame();
+    }
+
+    handleHtmlAnnotateModeNone() {
+        this.htmlAnnotateMode = 'none';
+        this._postHtmlModeToFrame();
+    }
+
+    handleHtmlAnnotateModeBlock() {
+        this.htmlAnnotateMode = 'block';
+        this._postHtmlModeToFrame();
+    }
+
+    handleHtmlAnnotateModeHighlight() {
+        this.htmlAnnotateMode = 'highlight';
+        this._postHtmlModeToFrame();
+    }
+
+    get htmlModeNoneVariant() {
+        return this.htmlAnnotateMode === 'none' ? 'brand' : 'neutral';
+    }
+
+    get htmlModeBlockVariant() {
+        return this.htmlAnnotateMode === 'block' ? 'brand' : 'neutral';
+    }
+
+    get htmlModeHighlightVariant() {
+        return this.htmlAnnotateMode === 'highlight' ? 'brand' : 'neutral';
+    }
+
+    _scrollHtmlAnnotationIntoView(annotationId) {
+        if (!this.hasHtmlPreview || !annotationId) {
+            return;
+        }
+        this._postToHtmlFrame({ type: 'rcm-html-scroll', id: String(annotationId) });
+    }
+
     get annotationItems() {
-        return ANNOTATION_DEMO_ITEMS.map((item) => {
+        return this._annotationBaseRows.map((item) => {
             const expanded = this.expandedAnnotationIds.has(item.id);
             const linkedClaims = (item.linkedClaims || []).map((lc, i) => ({
                 ...lc,
@@ -895,6 +1251,7 @@ export default class ContentRecordPage extends LightningElement {
             next.add(id);
             this.expandedAnnotationIds = next;
             this.selectedAnnotationId = id;
+            this._scrollHtmlAnnotationIntoView(id);
         }
     }
 
@@ -939,6 +1296,7 @@ export default class ContentRecordPage extends LightningElement {
         const next = new Set(this.expandedAnnotationIds);
         next.add(id);
         this.expandedAnnotationIds = next;
+        this._scrollHtmlAnnotationIntoView(id);
     }
 
     /**
@@ -963,6 +1321,9 @@ export default class ContentRecordPage extends LightningElement {
             const n = new Set(this.expandedCommentsIds);
             n.add(id);
             this.expandedCommentsIds = n;
+        }
+        if (id) {
+            this._scrollHtmlAnnotationIntoView(id);
         }
     }
 

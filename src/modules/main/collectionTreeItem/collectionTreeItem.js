@@ -107,9 +107,14 @@ export default class CollectionTreeItem extends LightningElement {
         if (!this.item?.content) {
             return [];
         }
+        const selectedId = this.selectedId;
         return this.item.content.map(content => ({
             ...content,
-            icon: GENERIC_DOCUMENT_ICON
+            icon: GENERIC_DOCUMENT_ICON,
+            rowClass:
+                selectedId && content.id === selectedId
+                    ? 'content-item-row slds-is-selected'
+                    : 'content-item-row'
         }));
     }
 

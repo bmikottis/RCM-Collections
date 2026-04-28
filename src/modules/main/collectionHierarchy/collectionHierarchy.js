@@ -8,7 +8,8 @@ import {
     calculateCompleteness,
     addRootCollection,
     buildNewCollectionFromTemplate,
-    recommendContentForRequired
+    recommendContentForRequired,
+    findContentWithParentById
 } from './sampleData';
 
 /** App-wide bridge: LWR synthetic shadow blocks normal DOM events from tree → hierarchy. */
@@ -84,6 +85,8 @@ function rcmEnsureDocumentNavListeners() {
  */
 export default class CollectionHierarchy extends LightningElement {
     @track selectedCollectionId = null;
+    /** When a content-record tab is active, the tree highlights this content id; otherwise the tree uses selectedCollectionId. */
+    @track selectedContentId = null;
     @track selectedCollectionIds = [];
     @track collectionsData = sampleCollections;
     @track expandedIds = new Set();
@@ -129,6 +132,9 @@ export default class CollectionHierarchy extends LightningElement {
     /** @type {((e: Event) => void) | null} */
     _boundViewCollectionHost = null;
 
+    /** @type {((e: MessageEvent) => void) | null} */
+    _boundCordimWindowMessage = null;
+
     connectedCallback() {
         this._boundOpenContentRecordHost = (e) => {
             this.handleOpenContentRecord(e);
@@ -144,6 +150,12 @@ export default class CollectionHierarchy extends LightningElement {
         // Document bridge: tree / breadcrumbs / content record use CustomEvents; listeners delegate to rcmHierarchyTarget.
         rcmHierarchyTarget = this;
         rcmEnsureDocumentNavListeners();
+        this._boundCordimWindowMessage = (e) => {
+            this._handleCordimHubMessage(e);
+        };
+        if (typeof window !== 'undefined') {
+            window.addEventListener('message', this._boundCordimWindowMessage);
+        }
     }
 
     renderedCallback() {
@@ -164,6 +176,10 @@ export default class CollectionHierarchy extends LightningElement {
         if (this._boundViewCollectionHost) {
             this.removeEventListener('viewcollection', this._boundViewCollectionHost);
             this._boundViewCollectionHost = null;
+        }
+        if (this._boundCordimWindowMessage && typeof window !== 'undefined') {
+            window.removeEventListener('message', this._boundCordimWindowMessage);
+            this._boundCordimWindowMessage = null;
         }
     }
 
@@ -464,6 +480,14 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Id for the left tree: highlights a content row when a content-record tab is active, otherwise the selected collection.
+     * @returns {string|null|undefined}
+     */
+    get treeSelectedId() {
+        return this.selectedContentId || this.selectedCollectionId;
+    }
+
+    /**
      * Breadcrumb bar above the detail area; hidden while a Regulated Content record is open
      * (breadcrumbs render in the record page header per Figma 457:75280).
      * @returns {boolean}
@@ -473,12 +497,29 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Keep tree selection highlight aligned with the active console tab (content file vs main / collection record).
+     */
+    _syncTreeSelectionToActiveTab() {
+        if (this.activeTabId === 'main') {
+            this.selectedContentId = null;
+            return;
+        }
+        const tab = this.consoleTabs.find(t => t.id === this.activeTabId);
+        if (tab?.type === 'content-record' && tab.content?.id) {
+            this.selectedContentId = tab.content.id;
+        } else {
+            this.selectedContentId = null;
+        }
+    }
+
+    /**
      * Switch console focus to the main tab so the collection workspace (tree + detail) renders.
      * Always applied when navigating via tree/breadcrumb — avoids stale tab lookups and stuck content-record UI.
      */
     focusMainConsoleTab() {
         this.activeTabId = 'main';
         this.consoleTabs = [...this.consoleTabs];
+        this._syncTreeSelectionToActiveTab();
     }
 
     handleCollectionCheck(event) {
@@ -519,6 +560,7 @@ export default class CollectionHierarchy extends LightningElement {
         const { id } = event.detail;
         this.expandPathToCollection(id);
         this.selectedCollectionId = id;
+        this.selectedContentId = null;
     }
 
     /**
@@ -579,6 +621,7 @@ export default class CollectionHierarchy extends LightningElement {
      */
     selectCollection(collectionId) {
         this.selectedCollectionId = collectionId;
+        this.selectedContentId = null;
     }
 
     /**
@@ -586,6 +629,7 @@ export default class CollectionHierarchy extends LightningElement {
      */
     clearSelection() {
         this.selectedCollectionId = null;
+        this.selectedContentId = null;
     }
 
     /** Open/close list view selector dropdown; close menu when opening */
@@ -922,6 +966,7 @@ export default class CollectionHierarchy extends LightningElement {
         this.collectionsData = addRootCollection(this.collectionsData, newCollection);
         this.expandedIds = new Set([...this.expandedIds, newId]);
         this.selectedCollectionId = newId;
+        this.selectedContentId = null;
         this.showCreateModal = false;
         this.createStep = 1;
         this.selectedTemplate = null;
@@ -1109,6 +1154,7 @@ export default class CollectionHierarchy extends LightningElement {
         const tabId = event.currentTarget.dataset.tabId;
         this.activeTabId = tabId;
         this.showMainTabDropdown = false;
+        this._syncTreeSelectionToActiveTab();
     }
 
     /**
@@ -1120,6 +1166,7 @@ export default class CollectionHierarchy extends LightningElement {
      */
     handleMainTabAreaClick(event) {
         this.activeTabId = 'main';
+        this._syncTreeSelectionToActiveTab();
         this.showMainTabDropdown = !this.showMainTabDropdown;
     }
 
@@ -1131,6 +1178,7 @@ export default class CollectionHierarchy extends LightningElement {
             event.preventDefault();
             event.stopPropagation();
             this.activeTabId = 'main';
+            this._syncTreeSelectionToActiveTab();
             this.showMainTabDropdown = !this.showMainTabDropdown;
         }
     }
@@ -1219,6 +1267,7 @@ export default class CollectionHierarchy extends LightningElement {
             if (this.activeTabId === tabId) {
                 this.activeTabId = 'main';
             }
+            this._syncTreeSelectionToActiveTab();
         }
     }
 
@@ -1247,6 +1296,7 @@ export default class CollectionHierarchy extends LightningElement {
                 this.consoleTabs = [...this.consoleTabs, newTab];
                 this.activeTabId = newTabId;
             }
+            this._syncTreeSelectionToActiveTab();
         }
     }
 
@@ -1270,6 +1320,7 @@ export default class CollectionHierarchy extends LightningElement {
             this.expandPathToCollection(collectionId);
             this.selectedCollectionId = collectionId;
             this.activeTabId = 'main';
+            this._syncTreeSelectionToActiveTab();
             return;
         }
 
@@ -1289,6 +1340,7 @@ export default class CollectionHierarchy extends LightningElement {
             this.consoleTabs = [...this.consoleTabs, newTab];
             this.activeTabId = newTabId;
         }
+        this._syncTreeSelectionToActiveTab();
     }
 
     /**
@@ -1330,6 +1382,37 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Cordim hub (cordim-master.html) posts messages to open a slide in a content-record tab.
+     * @param {MessageEvent} event
+     */
+    _handleCordimHubMessage(event) {
+        const d = event && event.data;
+        if (!d || d.type !== 'rcm-open-content-record' || typeof d.contentId !== 'string') {
+            return;
+        }
+        if (rcmHierarchyTarget !== this || !this.isConnected) {
+            return;
+        }
+        if (typeof window !== 'undefined' && event.origin && window.location.origin && event.origin !== window.location.origin) {
+            return;
+        }
+        if (!d.contentId.startsWith('cnt-cordim-')) {
+            return;
+        }
+        const hit = findContentWithParentById(this.collectionsData, d.contentId);
+        if (!hit || !hit.content) {
+            return;
+        }
+        this.handleOpenContentRecord({
+            detail: {
+                content: { ...hit.content },
+                parentCollectionId: hit.parentCollection.id,
+                parentCollectionName: hit.parentCollection.name || ''
+            }
+        });
+    }
+
+    /**
      * Handle open content record (from Collection Content card link or "Go to Record" in preview modal)
      * Adds a content-record tab and switches to it.
      * @param {CustomEvent} event - detail: { content, parentCollectionId, parentCollectionName }
@@ -1367,5 +1450,6 @@ export default class CollectionHierarchy extends LightningElement {
             this.consoleTabs = [...this.consoleTabs, newTab];
             this.activeTabId = tabId;
         }
+        this._syncTreeSelectionToActiveTab();
     }
 }
