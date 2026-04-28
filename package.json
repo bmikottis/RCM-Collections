@@ -18,6 +18,7 @@
     "stage:prod-compat": "yarn build:prod-compat && yarn start"
   },
   "dependencies": {
+    "@embedpdf/snippet": "^2.14.1",
     "@salesforce-ux/design-system": "^2.26.2",
     "lightning-base-components": "^1.27.2-alpha",
     "lwc": "8.10.0",

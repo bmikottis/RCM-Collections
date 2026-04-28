@@ -11,6 +11,57 @@ const MAIN_MIN_PX = 240;
 const SPLITTER_PX = 8;
 const SIDEBAR_DEFAULT_PX = 400;
 
+/** Salesforce Lightning brand blues for EmbedPDF theme (matches SLDS/Figma accents) */
+const EMBED_PDF_SLDS_THEME = {
+    preference: 'light',
+    light: {
+        background: {
+            app: '#f3f3f3',
+            surface: '#ffffff',
+            surfaceAlt: '#f3f3f3',
+            elevated: '#ffffff',
+            overlay: 'rgba(0, 0, 0, 0.4)',
+            input: '#ffffff'
+        },
+        foreground: {
+            primary: '#181818',
+            secondary: '#5c5c5c',
+            muted: '#706e6b',
+            disabled: '#b0adab',
+            onAccent: '#ffffff'
+        },
+        border: {
+            default: '#e5e5e5',
+            subtle: '#e5e5e5',
+            strong: '#c9c9c7'
+        },
+        accent: {
+            primary: '#0176d3',
+            primaryHover: '#014486',
+            primaryActive: '#014486',
+            primaryLight: 'rgba(1, 118, 211, 0.12)',
+            primaryForeground: '#ffffff'
+        },
+        interactive: {
+            hover: 'rgba(1, 118, 211, 0.08)',
+            active: 'rgba(1, 118, 211, 0.12)',
+            selected: 'rgba(1, 118, 211, 0.16)',
+            focus: '#0176d3',
+            focusRing: 'rgba(1, 118, 211, 0.2)'
+        },
+        state: {
+            error: '#c23934',
+            errorLight: 'rgba(194, 57, 52, 0.1)',
+            warning: '#fe9339',
+            warningLight: 'rgba(254, 147, 57, 0.1)',
+            success: '#2e844a',
+            successLight: 'rgba(46, 132, 74, 0.1)',
+            info: '#0176d3',
+            infoLight: 'rgba(1, 118, 211, 0.1)'
+        }
+    }
+};
+
 /** Demo annotation rows — shared by getter and expand/collapse behavior */
 const ANNOTATION_DEMO_ITEMS = [
     {
@@ -106,6 +157,75 @@ export default class ContentRecordPage extends LightningElement {
 
     _boundResizeEnd = (e) => this._handleResizePointerEnd(e);
 
+    /** 'embed' = @embedpdf/snippet; 'iframe' = browser PDF UI fallback */
+    @track pdfViewerMode = 'embed';
+
+    _embedPdfInitGeneration = 0;
+
+    _embedPdfMountUrl = null;
+
+    _contentViewerKey = null;
+
+    _teardownEmbedPdf() {
+        const host = this.template && this.template.querySelector('.content-record-pdf-host');
+        if (host) {
+            while (host.firstChild) {
+                host.removeChild(host.firstChild);
+            }
+        }
+        this._embedPdfMountUrl = null;
+    }
+
+    async _mountEmbedPdfIfNeeded() {
+        if (!this.hasPdfPreview) {
+            this._teardownEmbedPdf();
+            return;
+        }
+        if (this.pdfViewerMode !== 'embed') {
+            this._teardownEmbedPdf();
+            return;
+        }
+        const url = this.previewDocumentUrl;
+        if (!url) {
+            this._teardownEmbedPdf();
+            return;
+        }
+        const host = this.template.querySelector('.content-record-pdf-host');
+        if (!host) {
+            return;
+        }
+        if (this._embedPdfMountUrl === url && host.childElementCount > 0) {
+            return;
+        }
+        this._teardownEmbedPdf();
+        const generation = ++this._embedPdfInitGeneration;
+        try {
+            const mod = await import('@embedpdf/snippet');
+            const EmbedPDF = mod.default;
+            if (generation !== this._embedPdfInitGeneration) {
+                return;
+            }
+            EmbedPDF.init({
+                type: 'container',
+                target: host,
+                src: url,
+                tabBar: 'never',
+                theme: EMBED_PDF_SLDS_THEME
+            });
+            if (generation !== this._embedPdfInitGeneration) {
+                this._teardownEmbedPdf();
+                return;
+            }
+            this._embedPdfMountUrl = url;
+        } catch (e) {
+            if (typeof console !== 'undefined' && console.error) {
+                console.error('contentRecordPage: EmbedPDF failed, using iframe', e);
+            }
+            this.pdfViewerMode = 'iframe';
+            this._teardownEmbedPdf();
+        }
+    }
+
     connectedCallback() {
         this._boundWindowResize = () => {
             this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
@@ -131,6 +251,8 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     disconnectedCallback() {
+        this._embedPdfInitGeneration += 1;
+        this._teardownEmbedPdf();
         if (this._boundWindowResize) {
             window.removeEventListener('resize', this._boundWindowResize);
         }
@@ -143,6 +265,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     renderedCallback() {
+        this._syncPdfViewerForContent();
         this._scheduleSidebarLayoutApply();
         const layout = this._getLayoutEl();
         if (layout && typeof ResizeObserver !== 'undefined' && !this._layoutResizeObserver) {
@@ -150,6 +273,36 @@ export default class ContentRecordPage extends LightningElement {
                 this._boundLayoutResize();
             });
             this._layoutResizeObserver.observe(layout);
+        }
+        this._queueEmbedPdfMount();
+    }
+
+    _syncPdfViewerForContent() {
+        if (this.hasPdfPreview) {
+            const key = `${this.content?.id ?? ''}|${this.previewDocumentUrl}`;
+            if (key !== this._contentViewerKey) {
+                this._contentViewerKey = key;
+                this.pdfViewerMode = 'embed';
+                this._embedPdfInitGeneration += 1;
+                this._teardownEmbedPdf();
+            }
+        } else {
+            this._contentViewerKey = null;
+        }
+    }
+
+    _queueEmbedPdfMount() {
+        if (!this.hasPdfPreview) {
+            this._teardownEmbedPdf();
+            return;
+        }
+        if (typeof Promise === 'undefined') {
+            return;
+        }
+        if (this.pdfViewerMode === 'embed') {
+            void Promise.resolve().then(() => this._mountEmbedPdfIfNeeded());
+        } else {
+            this._teardownEmbedPdf();
         }
     }
 
@@ -346,6 +499,47 @@ export default class ContentRecordPage extends LightningElement {
             zip: 'doctype:zip'
         };
         return iconMap[type] || 'doctype:unknown';
+    }
+
+    /**
+     * When `content.previewUrl` is set (static demo assets), show PDF in the viewer via iframe.
+     * @returns {boolean}
+     */
+    get hasPdfPreview() {
+        return (
+            (this.content?.contentType || '').toLowerCase() === 'pdf' &&
+            typeof this.content?.previewUrl === 'string' &&
+            this.content.previewUrl.length > 0
+        );
+    }
+
+    /**
+     * Absolute URL for PDF iframe (encodes spaces and special path segments).
+     * @returns {string}
+     */
+    get previewDocumentUrl() {
+        const raw = this.content?.previewUrl;
+        if (!raw || typeof raw !== 'string') {
+            return '';
+        }
+        if (/^https?:\/\//i.test(raw)) {
+            return raw;
+        }
+        const path = raw.startsWith('/') ? raw : `/${raw}`;
+        if (typeof window !== 'undefined' && window.location && window.location.origin) {
+            return `${window.location.origin}${encodeURI(path)}`;
+        }
+        return encodeURI(path);
+    }
+
+    /** SLDS-branded EmbedPDF host vs browser iframe fallback */
+    get usePdfEmbedHost() {
+        return this.hasPdfPreview && this.pdfViewerMode === 'embed';
+    }
+
+    /** Hide duplicate paging/zoom row when EmbedPDF provides its own chrome */
+    get showLwcDocumentToolbarPagingRow() {
+        return !this.hasPdfPreview || this.pdfViewerMode === 'iframe';
     }
 
     get totalPages() {

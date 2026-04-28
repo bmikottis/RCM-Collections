@@ -470,10 +470,36 @@
 }
 
 .content-record-document-preview {
+    display: flex;
+    flex-direction: column;
     flex: 1;
     overflow: auto;
-    padding: var(--slds-g-spacing-small, 0.75rem);
+    padding: 0;
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    min-height: 0;
+}
+
+.content-record-pdf-frame,
+.content-record-pdf-host {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 28rem;
+    border: none;
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.content-record-pdf-host {
+    min-height: 32rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-record-pdf-host > * {
+    flex: 1;
     min-height: 0;
 }
 

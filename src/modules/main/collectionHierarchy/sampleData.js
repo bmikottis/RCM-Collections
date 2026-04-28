@@ -3,6 +3,8 @@
  * Life Sciences industry focused - regulatory content management.
  */
 
+import { getMakanaHealthCollection } from './makanaHealthData.js';
+
 // Collection Types/Templates – life sciences (FDA, EMA, drug launch, etc.)
 export const collectionTypes = [
     {
@@ -217,6 +219,7 @@ export const sampleCollections = {
     level: 0,
     isRoot: true,
     children: [
+        getMakanaHealthCollection(),
         {
             id: 'col-001',
             name: 'Cardiolex 50mg Regulatory Package',
