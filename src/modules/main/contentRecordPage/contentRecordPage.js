@@ -1046,14 +1046,6 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     /**
-     * Whether we can navigate back to the parent collection in the workspace
-     * @returns {boolean}
-     */
-    get showBackToCollection() {
-        return Boolean(this.parentCollectionId);
-    }
-
-    /**
      * Return to main workspace with the parent collection selected (tree + detail)
      */
     navigateToParentCollection() {
@@ -1072,10 +1064,6 @@ export default class ContentRecordPage extends LightningElement {
                 })
             );
         }
-    }
-
-    handleBackToCollectionClick() {
-        this.navigateToParentCollection();
     }
 
     /**
