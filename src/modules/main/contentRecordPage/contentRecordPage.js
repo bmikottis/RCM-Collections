@@ -1,5 +1,17 @@
 import { LightningElement, api, track } from 'lwc';
-import EmbedPDF, { ZoomMode } from '@embedpdf/snippet';
+
+/** Vendored from @embedpdf/snippet/dist (copy-embedpdf-assets.mjs). Public URL, not an npm import — avoids LWR3009. */
+const EMBED_PDF_ENTRY_PATH = '/public/assets/vendor/embedpdf-snippet/embedpdf.js';
+
+/**
+ * Native ESM import by absolute URL. Built so LWR prod-compat does not register @embedpdf as an AMD "module" bare specifier.
+ * @param {string} absUrl
+ * @returns {Promise<typeof import('@embedpdf/snippet')>}
+ */
+function _importEmbedPdfFromUrl(absUrl) {
+    // eslint-disable-next-line no-new-func -- required to bypass LWR's transform of import()
+    return new Function('u', 'return import(u)')(absUrl);
+}
 
 /** Must match collectionHierarchy.js */
 const RCM_VIEW_COLLECTION = 'rcm-view-collection';
@@ -203,29 +215,46 @@ export default class ContentRecordPage extends LightningElement {
         }
         this._teardownEmbedPdf();
         const generation = ++this._embedPdfInitGeneration;
-        try {
-            EmbedPDF.init({
-                type: 'container',
-                target: host,
-                src: url,
-                tabBar: 'never',
-                theme: EMBED_PDF_SLDS_THEME,
-                zoom: {
-                    defaultZoomLevel: ZoomMode.FitWidth
-                }
-            });
-            if (generation !== this._embedPdfInitGeneration) {
-                this._teardownEmbedPdf();
+        void (async () => {
+            if (typeof window === 'undefined' || !window.location?.origin) {
+                this.pdfViewerMode = 'iframe';
                 return;
             }
-            this._embedPdfMountUrl = url;
-        } catch (e) {
-            if (typeof console !== 'undefined' && console.error) {
-                console.error('contentRecordPage: EmbedPDF failed, using iframe', e);
+            const entryUrl = new URL(EMBED_PDF_ENTRY_PATH, window.location.origin).href;
+            try {
+                const mod = await _importEmbedPdfFromUrl(entryUrl);
+                const EmbedPDF = mod.default;
+                const { ZoomMode } = mod;
+                if (generation !== this._embedPdfInitGeneration || this.pdfViewerMode !== 'embed') {
+                    return;
+                }
+                const hostNode = this.template.querySelector('.content-record-pdf-host');
+                if (!hostNode) {
+                    return;
+                }
+                EmbedPDF.init({
+                    type: 'container',
+                    target: hostNode,
+                    src: url,
+                    tabBar: 'never',
+                    theme: EMBED_PDF_SLDS_THEME,
+                    zoom: {
+                        defaultZoomLevel: ZoomMode.FitWidth
+                    }
+                });
+                if (generation !== this._embedPdfInitGeneration) {
+                    this._teardownEmbedPdf();
+                    return;
+                }
+                this._embedPdfMountUrl = url;
+            } catch (e) {
+                if (typeof console !== 'undefined' && console.error) {
+                    console.error('contentRecordPage: EmbedPDF failed, using iframe', e);
+                }
+                this.pdfViewerMode = 'iframe';
+                this._teardownEmbedPdf();
             }
-            this.pdfViewerMode = 'iframe';
-            this._teardownEmbedPdf();
-        }
+        })();
     }
 
     connectedCallback() {

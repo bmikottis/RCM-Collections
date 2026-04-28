@@ -5,6 +5,9 @@ dist
 # LWR static build output (regenerate with npm run build)
 site/
 
+# Vendored from @embedpdf/snippet/dist (see scripts/copy-embedpdf-assets.mjs)
+src/assets/vendor/embedpdf-snippet/
+
 .vscode
 .DS_Store
 
