@@ -2,6 +2,7 @@ import { LightningElement, api, track } from 'lwc';
 
 /** Must match collectionHierarchy.js */
 const RCM_VIEW_COLLECTION = 'rcm-view-collection';
+const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
 
 /** v2: resets everyone once (fixes narrow persisted widths); drag delta sign fixed in pointer move */
 const STORAGE_KEY_SIDEBAR = 'rcm-content-record-annotation-sidebar-px-v2';
@@ -127,16 +128,18 @@ export default class ContentRecordPage extends LightningElement {
     @api content;
     @api parentCollectionName;
     @api parentCollectionId;
+    /** Path segments (id + name) from the collection tree — see Figma 457:75280 <lightning-breadcrumbs> */
+    @api recordBreadcrumbItems;
 
     @track activeTab = 'document';
     /** Right sidebar scoped tabs: annotations | contentWorkItems */
     @track scopedPanelTab = 'annotations';
     @track workflowStage = 'draft'; // draft | review | approve | archive
-    @track expandedAnnotationIds = new Set(['001']);
-    @track expandedLinkedClaimsIds = new Set(['001']);
-    @track expandedCommentsIds = new Set(['001']);
-    /** Which annotation card shows the full blue selection outline (Figma) */
-    @track selectedAnnotationId = '001';
+    @track expandedAnnotationIds = new Set();
+    @track expandedLinkedClaimsIds = new Set();
+    @track expandedCommentsIds = new Set();
+    /** Which annotation card shows the full blue selection outline (Figma); null = none */
+    @track selectedAnnotationId = null;
     @track openMenuAnnotationId = null;
     @track anchorCheckedIds = new Set();
     /** Draft text per annotation id for comment composer */
@@ -164,7 +167,7 @@ export default class ContentRecordPage extends LightningElement {
 
     _embedPdfMountUrl = null;
 
-    _contentViewerKey = null;
+    _contentRecordKey = null;
 
     _teardownEmbedPdf() {
         const host = this.template && this.template.querySelector('.content-record-pdf-host');
@@ -202,6 +205,7 @@ export default class ContentRecordPage extends LightningElement {
         try {
             const mod = await import('@embedpdf/snippet');
             const EmbedPDF = mod.default;
+            const { ZoomMode } = mod;
             if (generation !== this._embedPdfInitGeneration) {
                 return;
             }
@@ -210,7 +214,10 @@ export default class ContentRecordPage extends LightningElement {
                 target: host,
                 src: url,
                 tabBar: 'never',
-                theme: EMBED_PDF_SLDS_THEME
+                theme: EMBED_PDF_SLDS_THEME,
+                zoom: {
+                    defaultZoomLevel: ZoomMode.FitWidth
+                }
             });
             if (generation !== this._embedPdfInitGeneration) {
                 this._teardownEmbedPdf();
@@ -277,17 +284,27 @@ export default class ContentRecordPage extends LightningElement {
         this._queueEmbedPdfMount();
     }
 
+    _resetAnnotationStateForContentChange() {
+        this.expandedAnnotationIds = new Set();
+        this.expandedLinkedClaimsIds = new Set();
+        this.expandedCommentsIds = new Set();
+        this.selectedAnnotationId = null;
+        this.openMenuAnnotationId = null;
+        this.commentDrafts = {};
+        this.anchorCheckedIds = new Set();
+    }
+
     _syncPdfViewerForContent() {
+        const key = `${this.content?.id ?? ''}|${this.previewDocumentUrl || ''}`;
+        if (key === this._contentRecordKey) {
+            return;
+        }
+        this._contentRecordKey = key;
+        this._resetAnnotationStateForContentChange();
         if (this.hasPdfPreview) {
-            const key = `${this.content?.id ?? ''}|${this.previewDocumentUrl}`;
-            if (key !== this._contentViewerKey) {
-                this._contentViewerKey = key;
-                this.pdfViewerMode = 'embed';
-                this._embedPdfInitGeneration += 1;
-                this._teardownEmbedPdf();
-            }
-        } else {
-            this._contentViewerKey = null;
+            this.pdfViewerMode = 'embed';
+            this._embedPdfInitGeneration += 1;
+            this._teardownEmbedPdf();
         }
     }
 
@@ -453,6 +470,23 @@ export default class ContentRecordPage extends LightningElement {
         return this.content?.title || this.content?.name || 'Regulated Content';
     }
 
+    /** Breadcrumb data from parent (collection path); Figma: lightning-breadcrumbs above eyebrow */
+    get recordBreadcrumbsList() {
+        return Array.isArray(this.recordBreadcrumbItems) ? this.recordBreadcrumbItems : [];
+    }
+
+    get hasRecordBreadcrumbs() {
+        return this.recordBreadcrumbsList.length > 0;
+    }
+
+    /** Figma: 13px on-surface-1, line 18px — e.g. "Regulated Content Version" */
+    get recordEyebrowLabel() {
+        if (this.content?.recordTypeLabel) {
+            return this.content.recordTypeLabel;
+        }
+        return 'Regulated Content Version';
+    }
+
     /** File name shown in the viewer toolbar */
     get displayFileName() {
         return this.contentName;
@@ -575,26 +609,39 @@ export default class ContentRecordPage extends LightningElement {
         }
     }
 
-    get pathDraftClass() {
-        return this._pathSegClass('draft');
-    }
-
-    get pathReviewClass() {
-        return this._pathSegClass('review');
-    }
-
-    get pathApproveClass() {
-        return this._pathSegClass('approve');
-    }
-
-    get pathArchiveClass() {
-        return this._pathSegClass('archive');
-    }
-
-    /** Figma path: chevron segments (514:114938) — active = inverse surface, inactive = container-3 */
-    _pathSegClass(stage) {
-        const active = this.workflowStage === stage;
-        return active ? 'content-path-seg content-path-seg_is-active' : 'content-path-seg';
+    /**
+     * Path steps: first = pill-left + right cap; middle/last = stage + right cap only
+     * (no left notches; previous step’s right cap overlays the next body).
+     * @returns {Array<{key: string, label: string, segClass: string, showRightCap: boolean, ariaCurrent: string|null, wrapStyle: string}>}
+     */
+    get pathStepItems() {
+        const order = [
+            { stage: 'draft', label: 'Draft' },
+            { stage: 'review', label: 'Review' },
+            { stage: 'approve', label: 'Approve' },
+            { stage: 'archive', label: 'Archive' }
+        ];
+        return order.map((s, i) => {
+            const isFirst = i === 0;
+            const isLast = i === order.length - 1;
+            const active = this.workflowStage === s.stage;
+            const mod = isFirst ? 'content-path-seg_first' : isLast ? 'content-path-seg_last' : 'content-path-seg_middle';
+            return {
+                key: s.stage,
+                label: s.label,
+                showRightCap: !isLast,
+                segClass: [
+                    'content-path-seg',
+                    mod,
+                    active ? 'content-path-seg_is-active' : ''
+                ]
+                    .filter(Boolean)
+                    .join(' '),
+                ariaCurrent: active ? 'step' : null,
+                // Later steps sit under earlier ones so each step's right cap paints on top of the next body.
+                wrapStyle: `z-index: ${order.length - i};`
+            };
+        });
     }
 
     get annotationItems() {
@@ -628,10 +675,18 @@ export default class ContentRecordPage extends LightningElement {
                 showAnchorIcon: this.anchorCheckedIds.has(item.id),
                 expanded,
                 isCollapsed: !expanded,
+                metaClass: [
+                    'content-record-annotation-meta',
+                    !expanded ? 'content-record-annotation-meta_collapsed' : ''
+                ]
+                    .filter(Boolean)
+                    .join(' '),
+                linkedClaimsBadgeLabel: `Linked claims (${linkedClaims.length})`,
+                commentsBadgeLabel: `Comments (${comments.length})`,
                 cardClass: [
                     'content-record-annotation-card',
                     expanded ? 'content-record-annotation-card_is-expanded' : '',
-                    this.selectedAnnotationId === item.id
+                    this.selectedAnnotationId != null && this.selectedAnnotationId === item.id
                         ? 'content-record-annotation-card_is-selected'
                         : ''
                 ]
@@ -706,6 +761,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     handleAnnotationToggle(event) {
+        event.stopPropagation();
         const id = event.currentTarget.dataset.id;
         const next = new Set(this.expandedAnnotationIds);
         if (next.has(id)) {
@@ -719,31 +775,12 @@ export default class ContentRecordPage extends LightningElement {
         } else {
             next.add(id);
             this.selectedAnnotationId = id;
-            const seed = ANNOTATION_DEMO_ITEMS.find((row) => row.id === id);
-            if (seed) {
-                const nLinked = (seed.linkedClaims || []).length;
-                const nComments = (seed.comments || []).length;
-                if (nLinked > 0) {
-                    const lk = new Set(this.expandedLinkedClaimsIds);
-                    lk.add(id);
-                    this.expandedLinkedClaimsIds = lk;
-                }
-                if (nComments > 0) {
-                    const cm = new Set(this.expandedCommentsIds);
-                    cm.add(id);
-                    this.expandedCommentsIds = cm;
-                }
-            }
         }
         this.expandedAnnotationIds = next;
     }
 
     /**
-     * Collapsed footer pills: expand card and open linked or comments section (Figma)
-     * @param {Event} event
-     */
-    /**
-     * Select annotation card for focus styling; ignores clicks from nested controls.
+     * Card surface: select + expand when collapsed. Skips buttons, links, form controls, and the info icon.
      * @param {MouseEvent} event
      */
     handleAnnotationCardActivate(event) {
@@ -753,20 +790,39 @@ export default class ContentRecordPage extends LightningElement {
             if (!node || !node.tagName) {
                 continue;
             }
-            const t = node.tagName.toLowerCase();
-            if (t === 'button' || t === 'a' || t === 'textarea' || t === 'input') {
+            if (node.classList && node.classList.contains('content-record-annotation-info-icon')) {
                 return;
             }
-            if (t.startsWith('lightning-')) {
+            const t = node.tagName.toLowerCase();
+            if (t === 'button' || t === 'a' || t === 'input' || t === 'textarea' || t === 'select' || t === 'label') {
+                return;
+            }
+            if (
+                t === 'lightning-input' ||
+                t === 'lightning-textarea' ||
+                t === 'lightning-button' ||
+                t === 'lightning-button-icon' ||
+                t === 'lightning-combobox'
+            ) {
                 return;
             }
         }
         const id = event.currentTarget.dataset.id;
-        if (id) {
-            this.selectedAnnotationId = id;
+        if (!id) {
+            return;
+        }
+        this.selectedAnnotationId = id;
+        if (!this.expandedAnnotationIds.has(id)) {
+            const next = new Set(this.expandedAnnotationIds);
+            next.add(id);
+            this.expandedAnnotationIds = next;
         }
     }
 
+    /**
+     * Collapsed badge row: expand the card and open linked claims or comments (Figma 276:19820).
+     * @param {MouseEvent} event
+     */
     handleCollapsedSummaryClick(event) {
         event.stopPropagation();
         const id = event.currentTarget.dataset.id;
@@ -935,6 +991,27 @@ export default class ContentRecordPage extends LightningElement {
 
     handleBackToCollectionClick() {
         this.navigateToParentCollection();
+    }
+
+    /**
+     * Breadcrumb: select a collection in the path (same behavior as main workspace bar).
+     * @param {CustomEvent} event
+     */
+    handleRecordBreadcrumbClick(event) {
+        if (event?.cancelable) {
+            event.preventDefault();
+        }
+        const id = event?.currentTarget?.name;
+        if (!id || typeof document === 'undefined') {
+            return;
+        }
+        document.dispatchEvent(
+            new CustomEvent(RCM_TREE_SELECT_COLLECTION, {
+                bubbles: true,
+                composed: true,
+                detail: { id }
+            })
+        );
     }
 
     handleParentCollectionClick(event) {

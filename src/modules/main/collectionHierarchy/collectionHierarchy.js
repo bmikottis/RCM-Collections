@@ -464,6 +464,15 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
+     * Breadcrumb bar above the detail area; hidden while a Regulated Content record is open
+     * (breadcrumbs render in the record page header per Figma 457:75280).
+     * @returns {boolean}
+     */
+    get showStandaloneBreadcrumbBar() {
+        return this.hasBreadcrumbs && !this.showContentRecordPage;
+    }
+
+    /**
      * Switch console focus to the main tab so the collection workspace (tree + detail) renders.
      * Always applied when navigating via tree/breadcrumb — avoids stale tab lookups and stuck content-record UI.
      */
@@ -1022,6 +1031,11 @@ export default class CollectionHierarchy extends LightningElement {
     get showContentRecordPage() {
         const activeTab = this.consoleTabs.find(tab => tab.id === this.activeTabId);
         return activeTab?.type === 'content-record';
+    }
+
+    /** When the content record is open, the right column scrolls inside the wrap; main does not scroll. */
+    get detailMainClass() {
+        return this.showContentRecordPage ? 'detail-main detail-main_content-record' : 'detail-main';
     }
 
     /**

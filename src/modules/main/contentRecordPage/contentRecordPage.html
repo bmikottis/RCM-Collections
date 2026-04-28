@@ -1,19 +1,35 @@
 <template>
     <article class="slds-card content-record-page-card">
         <div class="content-record-page-inner">
+            <div class="content-record-hero">
             <!-- Figma: Regulated Content record header (457:75280) — single surface-2 block -->
             <div class="content-record-page-header-shell">
                 <div class="content-record-page-header">
                     <div class="content-record-page-header-main">
                         <div class="content-record-page-header-icon" aria-hidden="true">
                             <lightning-icon
+                                class="content-record-header-doc-icon"
                                 icon-name="standard:document"
-                                size="large"
+                                size="medium"
                                 alternative-text="Regulated Content">
                             </lightning-icon>
                         </div>
                         <div class="content-record-page-header-titles">
-                            <p class="content-record-eyebrow">Regulated Content</p>
+                            <template lwc:if={hasRecordBreadcrumbs}>
+                                <div class="content-record-breadcrumbs-wrap">
+                                    <lightning-breadcrumbs class="content-record-breadcrumbs">
+                                        <template for:each={recordBreadcrumbsList} for:item="crumb">
+                                            <lightning-breadcrumb
+                                                key={crumb.id}
+                                                label={crumb.name}
+                                                name={crumb.id}
+                                                onclick={handleRecordBreadcrumbClick}>
+                                            </lightning-breadcrumb>
+                                        </template>
+                                    </lightning-breadcrumbs>
+                                </div>
+                            </template>
+                            <p class="content-record-eyebrow">{recordEyebrowLabel}</p>
                             <h1 class="content-record-page-title">{recordTitle}</h1>
                         </div>
                     </div>
@@ -27,24 +43,21 @@
                                 onclick={handleBackToCollectionClick}>
                             </lightning-button>
                         </template>
-                        <lightning-button
-                            label="Follow"
-                            variant="brand-outline"
-                            icon-name="utility:add">
+                        <lightning-button label="Follow" variant="brand-outline">
                         </lightning-button>
-                        <div class="slds-button-group" role="group" aria-label="Edit actions">
+                        <lightning-button-group>
                             <lightning-button label="Edit" variant="neutral" onclick={handleEdit}></lightning-button>
                             <lightning-button label="Delete" variant="neutral"></lightning-button>
                             <lightning-button label="Clone" variant="neutral"></lightning-button>
-                        </div>
+                        </lightning-button-group>
                         <lightning-button-icon
-                            icon-name="utility:threedots_vertical"
+                            icon-name="utility:down"
                             variant="border-filled"
                             alternative-text="More actions">
                         </lightning-button-icon>
                     </div>
                 </div>
-                <div class="content-record-highlight-panel">
+                <div class="content-record-highlight-panel" role="group" aria-label="Key fields">
                     <div class="content-record-highlight-field">
                         <span class="content-record-highlight-label">Content Type</span>
                         <span class="content-record-highlight-value">{contentTypeDisplay}</span>
@@ -55,7 +68,7 @@
                     </div>
                     <div class="content-record-highlight-field">
                         <span class="content-record-highlight-label">Status</span>
-                        <span class="content-record-highlight-value">{contentStatus}</span>
+                        <span class="content-record-highlight-value" title={contentStatus}>{contentStatus}</span>
                     </div>
                     <div class="content-record-highlight-field">
                         <span class="content-record-highlight-label">Effective Dates</span>
@@ -64,21 +77,23 @@
                 </div>
             </div>
 
-            <!-- Figma: Path (457:75282) — stages + 8px gap + Extract + Send for review split -->
+            <!-- Figma 457:75281 — chevron segments + white stroke + inverse active fill -->
             <div class="content-record-path-actions">
                 <div class="content-record-path-figma">
-                    <div class="content-record-path-stages" role="list" aria-label="Content workflow">
-                        <div class={pathDraftClass} role="listitem">
-                            <span class="content-path-seg-label">Draft</span>
-                        </div>
-                        <div class={pathReviewClass} role="listitem">
-                            <span class="content-path-seg-label">Review</span>
-                        </div>
-                        <div class={pathApproveClass} role="listitem">
-                            <span class="content-path-seg-label">Approve</span>
-                        </div>
-                        <div class={pathArchiveClass} role="listitem">
-                            <span class="content-path-seg-label">Archive</span>
+                    <div class="content-record-path-rail" role="group" aria-label="Content workflow stages">
+                        <div class="content-record-path-stages" role="presentation">
+                            <template for:each={pathStepItems} for:item="st">
+                                <div key={st.key} class="content-path-seg-wrap" data-step={st.key} style={st.wrapStyle}>
+                                    <div class={st.segClass} role="presentation">
+                                        <div class="content-path-seg__stage">
+                                            <span class="content-path-seg-label" aria-current={st.ariaCurrent}>{st.label}</span>
+                                        </div>
+                                        <template lwc:if={st.showRightCap}>
+                                            <div class="content-path-seg__end content-path-seg__end_right" aria-hidden="true"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                     <lightning-button
@@ -102,7 +117,9 @@
                     </div>
                 </div>
             </div>
+            </div>
 
+            <div class="content-record-article">
             <!-- Main tabs + body (Figma: Regulated Content record tabs + two-column viewer) -->
             <lightning-tabset active-tab-value={activeTab} class="content-record-main-tabset">
                 <lightning-tab label="Document" value="document" onactive={handleMainTabActive}>
@@ -237,9 +254,18 @@
                                 onkeydown={handleSplitterKeyDown}>
                             </div>
                             <aside class="content-record-doc-sidebar" aria-label="Document tools and annotations">
-                                <lightning-tabset variant="scoped" active-tab-value={scopedPanelTab} class="content-record-scoped-tabset">
-                                    <lightning-tab label={annotationsTabLabel} value="annotations" onactive={handleScopedTabActive}>
-                                        <div class="content-record-annotations-panel slds-p-around_small">
+                                <div class="content-record-scoped-shell">
+                                <lightning-tabset
+                                    variant="scoped"
+                                    active-tab-value={scopedPanelTab}
+                                    class="content-record-scoped-tabset">
+                                    <lightning-tab
+                                        class="content-record-scoped-tab"
+                                        label={annotationsTabLabel}
+                                        value="annotations"
+                                        onactive={handleScopedTabActive}>
+                                        <div class="content-record-scoped-tab-body">
+                                        <div class="content-record-annotations-panel">
                                             <h2 class="content-record-annotations-heading slds-assistive-text">Annotations</h2>
                                             <div class="content-record-annotations-controls">
                                                 <lightning-input
@@ -251,15 +277,10 @@
                                                 </lightning-input>
                                                 <div class="content-record-annotations-toolbar">
                                                     <lightning-button-icon
-                                                        icon-name="utility:sort"
-                                                        variant="bare"
-                                                        size="small"
-                                                        alternative-text="Sort">
-                                                    </lightning-button-icon>
-                                                    <lightning-button-icon
                                                         icon-name="utility:filterList"
-                                                        variant="bare"
+                                                        variant="border-filled"
                                                         size="small"
+                                                        class="content-record-annotations-filter-btn"
                                                         alternative-text="Filter">
                                                     </lightning-button-icon>
                                                 </div>
@@ -421,7 +442,7 @@
                                                                 </template>
                                                             </div>
                                                         </div>
-                                                        <div class="content-record-annotation-meta">
+                                                        <div class={ann.metaClass}>
                                                             <lightning-icon
                                                                 icon-name="utility:user"
                                                                 size="xx-small"
@@ -442,34 +463,26 @@
                                                         </div>
                                                         <template lwc:if={ann.isCollapsed}>
                                                             <div
-                                                                class="content-record-annotation-collapsed-footer"
+                                                                class="content-record-annotation-collapsed-badges"
                                                                 role="group"
                                                                 aria-label="Annotation summary">
                                                                 <button
                                                                     type="button"
-                                                                    class="content-record-annotation-summary-pill"
+                                                                    class="content-record-annotation-figma-badge"
                                                                     data-id={ann.id}
                                                                     data-jump="linked"
                                                                     onclick={handleCollapsedSummaryClick}>
-                                                                    Linked Claims ({ann.linkedClaimsCount})
+                                                                    {ann.linkedClaimsBadgeLabel}
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    class="content-record-annotation-summary-pill"
+                                                                    class="content-record-annotation-figma-badge"
                                                                     data-id={ann.id}
                                                                     data-jump="comments"
                                                                     onclick={handleCollapsedSummaryClick}>
-                                                                    Comments ({ann.commentsCount})
+                                                                    {ann.commentsBadgeLabel}
                                                                 </button>
                                                             </div>
-                                                        </template>
-                                                        <template lwc:if={ann.flagged}>
-                                                            <template lwc:if={ann.isCollapsed}>
-                                                                <p class="content-record-annotation-flag-note">
-                                                                    Flag icon appears if missing location or outstanding claim match
-                                                                    recommendations.
-                                                                </p>
-                                                            </template>
                                                         </template>
                                                         <template lwc:if={ann.expanded}>
                                                             <div class="content-record-annotation-body">
@@ -677,12 +690,17 @@
                                                                         </div>
                                                                 </div>
                                                                 <div class="content-record-annotation-anchor">
-                                                                    <div class="content-record-anchor-checkbox-wrap">
+                                                                    <div class="content-record-anchor-row">
+                                                                        <span
+                                                                            class="content-record-anchor-text"
+                                                                            aria-hidden="true"
+                                                                            >Mark as Anchor</span
+                                                                        >
                                                                         <lightning-input
                                                                             type="checkbox"
                                                                             label="Mark as Anchor"
                                                                             data-id={ann.id}
-                                                                            variant="label-inline"
+                                                                            variant="label-hidden"
                                                                             class="content-record-anchor-input"
                                                                             checked={ann.anchorChecked}
                                                                             onchange={handleAnchorChange}>
@@ -693,7 +711,7 @@
                                                                         title="Mark this annotation as an anchor for reference in the document.">
                                                                         <lightning-icon
                                                                             icon-name="utility:info"
-                                                                            size="xx-small"
+                                                                            size="x-small"
                                                                             alternative-text="About anchor">
                                                                         </lightning-icon>
                                                                     </span>
@@ -709,9 +727,15 @@
                                                 </template>
                                             </div>
                                         </div>
+                                        </div>
                                     </lightning-tab>
-                                    <lightning-tab label={contentWorkItemsTabLabel} value="contentWorkItems" onactive={handleScopedTabActive}>
-                                        <div class="content-record-work-items-panel slds-p-around_small">
+                                    <lightning-tab
+                                        class="content-record-scoped-tab"
+                                        label={contentWorkItemsTabLabel}
+                                        value="contentWorkItems"
+                                        onactive={handleScopedTabActive}>
+                                        <div class="content-record-scoped-tab-body">
+                                        <div class="content-record-work-items-panel">
                                             <h2 class="content-record-work-items-heading slds-assistive-text">Content Work items</h2>
                                             <div class="content-record-work-items-toolbar">
                                                 <lightning-input
@@ -723,15 +747,10 @@
                                                 </lightning-input>
                                                 <div class="content-record-work-items-toolbar-actions">
                                                     <lightning-button-icon
-                                                        icon-name="utility:sort"
-                                                        variant="bare"
-                                                        size="small"
-                                                        alternative-text="Sort">
-                                                    </lightning-button-icon>
-                                                    <lightning-button-icon
                                                         icon-name="utility:filterList"
-                                                        variant="bare"
+                                                        variant="border-filled"
                                                         size="small"
+                                                        class="content-record-work-items-filter-btn"
                                                         alternative-text="Filter">
                                                     </lightning-button-icon>
                                                 </div>
@@ -758,8 +777,10 @@
                                                 </template>
                                             </ul>
                                         </div>
+                                        </div>
                                     </lightning-tab>
                                 </lightning-tabset>
+                                </div>
                             </aside>
                         </div>
                     </div>
@@ -795,6 +816,7 @@
                     </div>
                 </lightning-tab>
             </lightning-tabset>
+            </div>
         </div>
     </article>
 </template>

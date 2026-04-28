@@ -310,9 +310,9 @@
             </div>
             
             <!-- Right: Collection Preview -->
-            <main class="detail-main">
-                <!-- Breadcrumb Navigation -->
-                <template lwc:if={hasBreadcrumbs}>
+            <main class={detailMainClass}>
+                <!-- Breadcrumb Navigation (when content record is open, breadcrumbs live inside the page header — Figma 457:75280) -->
+                <template lwc:if={showStandaloneBreadcrumbBar}>
                     <nav class="breadcrumb-bar" aria-label="Breadcrumb">
                         <div class="breadcrumb-list">
                             <template for:each={breadcrumbs} for:item="crumb">
@@ -340,7 +340,8 @@
                         <main-content-record-page
                             content={activeContentRecordData}
                             parent-collection-name={activeContentRecordParentName}
-                            parent-collection-id={activeContentRecordParentId}>
+                            parent-collection-id={activeContentRecordParentId}
+                            record-breadcrumb-items={breadcrumbs}>
                         </main-content-record-page>
                     </div>
                 </template>

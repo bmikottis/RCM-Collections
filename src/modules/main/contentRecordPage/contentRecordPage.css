@@ -1,115 +1,229 @@
 /* Regulated Content record — Figma-aligned (page header, path, tabs, viewer + scoped panel) */
 
 .content-record-page-card {
-    --slds-c-card-color-background: var(--slds-g-color-surface-1, #ffffff);
-    height: 100%;
+    --slds-c-card-color-background: transparent;
+    --slds-c-card-radius-border: 0;
+    --slds-c-card-shadow: 0 0 0 0;
+    --cr-doc-viewport-max: min(75dvh, 52rem);
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 0;
 }
 
 .content-record-page-inner {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     min-height: 0;
-    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    /* Matches header surface so no white sliver around the page-header block */
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 
-/* —— Figma 457:75280 — single Page Header block (surface-2) —— */
+/* Record page header + path — scrolls away while the article (tabs + viewer) stays in view */
+.content-record-hero {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+/* Main tabset: white “card” for document + panes; sits on surface-2 (page-inner) */
+.content-record-article {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    min-height: 0;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    box-sizing: border-box;
+    isolation: isolate;
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    overflow: hidden;
+    margin: 0;
+}
+
+/* —— Figma 457:75280 — Page Header: surface-2, 16px sections, breadcrumbs + title row + detail row —— */
 .content-record-page-header-shell {
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
     border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
+/* Figma: min-h 51px title row, 16px padding, actions gap 8px + pl-8 */
 .content-record-page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--slds-g-spacing-small, 0.75rem);
-    padding: var(--slds-g-spacing-medium, 1rem);
+    box-sizing: border-box;
+    padding: var(--slds-g-spacing-4, 1rem);
     min-height: 3.1875rem;
 }
 
 .content-record-page-header-main {
     display: flex;
-    gap: var(--slds-g-spacing-small, 0.75rem);
+    flex: 1 1 12rem;
+    gap: var(--slds-g-spacing-3, 0.75rem);
     align-items: center;
     min-width: 0;
-    flex: 1;
+    min-height: 3.1875rem;
 }
 
+/* Header object icon: no background tile (icon on surface-2) */
 .content-record-page-header-icon {
+    display: flex;
     flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+/* LBC: no inner boundary padding; control glyph size via sizing hook */
+.content-record-page-header-icon .content-record-header-doc-icon {
+    --slds-c-icon-sizing: 1.25rem; /* 20px */
+    --slds-c-icon-spacing-block: 0;
+    --slds-c-icon-spacing-inline: 0;
 }
 
 .content-record-page-header-titles {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     min-width: 0;
     flex: 1;
 }
 
-/* Figma: 13px on-surface-1 */
+.content-record-breadcrumbs-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 2px;
+}
+
+.content-record-breadcrumbs {
+    min-width: 0;
+}
+
+/* Figma 457:75280: 13px / 18px line, on-surface-1 (token can resolve >13px, so use rem) */
 .content-record-eyebrow {
     margin: 0 0 var(--slds-g-spacing-xxx-small, 0.125rem);
-    font-size: var(--slds-g-font-scale-2, 0.8125rem);
-    line-height: 1.125rem;
+    max-width: 100%;
+    font-size: 0.8125rem; /* 13px @ 16px root — object label */
+    line-height: 1.125rem; /* 18px */
+    font-weight: var(--slds-g-font-weight-3, 400);
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Figma: font-scale-5 (28px), line 35px, on-surface-3 */
 .content-record-page-title {
     margin: 0;
+    max-width: 100%;
     font-size: 1.75rem;
     font-weight: var(--slds-g-font-weight-4, 400);
     line-height: 2.1875rem;
     color: var(--slds-g-color-on-surface-3, #03234d);
     word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/* Figma: actions gap-2 (8px), pl-2 (8px) */
 .content-record-page-header-actions {
     display: flex;
     flex-wrap: wrap;
+    flex-shrink: 0;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
-    padding-left: var(--slds-g-spacing-x-small, 0.5rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    padding-left: var(--slds-g-spacing-2, 0.5rem);
 }
 
-/* —— Detail row (same shell) — Figma: 12px labels, 13px values —— */
+/* Figma 457:75280 “Detail row”: 16px padding, items max 225px, label 12/17, value 13/18, gap 2px */
 .content-record-highlight-panel {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
+    align-content: flex-start;
     justify-content: space-between;
-    gap: var(--slds-g-spacing-medium, 1rem) var(--slds-g-spacing-x-large, 2rem);
-    padding: var(--slds-g-spacing-medium, 1rem);
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    box-sizing: border-box;
+    gap: 2px var(--slds-g-spacing-4, 1rem);
+    width: 100%;
+    /* Detail row: p-16; matches Page Header frame */
+    padding: var(--slds-g-spacing-4, 1rem);
+    border-top: none;
 }
 
+/* 225px × 37px block: col gap 2px; label row h-16, value 13/18 (Figma inspect) */
 .content-record-highlight-field {
     display: flex;
     flex-direction: column;
+    flex-wrap: nowrap;
+    flex: 1 1 0;
+    align-items: flex-start;
+    align-self: flex-start;
+    justify-content: flex-start;
     gap: 2px;
     min-width: 0;
-    max-width: 14.0625rem;
-    flex: 1 1 12rem;
+    max-width: 14.0625rem; /* 225px */
+    width: auto;
+    min-height: 0;
+    box-sizing: border-box;
 }
 
+/* Body/font-scale-neg-1/Regular: 12px, line 17, on-surface-1; title row 16px tall in Figma */
 .content-record-highlight-label {
-    font-size: var(--slds-g-font-size-1, 0.75rem);
+    display: block;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    height: 1rem;
+    min-height: 1rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
     line-height: 1.0625rem;
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    letter-spacing: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
+/* Body/font-scale-base: 13px, line 18, on-surface-3 (Figma uses #001e5b / #03234d) */
 .content-record-highlight-value {
-    font-size: var(--slds-g-font-scale-2, 0.8125rem);
+    display: block;
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: var(--slds-g-font-size-base, var(--slds-g-font-scale-2, 0.8125rem));
     line-height: 1.125rem;
     color: var(--slds-g-color-on-surface-3, #001e5b);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    letter-spacing: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* —— Figma 457:75282 — Path row: stages (gap 8) + actions —— */
+/* —— Figma 457:75281 — RCM Content Version Path: 20px rail, 32px steps, sliding inverse-1 pill —— */
 .content-record-path-actions {
-    padding: var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-medium, 1rem);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
     border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
@@ -117,101 +231,174 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
     width: 100%;
 }
 
-.content-record-path-stages {
-    --path-chevron: 0.625rem;
+/* —— Figma 457:75285 / 75286 / 75294 — path: pill ends + 17/20px caps, white hairline, z-stack —— */
+.content-record-path-rail {
     display: flex;
     flex: 1 1 16rem;
-    min-width: 0;
-    align-items: stretch;
-    gap: 0;
+    min-width: 12rem;
     min-height: 2rem;
+    border-radius: var(--slds-g-radius-border-4, 1.25rem);
+    overflow: hidden;
+    background-color: var(--slds-g-color-surface-container-3, #e5e5e5);
+    box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
+    box-sizing: border-box;
 }
 
-/**
- * Chevron path (Figma 514:114938): each stage is a clipped ribbon; right edge is an arrow;
- * segments overlap so the next stage’s left notch reveals the previous fill.
- */
+.content-record-path-stages {
+    --path-stroke: var(--slds-g-color-surface-1, #ffffff);
+    display: flex;
+    flex: 1 1 auto;
+    align-items: stretch;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 2rem;
+    width: 100%;
+    gap: 0;
+    box-sizing: border-box;
+}
+
+/* Tuck under previous step’s right cap (only right points; no left notches on steps 2+) */
+.content-path-seg-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 2rem;
+    box-sizing: border-box;
+}
+
+.content-path-seg-wrap:not(:first-child) {
+    margin-left: -0.9375rem; /* 15px — interlock with previous step’s right cap */
+}
+
 .content-path-seg {
     --path-seg-bg: var(--slds-g-color-surface-container-3, #e5e5e5);
     --path-seg-fg: var(--slds-g-color-on-surface-2, #2e2e2e);
-    flex: 1 1 0;
-    min-width: 2.5rem;
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: calc(-1 * var(--path-chevron));
-    padding: 0.4375rem 1.125rem 0.4375rem 1.25rem;
-    background-color: var(--path-seg-bg);
-    color: var(--path-seg-fg);
-    font-size: var(--slds-g-font-scale-2, 0.8125rem);
-    line-height: 1.125rem;
-    z-index: 1;
-    clip-path: polygon(
-        var(--path-chevron) 0,
-        calc(100% - var(--path-chevron)) 0,
-        100% 50%,
-        calc(100% - var(--path-chevron)) 100%,
-        var(--path-chevron) 100%,
-        0 50%
-    );
-}
-
-.content-path-seg:first-child {
-    margin-left: 0;
-    padding-left: 0.75rem;
-    z-index: 1;
-    clip-path: polygon(
-        0 0,
-        calc(100% - var(--path-chevron)) 0,
-        100% 50%,
-        calc(100% - var(--path-chevron)) 100%,
-        0 100%
-    );
-}
-
-.content-path-seg:nth-child(2) {
-    z-index: 2;
-}
-
-.content-path-seg:nth-child(3) {
-    z-index: 3;
-}
-
-.content-path-seg:nth-child(4) {
-    z-index: 4;
-}
-
-.content-path-seg:last-child:not(:only-child) {
-    clip-path: polygon(var(--path-chevron) 0, 100% 0, 100% 100%, var(--path-chevron) 100%, 0 50%);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 2rem;
+    isolation: isolate;
+    /* White hairline on the full segment (caps + stage) — matches Figma “stroke” */
+    filter: drop-shadow(0.4px 0 0 var(--path-stroke)) drop-shadow(-0.4px 0 0 var(--path-stroke))
+        drop-shadow(0 0.4px 0 var(--path-stroke)) drop-shadow(0 -0.4px 0 var(--path-stroke))
+        drop-shadow(0.3px 0.3px 0 var(--path-stroke)) drop-shadow(0.3px -0.3px 0 var(--path-stroke))
+        drop-shadow(-0.3px 0.3px 0 var(--path-stroke)) drop-shadow(-0.3px -0.3px 0 var(--path-stroke));
 }
 
 .content-path-seg_is-active {
     --path-seg-bg: var(--slds-g-color-surface-container-inverse-1, #032d60);
     --path-seg-fg: var(--slds-g-color-on-surface-inverse-1, #ffffff);
-    font-weight: var(--slds-g-font-weight-4, 400);
+}
+
+/* Left cap (17×32) — optional; path uses right caps only (see pathStepItems) */
+.content-path-seg__end_left {
+    flex: 0 0 auto;
+    z-index: 1;
+    align-self: stretch;
+    width: 1.0625rem; /* 17px */
+    min-width: 1.0625rem;
+    height: 2rem;
+    min-height: 2rem;
+    background-color: var(--path-seg-bg);
+    clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+/* Right tooth (20×32); Figma right: -2px, tip at center-right */
+.content-path-seg__end_right {
+    flex: 0 0 auto;
+    z-index: 1;
+    align-self: stretch;
+    width: 1.25rem; /* 20px */
+    min-width: 1.25rem;
+    height: 2rem;
+    min-height: 2rem;
+    margin-right: -0.125rem; /* -2px */
+    background-color: var(--path-seg-bg);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+/* Stage: flanked by caps; 32px height; 13/18 type */
+.content-path-seg__stage {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    justify-content: center;
+    min-width: 0;
+    min-height: 2rem;
+    box-sizing: border-box;
+    background-color: var(--path-seg-bg);
+}
+
+/* 457:75285 — first: pill-left, pl-16, no right radius (cap carries point) */
+.content-path-seg_first .content-path-seg__stage {
+    padding: 0 var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-4, 1rem);
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* 457:75286 — middle: pr-1 on stage in file */
+.content-path-seg_middle .content-path-seg__stage {
+    padding: 0 var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-1, 0.25rem);
+    border-radius: 0;
+}
+
+/* 457:75294 — final: pill-right, pr-12, min-w-74 */
+.content-path-seg_last .content-path-seg__stage {
+    flex: 1 1 4.625rem; /* 74px min in Figma */
+    min-width: 4.625rem;
+    padding: 0 var(--slds-g-spacing-3, 0.75rem) 0 0.25rem; /* pr-12 Figma */
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .content-path-seg-label {
+    position: relative;
+    z-index: 1;
     overflow: hidden;
+    max-width: 100%;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+    font-size: var(--slds-g-font-scale-2, 0.8125rem);
+    line-height: 1.125rem;
+    color: var(--path-seg-fg, var(--slds-g-color-on-surface-2, #2e2e2e));
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
-    width: 100%;
+    font-weight: var(--slds-g-font-weight-4, 400);
     pointer-events: none;
+    box-sizing: border-box;
 }
 
 .content-record-extract-btn {
     flex-shrink: 0;
+    --slds-c-button-line-height: 2rem;
+    min-height: 2rem;
 }
 
-/* Figma split: white fill, border-2, accent-2 label semibold */
+/* Figma: split — 32px height, pill ends, border-2, accent-2 label semibold */
 .content-record-send-split {
+    display: flex;
     flex-shrink: 0;
+    align-items: stretch;
+    height: 2rem;
 }
 
 .content-record-btn-send-review {
@@ -221,25 +408,41 @@
     --slds-c-button-neutral-color-border-hover: var(--slds-g-color-border-2, #5c5c5c);
     --slds-c-button-text-color: var(--slds-g-color-accent-2, #0250d9);
     --slds-c-button-text-color-hover: var(--slds-g-color-accent-2, #0250d9);
+    min-height: 2rem;
+    padding-left: var(--slds-g-spacing-4, 1rem);
+    padding-right: var(--slds-g-spacing-4, 1rem);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     font-weight: var(--slds-g-font-weight-6, 600);
     font-size: var(--slds-g-font-scale-1, 0.875rem);
     line-height: 1.1875rem;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
 }
 
 .content-record-btn-send-review-chevron {
+    width: 2rem;
+    min-width: 2rem;
+    min-height: 2rem;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
     margin-left: -1px;
+    --slds-c-button-color-border: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-button-color-border-hover: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-button-color-background: var(--slds-g-color-surface-container-1, #ffffff);
+    --slds-c-button-color-background-hover: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 /* —— Main tabset —— */
 .content-record-main-tabset {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
 }
 
 .content-record-main-tabset .slds-tabs_default__nav {
@@ -248,19 +451,30 @@
 }
 
 .content-record-tab-panel {
-    min-height: 24rem;
+    min-height: 0;
+    box-sizing: border-box;
 }
 
 .content-record-tab-panel_document {
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    max-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
+    overflow: hidden;
 }
 
 /* —— Document + sidebar —— */
 .content-record-doc-layout {
     display: flex;
-    flex: 1;
-    min-height: 28rem;
+    flex: 1 1 auto;
+    align-items: stretch;
+    min-height: 0;
     min-width: 0;
+    max-height: 100%;
+    overflow: hidden;
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
 
@@ -270,6 +484,7 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
 /* Draggable splitter between document viewer and annotation panel */
@@ -305,27 +520,97 @@
 .content-record-doc-sidebar {
     /* width set in JS; min-width prevents flex from visually collapsing before/without JS */
     min-width: var(--cr-annotation-sidebar-min, 240px);
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    align-self: stretch;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
     background-color: var(--slds-g-color-surface-1, #ffffff);
     box-sizing: border-box;
 }
 
-.content-record-scoped-tabset {
-    flex: 1;
+/* Figma 457:76056 / RCL — rounded scoped panel; single 16px inset for tab body */
+.content-record-scoped-shell {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    align-self: stretch;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: var(--slds-g-radius-border-3, 0.5rem);
+    /* Rounded + overflow hidden clips the tabset’s 1px SLDS border (subpixel); draw edge with inset ring */
+    box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
+    overflow: hidden;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.content-record-scoped-tabset {
+    /* Chrome + active / inactive tab tokens (Figma 457:76056) */
+    --slds-c-tabs-item-color-border-active: var(--slds-g-color-accent-2, #0176d3);
+    --slds-c-tabs-item-text-color-active: var(--slds-g-color-accent-2, #0176d3);
+    /* Do not override list sizing — 0.25rem was a hairline/underline token here and broke default nav & separator borders. */
+    /* Flatten LBC default panel padding; we use .content-record-scoped-tab-body */
+    --slds-c-tabs-panel-spacing-block: 0;
+    --slds-c-tabs-panel-spacing-blockstart: 0;
+    --slds-c-tabs-panel-spacing-blockend: 0;
+    --slds-c-tabs-panel-spacing-inline: 0;
+    --slds-c-tabs-panel-spacing-inlineend: 0;
+    --slds-c-tabs-panel-spacing-inlinestart: 0;
+    /* Grid on the LBC host: single shadow child (.slds-tabs_scoped) fills the row, giving slotted
+       panels a definite % height. Flex does not work here because the inner root is not flex. */
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+/* LBC: :host(.slds-show) { display: block } — we need a panel flex column; beat specificity. */
+/* Slotted .slds-tabs_scoped is block: active tab is below nav; fill remaining panel height. */
+lightning-tabset.content-record-scoped-tabset
+    > lightning-tab.content-record-scoped-tab.slds-show {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: calc(100% - var(--slds-c-tabs-item-sizing-height, 2.5rem));
+    width: 100%;
+    overflow: hidden;
+}
+
+.content-record-scoped-tab-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    overflow: hidden;
 }
 
 /* Content Work items scoped tab (Figma 514:115046) */
 .content-record-work-items-panel {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
     gap: var(--slds-g-spacing-x-small, 0.5rem);
     min-height: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .content-record-work-items-heading {
@@ -341,6 +626,7 @@
 .content-record-work-items-search {
     flex: 1;
     min-width: 0;
+    --slds-c-input-radius-border: var(--slds-g-radius-border-4, 1rem);
 }
 
 .content-record-work-items-toolbar-actions {
@@ -354,7 +640,9 @@
     padding: 0;
     list-style: none;
     overflow-y: auto;
-    max-height: calc(100vh - 18rem);
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
 }
 
 .content-record-work-item {
@@ -401,6 +689,7 @@
 .content-record-viewer-toolbar {
     display: flex;
     flex-direction: column;
+    flex: 0 0 auto;
     border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
@@ -472,30 +761,34 @@
 .content-record-document-preview {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    overflow: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
     padding: 0;
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
-    min-height: 0;
+    touch-action: auto;
 }
 
 .content-record-pdf-frame,
 .content-record-pdf-host {
     width: 100%;
     flex: 1 1 auto;
-    min-height: 28rem;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
     border: none;
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    border-radius: 0;
     background-color: var(--slds-g-color-surface-1, #ffffff);
     box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
 }
 
 .content-record-pdf-host {
-    min-height: 32rem;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    align-self: stretch;
 }
 
 .content-record-pdf-host > * {
@@ -563,20 +856,31 @@
 .content-record-annotations-panel {
     display: flex;
     flex-direction: column;
-    gap: var(--slds-g-spacing-small, 0.75rem);
+    flex: 1 1 auto;
     min-height: 0;
+    width: 100%;
+    height: 100%;
+    gap: var(--slds-g-spacing-small, 0.75rem);
 }
 
 .content-record-annotations-controls {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .content-record-annotations-search-field {
     flex: 1 1 8rem;
     min-width: 0;
+    --slds-c-input-radius-border: var(--slds-g-radius-border-4, 1rem);
+}
+
+/* Figma RCL 233:44892 — icon button (bordered) for filter, not bare utility */
+.content-record-annotations-filter-btn,
+.content-record-work-items-filter-btn {
+    flex-shrink: 0;
+    --slds-c-button-radius-border: var(--slds-g-radius-border-2, 0.25rem);
 }
 
 .content-record-annotations-toolbar {
@@ -587,19 +891,20 @@
 }
 
 .content-record-annotations-list {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
-    max-height: calc(100vh - 14rem);
+    max-height: none;
     display: flex;
     flex-direction: column;
     gap: var(--slds-g-spacing-small, 0.75rem);
-    /* Room for selection ring/outline so scroll container does not clip it */
-    padding: var(--slds-g-spacing-xx-small, 0.25rem);
+    padding: 0;
+    margin: 0;
 }
 
 /* Annotation card — Figma RCM Component Library node 276:18379 */
 .content-record-annotation-card {
+    cursor: pointer;
     background-color: var(--slds-g-color-surface-container-1, #ffffff);
     border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
     border-radius: var(--slds-g-radius-border-3, 0.75rem);
@@ -742,6 +1047,63 @@
     height: 1rem;
 }
 
+/* Figma RCM Component Library 276:19820 — user metadata (collapsed + expanded): 13px author, 12px meta */
+.content-record-annotation-meta_collapsed {
+    min-height: 0;
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-2, 0.5rem);
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.content-record-annotation-meta_collapsed .content-record-annotation-author {
+    font-size: 0.8125rem; /* 13px */
+    line-height: 1.125rem; /* 18px */
+}
+
+.content-record-annotation-meta_collapsed .content-record-annotation-time,
+.content-record-annotation-meta_collapsed .content-record-annotation-status-text {
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.125rem;
+}
+
+.content-record-annotation-collapsed-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-2, 0.5rem);
+}
+
+.content-record-annotation-figma-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.5625rem;
+    padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
+    border: none;
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+    background-color: var(--slds-g-color-surface-container-2, #f3f3f3);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.0625rem;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.content-record-annotation-figma-badge:hover {
+    background-color: var(--slds-g-color-surface-3, #e5e5e5);
+    color: var(--slds-g-color-on-surface-3, #2e2e2e);
+}
+
+.content-record-annotation-figma-badge:focus {
+    outline: 2px solid var(--slds-g-color-border-brand-1, #0176d3);
+    outline-offset: 1px;
+}
+
+/* Legacy (replaced by figma badges) — keep for any stray references */
 .content-record-annotation-collapsed-footer {
     display: flex;
     flex-wrap: wrap;
@@ -776,15 +1138,6 @@
 .content-record-annotation-summary-pill:focus {
     outline: 2px solid var(--slds-g-color-border-brand-1, #0176d3);
     outline-offset: 1px;
-}
-
-.content-record-annotation-flag-note {
-    margin: 0;
-    padding: 0 var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-small, 0.75rem);
-    font-size: 0.6875rem;
-    line-height: 1rem;
-    font-style: italic;
-    color: #e91e63;
 }
 
 .content-record-annotation-body {
@@ -848,12 +1201,12 @@
 .content-record-annotation-author {
     color: var(--slds-g-color-accent-2, #0250d9);
     text-decoration: none;
-    font-size: var(--slds-g-font-size-2, 0.75rem);
+    font-size: 0.8125rem; /* 13px — Figma 276:19820 */
     line-height: 1.125rem;
 }
 
 .content-record-annotation-author_comment {
-    font-size: var(--slds-g-font-size-2, 0.75rem);
+    font-size: 0.8125rem;
 }
 
 .content-record-annotation-author:hover {
@@ -867,19 +1220,19 @@
 
 .content-record-annotation-time {
     font-style: normal;
-    font-size: 0.625rem;
-    line-height: 1rem;
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.125rem;
 }
 
 .content-record-annotation-status-text {
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    font-size: 0.625rem;
-    line-height: 1rem;
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.125rem;
 }
 
 .content-record-annotation-section-body {
-    margin: 0 var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-x-small, 0.5rem);
-    padding: var(--slds-g-spacing-small, 0.75rem);
+    margin: 0 var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-xx-small, 0.25rem);
+    padding: var(--slds-g-spacing-x-small, 0.5rem);
     font-size: var(--slds-g-font-size-2, 0.75rem);
     line-height: 1.25rem;
     color: var(--slds-g-color-on-surface-2, #706e6b);
@@ -1092,14 +1445,14 @@
     margin: 0;
 }
 
-/* Single grey bar: chevron + title (left), Link / Add Comment (right) */
+/* Single grey bar: chevron + title (left), Link / Add Comment (right) — Figma: tight vertical padding */
 .content-record-annotation-section-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--slds-g-spacing-small, 0.5rem);
-    min-height: 2rem;
-    padding: var(--slds-g-spacing-xx-small, 0.25rem) var(--slds-g-spacing-small, 0.5rem);
+    gap: var(--slds-g-spacing-x-small, 0.5rem);
+    min-height: 1.5rem;
+    padding: 0.125rem var(--slds-g-spacing-x-small, 0.5rem);
     background-color: var(--slds-g-color-surface-container-2, #f3f3f3);
     border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
@@ -1107,10 +1460,10 @@
 .content-record-annotation-section-toggle {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-small, 0.5rem);
+    gap: var(--slds-g-spacing-x-small, 0.5rem);
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 2rem;
+    min-height: 1.5rem;
     padding: 0;
     margin: 0;
     text-align: left;
@@ -1119,7 +1472,7 @@
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
     font-weight: var(--slds-g-font-weight-4, 400);
-    line-height: 1.0625rem;
+    line-height: 1.125rem;
     background-color: transparent;
     border: none;
     border-radius: 0;
@@ -1151,22 +1504,12 @@
     visibility: visible;
     opacity: 1;
     height: auto;
-    padding-top: var(--slds-g-spacing-small, 0.5rem);
+    padding-top: var(--slds-g-spacing-xx-small, 0.25rem);
     background-color: transparent;
     border-top: none;
 }
 
-.content-record-annotation-section-shell.content-record-annotation-section-shell_open
-    .content-record-annotation-section-toggle-icon {
-    transform: rotate(0deg);
-    transform-origin: 45%;
-}
-
-.content-record-annotation-section-shell:not(.content-record-annotation-section-shell_open)
-    .content-record-annotation-section-toggle-icon {
-    transform: rotate(-90deg);
-    transform-origin: 45%;
-}
+/* Chevron direction is driven by icon-name in JS (right = collapsed, down = expanded); do not rotate — rotation made "right" look like "up". */
 
 .content-record-annotation-section-heading-text {
     flex: 1;
@@ -1199,40 +1542,64 @@
     text-decoration: underline;
 }
 
+/* Figma RCM Component Library 276:18379 — Mark as Anchor: label + checkbox, navy info, brand rule */
 .content-record-annotation-anchor {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-x-small, 0.5rem);
-    padding: var(--slds-g-spacing-x-small, 0.5rem) var(--slds-g-spacing-small, 0.75rem)
-        var(--slds-g-spacing-small, 0.75rem);
-    margin-top: 0;
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    justify-content: space-between;
+    gap: var(--slds-g-spacing-4, 1rem);
+    box-sizing: border-box;
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    margin: 0;
     background-color: var(--slds-g-color-surface-1, #ffffff);
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-bottom: 0.25rem solid var(--slds-g-color-border-brand-1, #0176d3);
+    border-bottom-left-radius: var(--slds-g-radius-border-3, 0.75rem);
+    border-bottom-right-radius: var(--slds-g-radius-border-3, 0.75rem);
 }
 
-.content-record-anchor-checkbox-wrap {
+/* Layout: Figma “Mark as Anchor” (label) then checkbox, left cluster */
+.content-record-anchor-row {
+    display: flex;
     flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--slds-g-spacing-3, 0.75rem);
     min-width: 0;
 }
 
+/* Figma: on-surface-1 gray label (~#5c5c5c), 14px / 1.25 */
+.content-record-anchor-text {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-2, 0.875rem);
+    line-height: 1.25rem;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
 .content-record-anchor-input {
-    --slds-c-input-label-font-size: var(--slds-g-font-size-2, 0.75rem);
+    --slds-c-input-line-height: 1.25rem;
+    flex-shrink: 0;
 }
 
 .content-record-annotation-info-icon {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 1.375rem;
-    height: 1.375rem;
-    flex-shrink: 0;
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    min-height: 2rem;
     border-radius: var(--slds-g-radius-border-circle, 50%);
-    background-color: var(--slds-g-color-surface-container-3, #e5e5e5);
-    color: var(--slds-g-color-on-surface-2, #706e6b);
+    /* Figma: deep navy circle, white “i” (palette-blue-15 / header navy) */
+    background-color: var(--slds-g-color-palette-blue-15, #03234d);
+    color: var(--slds-g-color-on-surface-inverse-1, #ffffff);
 }
 
 .content-record-annotation-info-icon lightning-icon {
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #706e6b);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    --slds-c-icon-color-background: transparent;
 }
 
 .content-record-annotations-empty {
@@ -1260,7 +1627,7 @@
         align-items: stretch;
     }
 
-    .content-record-path-stages {
+    .content-record-path-rail {
         flex-basis: auto;
     }
 
