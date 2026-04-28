@@ -43,12 +43,17 @@ export default class CollectionTreeItem extends LightningElement {
         return this._expandedIds;
     }
     set expandedIds(value) {
+        const prev = this._expandedIds || [];
         const prevLength = this._previousExpandedIdsLength;
+        const wasIn = this.item?.id && prev.includes(this.item.id);
         this._expandedIds = value || [];
         this._previousExpandedIdsLength = this._expandedIds.length;
-        
-        if (this._expandedIds.includes(this.item?.id)) {
+        const isIn = this.item?.id && this._expandedIds.includes(this.item.id);
+        if (isIn) {
             this.isExpanded = true;
+        } else if (wasIn && !isIn) {
+            // Id was removed from the programmatic set (e.g. path changed) — collapse
+            this.isExpanded = false;
         } else if (prevLength > 0 && this._expandedIds.length === 0) {
             this.isExpanded = false;
         }

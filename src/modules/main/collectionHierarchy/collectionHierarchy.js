@@ -523,13 +523,15 @@ export default class CollectionHierarchy extends LightningElement {
 
     /**
      * Expand all parent collections in the path to a given collection
+     * Replaces the tracked set (does not merge) so sibling branches from prior
+     * navigation are not left expanded.
      * @param {string} collectionId - The target collection ID
      */
     expandPathToCollection(collectionId) {
         const path = getCollectionPath(this.collectionsData, collectionId);
         if (path) {
-            const newExpandedIds = new Set(this.expandedIds);
-            path.forEach(item => {
+            const newExpandedIds = new Set();
+            path.forEach((item) => {
                 if (!item.isRoot) {
                     newExpandedIds.add(item.id);
                 }
