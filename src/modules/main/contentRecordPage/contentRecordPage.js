@@ -513,12 +513,12 @@ export default class ContentRecordPage extends LightningElement {
         return this.recordBreadcrumbsList.length > 0;
     }
 
-    /** Figma: 13px on-surface-1, line 18px — e.g. "Regulated Content Version" */
+    /** Figma: 13px on-surface-1, line 18px — default "Regulated Content" */
     get recordEyebrowLabel() {
         if (this.content?.recordTypeLabel) {
             return this.content.recordTypeLabel;
         }
-        return 'Regulated Content Version';
+        return 'Regulated Content';
     }
 
     /** File name shown in the viewer toolbar */
@@ -553,6 +553,24 @@ export default class ContentRecordPage extends LightningElement {
         return t ? t.charAt(0).toUpperCase() + t.slice(1) : '—';
     }
 
+    /** Header “Type” field: file format (PDF vs HTML, etc.) */
+    get contentFormatTypeLabel() {
+        const t = (this.content?.contentType || '').toLowerCase();
+        if (t === 'pdf') {
+            return 'PDF';
+        }
+        if (t === 'html' || t === 'htm') {
+            return 'HTML';
+        }
+        if (t === 'word' || t === 'docx') {
+            return 'Word';
+        }
+        if (t) {
+            return t.toUpperCase();
+        }
+        return '—';
+    }
+
     get contentIcon() {
         const type = (this.content?.contentType || '').toLowerCase();
         const iconMap = {
@@ -582,7 +600,20 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     /**
-     * Absolute URL for PDF iframe (encodes spaces and special path segments).
+     * HTML content: same `previewUrl` pattern as PDF, different renderer (iframe, no EmbedPDF).
+     * @returns {boolean}
+     */
+    get hasHtmlPreview() {
+        const t = (this.content?.contentType || '').toLowerCase();
+        return (
+            (t === 'html' || t === 'htm') &&
+            typeof this.content?.previewUrl === 'string' &&
+            this.content.previewUrl.length > 0
+        );
+    }
+
+    /**
+     * Absolute URL for document iframe (PDF or HTML; encodes path segments).
      * @returns {string}
      */
     get previewDocumentUrl() {
@@ -605,8 +636,14 @@ export default class ContentRecordPage extends LightningElement {
         return this.hasPdfPreview && this.pdfViewerMode === 'embed';
     }
 
-    /** Hide duplicate paging/zoom row when EmbedPDF provides its own chrome */
+    /**
+     * Paging/zoom row — PDF iframe fallback only; not for HTML (no page model) or EmbedPDF.
+     * @returns {boolean}
+     */
     get showLwcDocumentToolbarPagingRow() {
+        if (this.hasHtmlPreview) {
+            return false;
+        }
         return !this.hasPdfPreview || this.pdfViewerMode === 'iframe';
     }
 

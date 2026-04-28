@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<title>Webinar</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+	<!--    css styles starts-->
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/responsive.css" />
+	<link rel="stylesheet" type="text/css" href="css/animate.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:ital,wght@0,100;0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap"
+		rel="stylesheet">
+
+	<!--css styles ends-->
+
+	<!--js starts-->
+
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/Common.js"></script>
+	<script src="js/main.js"></script>
+	<script>
+		let allData = {{{.}}}
+	</script>
+	<!--js ends-->
+</head>
+
+
+
+<body class="eu start_section_main">
+
+	<div class="wrapper">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+				
+<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+		id="icon_home" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+		id="icon_actualization" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a
+		href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+		id="icon_efficacy" class=""><img src="images/menu.svg" class="menu"
+                                         alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+		id="icon_MoA" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+		id="icon_survey" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+		id="icon_calculator" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li  class="active_li"><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+		id="icon_coverage" class=""><img src="images/active_menu.svg" class="menu_active" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+		id="icon_competitors" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+		id="icon_guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+		id="icon_finish" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+<li id="plus_icon"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+
+		</ul>
+			<ul class="menubar2" style="display: flex;">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization" class=""><img src="images/menu.svg" class="menu" alt="menu">Risks</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy" class=""><img src="images/menu.svg" class="menu"
+                                                    alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage" class="active_a"><img src="images/active_menu.svg" class="menu_active" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+					</ul>
+		</div>
+		<div id="start_section" class="body">
+
+			<div class="left_tab1">
+				<div class="head1">CORDIM® coverage is improving</div>
+				<p class="p1">The following plans are covered without restrictions for CORDIM® and cost no more than
+					$25.
+				</p>
+				<div class="profile"><img src="images/profile_btn2.png" class="profile_btn" alt="profile_btn"></div>
+				<div class="profile profile_active"><img src="images/profile_btn3.png" class="profile_btn"
+                                                         alt="profile_btn"></div>
+				<div class="hcp_popup" id="hcp_pop">
+					<!-- <div class="close_btn"><img src="images/button_close.png" class="" alt="close_btn"></div>
+					<p class="p3">Select HCP</p>
+					<p class="p4 hcp"><span><img src="images/profile_icon.png" class="profile_icon"
+								alt="profile_icon"></span> Helen Smith</p>
+					<p class="p4_active"><span><img src="images/profile_icon_active.png" class="profile_icon"
+								alt="profile_icon"></span> Helen Smith</p>
+					<p class="p5 hcp"><span><img src="images/profile_icon.png" class="profile_icon"
+								alt="profile_icon"></span> Steven Miller</p>
+					<p class="p5_active"><span><img src="images/profile_icon_active.png" class="profile_icon"
+								alt="profile_icon"></span> Steven Miller</p>
+					<div class="save_btn"><span>Save</span></div> -->
+				</div>
+				<div class="table_main">
+					<div class="table_head1 table_head">Drug </div>
+					<div class="table_head2 table_head">Plan</div>
+					<div class="table_head3 table_head">Status</div>
+					<div class="table_head4 table_head"><span><img src="images/switcher_on.png" class="switcher_on"
+                                                                   alt="switcher_on"></span>Patient Pay</div>
+					<ul class="col col_1">
+						<li>Commercial</li>
+						<li>Commercial</li>
+						<li>Commercial</li>
+					</ul>
+					<ul class="col col_2">
+						<li>Healthcare</li>
+						<li>Administrative Plans</li>
+						<li>Other</li>
+					</ul>
+					<ul class="col col_3">
+						<li>Tier 3 Non-Preferred</li>
+						<li>Tier 3 Non-Preferred</li>
+						<li>Tier 3 Non-Preferred</li>
+					</ul>
+					<ul class="col col_4">
+						<li>$10 - $18</li>
+						<li>$12 - $20</li>
+						<li>$22 - $25</li>
+					</ul>
+				</div>
+				<div class="table_main2">
+					<div class="table_head1 table_head">Drug </div>
+					<div class="table_head2 table_head">Plan</div>
+					<div class="table_head3 table_head">Status</div>
+
+					<ul class="col col_1">
+						<li>Commercial</li>
+						<li>Commercial</li>
+						<li>Commercial</li>
+					</ul>
+					<ul class="col col_2">
+						<li>Healthcare</li>
+						<li>Administrative Plans</li>
+						<li>Other</li>
+					</ul>
+					<ul class="col col_3">
+						<li>Tier 3 Non-Preferred</li>
+						<li>Tier 3 Non-Preferred</li>
+						<li>Tier 3 Non-Preferred</li>
+					</ul>
+
+				</div>
+				<div class="table_head5 table_head"><span><img src="images/switcher_off.png" class="switcher_off"
+                                                               alt="switcher_on"></span></div>
+
+
+			</div>
+			<div class="left_tab2">
+				<div class="head1">Economic benefits of CORDIM® for your patients</div>
+
+				<div class="head_box">
+					<div id="left_box" class="left_box"></div>
+					<p class="p1">of your patients are eligible to be prescribed CORDIM®
+					</p>
+				</div>
+				<p class="p2">The benefit of prescribing <span>CORDIM®​</span>
+					compared to competitors </p>
+				<div class="table_main">
+					<div class="table_head1 table_head">Drug </div>
+					<div class="table_head2 table_head">The cost<br> of treatment
+						per month ($) per 1 patient</div>
+					<div class="table_head3 table_head">The cost<br> of treatment<br>
+						per month ($)<br>
+						per all your patients</div>
+					<div class="table_head4 table_head">Benefit, % </div>
+					<div class="table_head5 table_head">Benefit, ($)</div>
+					<ul class="col col_1">
+						<li>CORDIM®​
+						</li>
+						<li>CORSAFE</li>
+						<li>LISINOCOR</li>
+						<li>PRESTAN</li>
+						<li>SARTALON</li>
+					</ul>
+					<ul class="col col_2">
+						<li>12.00
+						</li>
+						<li>16.50</li>
+						<li>17.10</li>
+						<li>21.30</li>
+						<li>14.70</li>
+					</ul>
+					<ul class="col col_3">
+						<li id="c5">
+						</li>
+						<li id="c6"></li>
+						<li id="c7"></li>
+						<li id="c8"></li>
+						<li id="c9"></li>
+					</ul>
+					<ul class="col col_4">
+						<li>
+						</li>
+						<li>37.5</li>
+						<li>42.5</li>
+						<li>77.5</li>
+						<li>22.5</li>
+					</ul>
+					<ul class="col col_5">
+						<li>
+						</li>
+						<li id="e6"></li>
+						<li id="e7"></li>
+						<li id="e8"></li>
+						<li id="e9" class="last_li"></li>
+					</ul>
+				</div>
+
+
+
+
+			</div>
+
+
+			<div class="sidebar1">
+				<img src="images/functional_buttons.png" class="sidebar1" alt="sidebar1">
+			</div>
+
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn"
+				class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"
+				class="pi_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+</body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px">
+		<!-- <embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px"> -->
+	</div>
+	<!-- html end -->
+
+</div>
+<script>
+	let allData = {{{.}}}
+</script>
+<!--
+<script>
+	//this code is used for hcp account
+
+	// setTimeout(() => {
+
+		// let configArray = allData.customers;
+		const configArray = ['Ashutosh', 'Shailendra', 'pankaj'];
+		let hcp_popupHTML = '<div class="close_btn"><img src="images/button_close.png" class="" alt="close_btn"></div><p class="p3">Select HCP</p>'
+
+		configArray.map((ele, index) => {
+			//console.log('asdasd' + index + ele)
+			hcp_popupHTML += `<p class="p4 hcp"><span><img src="images/profile_icon.png" class="profile_icon" alt="profile_icon"></span>
+		${ele.firstname} ${ele.lastname}
+</p>` + `<p class="p4_active"><span><img src="images/profile_icon_active.png" class="profile_icon"
+								alt="profile_icon"></span>
+								${ele.firstname} ${ele.lastname}</p>`
+		})
+
+		hcp_popupHTML += '<div class="save_btn"><span>Save</span></div>'
+		//console.log(hcp_popupHTML)
+		document.getElementById("hcp_pop").innerHTML = hcp_popupHTML;
+
+	// }, 3000);
+
+
+
+
+
+</script> -->
+
+
+<script>
+	//this code is used for hcp account
+	// const configArray = ['Ashutosh','Shailendra','pankaj'];
+	let configArray = allData.customers;
+	let hcp_popupHTML = '<div class="close_btn"><img src="images/button_close.png" class="" alt="close_btn"></div><p class="p3">Select HCP</p><div class="dropdown">'
+
+	configArray.map((ele, index) => {
+	hcp_popupHTML += `<p class="hcp hcpnormal hcpactive" onclick='activateElement(${index})'><span><img src="images/profile_icon.png" class="profile_icon" alt="profile_icon"></span>
+		${ele.firstname} ${ele.lastname}
+</p>
+
+<p class="hcp hcpbold p4_active"><span><img src="images/profile_icon_active.png" class="profile_icon"
+								alt="profile_icon"></span>
+								${ele.firstname} ${ele.lastname}</p>
+
+
+`
+	})
+
+	hcp_popupHTML += '</div><div class="save_btn"><span>Save</span></div>'
+	//console.log(hcp_popupHTML)
+	document.getElementById("hcp_pop").innerHTML = hcp_popupHTML;
+
+
+// this is the onlick event of the buttons.
+	function activateElement(index){
+
+	let hcpbold = document.getElementsByClassName('hcpbold')
+	let hcpNormal = document.getElementsByClassName('hcpnormal')
+
+let hcplength = hcpbold.length
+console.log(hcplength)
+console.log(hcpNormal)
+for(i = 0 ; i < hcplength; i++){
+    console.log(hcpbold[i].innerHTML)
+    hcpbold[i].style.display = 'none'
+    hcpNormal[i].style.display = 'block'
+}
+
+	const myclass = 'hcpactive'
+	const myclassActive = 'p4_active'
+	document.getElementsByClassName(myclass)[index].style.display = 'none'
+	document.getElementsByClassName(myclassActive)[index].style.display = 'block'
+   console.log(myclass);
+}
+$(".close_btn").click(function(){
+
+		$(".hcp_popup").hide();
+		$(".home_cta").css('pointer-events','auto');
+		$(".pi_cta").css('pointer-events','auto');
+	  });
+	  $(".save_btn").click(function(){
+
+		$(".hcp_popup").hide();
+		$(".home_cta").css('pointer-events','auto');
+		$(".pi_cta").css('pointer-events','auto');
+	  });
+// this is the onlick event of the buttons.
+
+</script>
+
+
+
+
+<script>
+
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+	//calculator js
+	function myFunction() {
+		var b1 = document.getElementById("cnumber").value;
+		const b2 = b1 * 0.36;
+		const b5 = 12.00;
+		const c5 = b5 * b2;
+		const b6 = 16.50;
+		const b7 = 17.10;
+		const b8 = 21.30;
+		const b9 = 14.70;
+
+
+		const c6 = b6 * b2;
+		const c7 = b7 * b2;
+		const c8 = b8 * b2;
+		const c9 = b9 * b2;
+
+		const e6 = c6 - c5;
+		const e7 = c7 - c5;
+		const e8 = c8 - c5;
+		const e9 = c9 - c5;
+
+
+		document.getElementById("left_box").innerHTML = Math.round(b2);
+		document.getElementById("c5").innerHTML = Math.round(c5);
+		document.getElementById("c6").innerHTML = Math.round(c6);
+		document.getElementById("c7").innerHTML = Math.round(c7);
+		document.getElementById("c8").innerHTML = Math.round(c8);
+		document.getElementById("c9").innerHTML = Math.round(c9);
+
+		document.getElementById("e6").innerHTML = Math.round(e6);
+		document.getElementById("e7").innerHTML = Math.round(e7);
+		document.getElementById("e8").innerHTML = Math.round(e8);
+		document.getElementById("e9").innerHTML = Math.round(e9);
+
+
+	}
+
+</script>
+<!-- <script>
+	$(document).ready(function () {
+		$(".p4").click(function(){
+		$(".p4_active").css('display','block');
+		$(".p4").css('display','none');
+		$(".p5_active").css('display','none');
+		$(".p5").css('display','block');
+	  });
+	  $(".p4_active").click(function(){
+		$(".p4_active").css('display','none');
+		$(".p4").css('display','block');
+		$(".p5").css('display','block');
+	  });
+	});
+</script> -->
+
+
+<script>
+let newAllData = allData.customers.length;
+	if (newAllData == 1){
+    document.querySelector('.profile').style.display = 'none'
+
+}
+</script>
+
+</html>

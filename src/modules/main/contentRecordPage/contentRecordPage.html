@@ -54,6 +54,10 @@
                         <span class="content-record-highlight-value">{contentTypeDisplay}</span>
                     </div>
                     <div class="content-record-highlight-field">
+                        <span class="content-record-highlight-label">Type</span>
+                        <span class="content-record-highlight-value">{contentFormatTypeLabel}</span>
+                    </div>
+                    <div class="content-record-highlight-field">
                         <span class="content-record-highlight-label">Version</span>
                         <span class="content-record-highlight-value">{contentVersion}</span>
                     </div>
@@ -215,11 +219,18 @@
                                                 src={previewDocumentUrl}></iframe>
                                         </template>
                                     </template>
+                                    <template lwc:elseif={hasHtmlPreview}>
+                                        <iframe
+                                            class="content-record-pdf-frame content-record-html-preview-frame"
+                                            title={contentName}
+                                            src={previewDocumentUrl}
+                                            sandbox="allow-same-origin allow-scripts"></iframe>
+                                    </template>
                                     <template lwc:else>
                                         <div class="content-record-preview-placeholder">
                                             <div class="content-record-preview-inner">
                                                 <lightning-icon
-                                                    icon-name="doctype:pdf"
+                                                    icon-name="doctype:unknown"
                                                     size="large"
                                                     class="content-record-preview-icon"
                                                     alternative-text="Document">

@@ -4,6 +4,7 @@
  */
 
 import { getMakanaHealthCollection } from './makanaHealthData.js';
+import { getCordimCollection } from './cordimData.js';
 
 // Collection Types/Templates – life sciences (FDA, EMA, drug launch, etc.)
 export const collectionTypes = [
@@ -220,6 +221,7 @@ export const sampleCollections = {
     isRoot: true,
     children: [
         getMakanaHealthCollection(),
+        getCordimCollection(),
         {
             id: 'col-001',
             name: 'Cardiolex 50mg Regulatory Package',

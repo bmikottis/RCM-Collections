@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<title>Webinar</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+	<!--    css styles starts-->
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/responsive.css" />
+	<link rel="stylesheet" type="text/css" href="css/animate.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:ital,wght@0,100;0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap"
+		rel="stylesheet">
+
+	<!--css styles ends-->
+
+	<!--js starts-->
+
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/Common.js"></script>
+	<script src="js/main.js"></script>
+	<!--js ends-->
+</head>
+
+
+
+<body class="eu start_section_main">
+
+	<div class="wrapper">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+							
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+									id="icon_home" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+									id="icon_actualization" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a
+									href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+									id="icon_efficacy" class=""><img src="images/menu.svg" class="menu"
+                                                                     alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+									id="icon_MoA" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li class="active_li"><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+									id="icon_survey" class=""><img src="images/active_menu.svg" class="menu_active" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+									id="icon_calculator" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+									id="icon_coverage" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+									id="icon_competitors" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+									id="icon_guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+									id="icon_finish" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+							<li id="plus_icon"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+
+
+			</ul>
+			<ul class="menubar2" style="display: flex;">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization" class=""><img src="images/menu.svg" class="menu" alt="menu">Risks</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy" class=""><img src="images/menu.svg" class="menu"
+                                                    alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey"
+						class="active_a"><img src="images/active_menu.svg" class="menu_active" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+					</ul>
+		</div>
+		<div id="start_section" class="body">
+
+			<div class="left_tab1">
+				<!-- <div class="survey_title">Survey</div> -->
+				<h1><span>Survey:</span> Treatment of <span>hypertension</span> in patients at high risk of <span>cardiovascular
+						disease</span></h1>
+				<p class="p1">Which antihypertensive drug do you prescribe in daily practice?​
+				</p>
+				<div class="bottom_bg"></div>
+				<div class="center_div">
+					<div class="bg_div"></div>
+					<div class="circle_left">
+						<img src="images/circle_left.png" alt="icons">
+					</div>
+					<div class="btn btn1" id="btn1"><span>&#8226;</span>CORDIM®</div>
+					<div class="btn btn2" id="btn2"><span>&#8226;</span>LISINOCOR</div>
+					<div class="btn btn3" id="btn3"><span>&#8226;</span>CORSAFE​</div>
+					<div class="btn btn4" id="btn4"><span>&#8226;</span>PRESTAN</div>
+
+					<div class="btn_active btn1_active" id="btn1_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>CORDIM®</div>
+					<div class="btn_active btn2_active" id="btn2_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>LISINOCOR</div>
+					<div class="btn_active btn3_active" id="btn3_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>CORSAFE​</div>
+					<div class="btn_active btn4_active" id="btn4_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>PRESTAN</div>
+
+					<div class="btn submit_btn" onclick="myFunction()">Confirm</div>
+					<div class="btn_active submit_btn_active">Confirm</div>
+				</div>
+
+			</div>
+			<div class="left_tab2">
+                <div class="refresh_btn_div" onClick="window.location.reload()"><img src="images/refersh_icon.png" class="refersh_icon" alt="refersh_icon"></div>
+				<p class="p4">Poll results: <span>Which antihypertensive drug do you prescribe in daily practice?</span>
+					​
+				</p>
+				<div class="bar1" id="bar1">
+
+				</div>
+				<div class="bar2" id="bar2">
+
+				</div>
+				<div class="bar3" id="bar3">
+
+				</div>
+				<div class="bar4" id="bar4">
+
+				</div>
+
+				<div class="fugures1 value" akhi="77">0</div>
+				<div class="fugures2 value" akhi="42">0</div>
+				<div class="fugures3 value" akhi="20">0</div>
+				<div class="fugures4 value" akhi="49">0</div>
+
+				<div class="info1">CORDIM®</div>
+				<div class="info2">CORSAFE</div>
+				<div class="info3">LISINOCOR</div>
+				<div class="info4">PRESTAN</div>
+				<ul class="number_ul">
+					<li>100</li>
+					<li>90</li>
+					<li>80</li>
+					<li>70</li>
+					<li>60</li>
+					<li>50</li>
+					<li>40</li>
+					<li>30</li>
+					<li>20</li>
+					<li>10</li>
+					<li>0</li>
+				</ul>
+				<div class="graph_text">Answers, HCPs</div>
+				<div class="graph_lines">
+					<img src="images/Graph_lines.svg" class="glines" alt="glines">
+				</div>
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/functional_buttons.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2 Page1_sidebar2">
+				<img src="images/usa_flag.png" class="sidebar2 Page1_sidebar2" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1 section1_dropdown1">
+				<img src="images/drop_down-country-USA.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+			</div>
+			<div class="sidebar2_dropdown2">
+				<img src="images/drop_down-country-Mexico.png" class="sidebar2_dropdown2" alt="sidebar2_dropdown2">
+			</div>
+			<div class="sidebar2_cardio">
+				<img src="images/Mecsico_flag.png" class="sidebar2_cardio" alt="sidebar2_cardio">
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<a class="usa_flag_droupdown_cta"></a>
+			<a class="gp_cta"></a>
+			<a class="cardio_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn" class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"   class="pi_cta"></a>
+		</div>
+		<div id="start_section2" class="body">
+			<div class="left_tab1 start_section2_tab1">
+				<h1>Treatment of <span>hypertension</span> in patients at high risk of <span>cardiovascular
+						disease</span></h1>
+				<p class="p1">Which antihypertensive drug do you prescribe in daily practice?​
+				</p>
+				<div class="bottom_bg"></div>
+				<div class="center_div">
+					<div class="bg_div"></div>
+					<div class="circle_left">
+						<img src="images/circle_left.png" alt="icons">
+					</div>
+					<div class="btn btn1"  id="btn5"><span>&#8226;</span>CORDIM®</div>
+					<div class="btn btn2"  id="btn6"><span>&#8226;</span>LISOPRESS</div>
+					<div class="btn btn3"  id="btn7"><span>&#8226;</span>SARTALON​</div>
+					<div class="btn btn4"  id="btn8"><span>&#8226;</span>CORSTAN</div>
+
+					<div class="btn_active btn1_active" id="btn5_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>CORDIM®</div>
+					<div class="btn_active btn2_active" id="btn6_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>LISOPRESS</div>
+					<div class="btn_active btn3_active" id="btn7_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>SARTALON​</div>
+					<div class="btn_active btn4_active" id="btn8_active"><span><img src="images/Circle_Icon.svg"
+								alt="icons"></span>CORSTAN</div>
+
+					<div class="btn submit_btn submit_btn2" onclick="myFunction2()">Confirm</div>
+					<div class="btn_active submit_btn_active">Confirm</div>
+				</div>
+
+			</div>
+			<div class="left_tab2 start_section2_tab2">
+                <div class="refresh_btn_div" onClick="window.location.reload()"><img src="images/refersh_icon.png" class="refersh_icon" alt="refersh_icon"></div>
+				<p class="p4">Poll results: <span>Which antihypertensive drug do you prescribe in daily practice?</span>
+					​
+				</p>
+				<div class="slide2_bar1" id="bar5">
+
+				</div>
+				<div class="slide2_bar2" id="bar6">
+
+				</div>
+				<div class="slide2_bar3" id="bar7">
+
+				</div>
+				<div class="slide2_bar4" id="bar8">
+
+				</div>
+
+				<div class="slide2_fugures1 value" akhi2="78">0</div>
+				<div class="slide2_fugures2 value" akhi2="25">0</div>
+				<div class="slide2_fugures3 value" akhi2="20">0</div>
+				<div class="slide2_fugures4 value" akhi2="08">0</div>
+
+				<div class="info1">CORDIM®</div>
+				<div class="info2">SARTALON​</div>
+				<div class="info3">LISOPRESS</div>
+				<div class="info4">CORSTAN</div>
+				<ul class="number_ul">
+					<li>100</li>
+					<li>90</li>
+					<li>80</li>
+					<li>70</li>
+					<li>60</li>
+					<li>50</li>
+					<li>40</li>
+					<li>30</li>
+					<li>20</li>
+					<li>10</li>
+					<li>0</li>
+				</ul>
+				<div class="graph_text">Answers, HCPs</div>
+				<div class="graph_lines">
+					<img src="images/Graph_lines.svg" class="glines" alt="glines">
+				</div>
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/functional_buttons.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2 Page2_sidebar2">
+				<img src="images/Mecsico_flag.png" class="Page2_sidebar2 Mecsico_sidebar" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1 section2_dropdown1">
+				<img src="images/drop_down-country-Mexico.png" class="section2_dropdown1" alt="sidebar2_dropdown1">
+			</div>
+			<div class="sidebar2_dropdown2">
+				<img src="images/drop_down-country-Mexico.png" class="sidebar2_dropdown2" alt="sidebar2_dropdown2">
+			</div>
+			<div class="sidebar2_cardio">
+				<img src="images/Mecsico_flag.png" class="sidebar2_cardio" alt="sidebar2_cardio">
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<a class="mexcio_flag_droupdown_cta"></a>
+			<a class="usa_cta2"></a>
+			<a class="mecsico_cta2"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn" class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"   class="pi_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+</body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px">
+		<!-- <embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px"> -->
+	</div>
+
+</div>
+<script>
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+</script>
+<script>
+	function myFunction() {
+		const counters = document.querySelectorAll('.value');
+		const speed = 200;
+
+		counters.forEach(counter => {
+			const animate = () => {
+				const value = +counter.getAttribute('akhi');
+				const data = +counter.innerText;
+
+				const time = value / speed;
+				if (data < value) {
+					counter.innerText = Math.ceil(data + time);
+					setTimeout(animate, 1);
+				} else {
+					counter.innerText = value;
+				}
+
+			}
+
+			animate();
+		});
+	}
+	function myFunction2() {
+		const counters = document.querySelectorAll('.value');
+		const speed = 200;
+
+		counters.forEach(counter => {
+			const animate = () => {
+				const value = +counter.getAttribute('akhi2');
+				const data = +counter.innerText;
+
+				const time = value / speed;
+				if (data < value) {
+					counter.innerText = Math.ceil(data + time);
+					setTimeout(animate, 15);
+				} else {
+					counter.innerText = value;
+				}
+
+			}
+
+			animate();
+		});
+	}
+
+	$(".cardio_cta").click(function(){
+		$("#start_section").hide();
+		$("section2_dropdown1").css('display', 'none');
+		$("sidebar2_dropdown2").hide();
+          $("#start_section2").show();
+		  $(".start_section2_tab2").hide();
+		  $(".start_section2_tab1").show();
+		  $(".Page2_sidebar2").show();
+		  $(".btn1_active").hide();
+		  $(".btn2_active").hide();
+		  $(".btn3_active").hide();
+		  $(".btn4_active").hide();
+		  $(".submit_btn_active").hide();
+		  $(".submit_btn2").css('opacity', '0.5');
+		  $(".submit_btn2").css('pointer-events', 'none');
+		  $(".btn1").show();
+		  $(".btn2").show();
+		  $(".btn3").show();
+		  $(".btn4").show();
+		  $(".submit_btn2").show();
+		  $(".usa_cta2").hide();
+		  $(".mecsico_cta2").hide();
+	  });
+	  $(".Page2_sidebar2").click(function(){
+		$(".section2_dropdown1").show();
+		$(".mecsico_cta2").hide();
+		$(".usa_cta2").show();
+		$(".mexcio_flag_droupdown_cta").show();
+	  });
+	  $(".Mecsico_sidebar").click(function(){
+		$(".mecsico_cta2").hide();
+	  });
+      $(".usa_cta2").click(function(){
+		$("#start_section").show();
+		$(".section2_dropdown1").hide();
+		$(".sidebar2_dropdown1").hide();
+          $("#start_section2").hide();
+		  $(".left_tab2").hide();
+		  $(".left_tab1").show();
+		  $(".Page1_sidebar2").show();
+		  $(".btn1_active").hide();
+		  $(".btn2_active").hide();
+		  $(".btn3_active").hide();
+		  $(".btn4_active").hide();
+		  $(".submit_btn_active").hide();
+		  $(".submit_btn2").css('opacity', '0.5');
+		  $(".submit_btn2").css('pointer-events', 'none');
+		  $(".btn1").show();
+		  $(".btn2").show();
+		  $(".btn3").show();
+		  $(".btn4").show();
+		  $(".submit_btn2").show();
+		  $(".usa_cta2").hide();
+		  $(".gp_cta").hide();
+		  $(".cardio_cta").hide();
+		  $(".submit_btn").show();
+		  $(".usa_flag_droupdown_cta").hide();
+
+	  });
+
+
+</script>
+
+</html>

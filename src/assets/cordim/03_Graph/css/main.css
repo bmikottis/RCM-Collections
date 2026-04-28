@@ -1,0 +1,109 @@
+/******* Titre de la séquence
+ ******************************************************************************/
+#content0 {
+    font-family: 'conduit_itc_bold';
+    color: #e41b2a;
+    font-size: 72px;
+    font-weight: bold;
+    text-align: center;
+    top: 45px;
+    position: absolute;
+}
+
+#content0 img {
+    position: relative;
+    margin: auto;
+}
+
+/******* Bloc principal
+ ******************************************************************************/
+#content1 {
+    width: 925px;
+    height: 635px;
+    left: 40px;
+    top: 90px;
+    position: absolute;
+}
+
+/******* Icone "dessin"
+ ******************************************************************************/
+#content2 {
+    width: 117px;
+    height: 110px;
+    left: 497px;
+    top: 623px;
+    position: absolute;
+}
+
+/******* Instructions
+ ******************************************************************************/
+#content3 {
+    font-family: 'conduit_itc_light';
+    font-size: 26px;
+    color: #5a5a5a;
+    text-align: center;
+    top: 150px;
+    text-transform: uppercase;
+    position: absolute;
+}
+
+/******* Zone de dessin
+ ******************************************************************************/
+#draw_area{
+    position: absolute;
+    left: 420px;
+    top: 130px;
+}
+
+/******* Bouton de validation
+ ******************************************************************************/
+#validate_button {
+    width: 212px;
+    height: 52px;
+    left: 45px;
+    top: 592px;
+    font-family: 'conduit_itc_bold';
+    font-size: 31px;
+    color: #000000;
+    text-align: center;
+    /* padding-top: 20px; */
+    cursor: pointer;
+    position: absolute;
+	z-index: 1;
+}
+
+#solution {
+    height: 144px;
+    overflow: hidden;
+    left: 468px;
+    top: 243px;
+    position: absolute;
+}
+
+.hide_solution {
+    width: 0px;
+}
+
+.show_solution {
+    width: 410px;
+}
+
+#explanation {
+    font-family: 'conduit_itc_light';
+    font-size: 26px;
+    color: #5a5a5a;
+    text-align: center;
+    top: 682px;
+    text-transform: uppercase;
+}
+
+#explanation img {
+    position: relative;
+    margin: auto;
+}
+
+.red {
+    position: relative;
+    color: #d81a28;
+    background: none;
+}

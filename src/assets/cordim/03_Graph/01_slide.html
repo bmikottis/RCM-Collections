@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<title>Webinar</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+	<!--    css styles starts-->
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/responsive.css" />
+	<link rel="stylesheet" type="text/css" href="css/animate.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:ital,wght@0,100;0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap"
+		rel="stylesheet">
+
+	<!--css styles ends-->
+
+	<!--js starts-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.0/mustache.js"></script>
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="Common.js"></script>
+	<script src="js/main.js"></script>
+	<!--js ends-->
+</head>
+
+
+
+<body class="eu actualization_section_main">
+
+	<div class="wrapper">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+			
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy" class=""><img src="images/active_menu.svg" class="menu_active"
+                                                         alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+			</ul>
+			<ul class="menubar2" style="display: flex;">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization" class=""><img src="images/menu.svg" class="menu" alt="menu">Risks</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy" class="active_a"><img src="images/active_menu.svg" class="menu_active"
+                                                            alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+		</div>
+		<div id="actualization_section" class="body">
+
+			<div class="left_tab1">
+
+				<p class="p1 fadeIn_animation"><span class="span_bold">CORDIM®</span>
+					Death risk reduction in patients with cardiovascular diseases.<sup>1</sup>
+				</p>
+
+				<div class="btn btn1">Show graph</div>
+				<div class="btn btn2">Erase drawing</div>
+				<div class="btn_active btn1_active">Show graph</div>
+				<div class="btn_active btn2_active">Erase drawing</div>
+				<div id="screen-container">
+					<!-- TITRE -->
+					<span id="content0" class="up-off"></span>
+					<!-- BLOC PRINCIPAL -->
+					<div id="content1" class="left-off"></div>
+					<!-- ICONE "DESSINER" -->
+					<div id="content2" class="off"></div>
+					<!-- INSTRUCTIONS -->
+					<span id="content3" class="off"></span>
+					<!-- ZONE DE DESSIN -->
+					<canvas id="draw_area" width="530" height="410"></canvas>
+					<!-- BOUTTON DE VALIDATION -->
+					<div id="validate_button" class="off" data-prevent-tap="true"></div>
+					<!-- SOLUTION -->
+					<div id="solution" class="hide_solution">
+						<img src="images/CORDIM®.png" />
+					</div>
+					<!-- EXPLICATIONS -->
+					<span id="explanation" class="off"></span>
+				</div>
+				<ul class="number_ul">
+					<li>6</li>
+					<li>5</li>
+					<li>4</li>
+					<li>3</li>
+					<li>2</li>
+					<li>1</li>
+					<li>0</li>
+				</ul>
+				<ul class="number2_ul">
+					<li>500</li>
+					<li>1000</li>
+					<li>1500</li>
+					<li>2000</li>
+				</ul>
+				<div class="general">Unit of measurement</div>
+				<div class="treatment">Days of treatment</div>
+				<div class="corborder"></div>
+				<div class="cordim">CORDIM®</div>
+				<div class="vector"><img src="images/Vector.png" /></div>
+				<div class="bottom_txt1">The long-term<br>
+					and regular use
+					of CORDIM® reduces
+					the risk of developing cardiovascular
+					diseases and death.<sup>1</sup>
+				</div>
+				<div class="bottom_txt2">
+					<span class="span_bold">CoreCare</span> study<sup>1</sup><br>
+					The decrease in frequency of myocardial infarction, stroke, and cardiovascular death
+				</div>
+
+				<div class="bottom_txt3">
+					-35<span class="">%</span>
+				</div>
+
+			</div>
+
+
+			<div class="sidebar1">
+				<img src="images/slide2_menu1.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn" class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"   class="pi_cta"></a>
+			<a href="javascript:openEmail();" id="email" class="email_cta"></a>
+
+			<!-- <div id="email" class="email_cta"></div> -->
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+</body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px">
+		<!-- <embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px"> -->
+	</div>
+
+</div>
+<script>
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+
+</script>
+<script>
+	const counters = document.querySelectorAll('.value');
+	const speed = 200;
+
+	counters.forEach(counter => {
+		const animate = () => {
+			const value = +counter.getAttribute('akhi');
+			const data = +counter.innerText;
+
+			const time = value / speed;
+			if (data < value) {
+				counter.innerText = Math.ceil(data + time);
+				setTimeout(animate, 1);
+			} else {
+				counter.innerText = value;
+			}
+
+		}
+
+		animate();
+	});
+
+
+
+
+</script>
+<script type="text/javascript">
+
+
+
+
+	function openEmail(){
+		PresentationPlayer.launchEmails(["Core care study"]);
+	}
+
+
+
+  </script>
+  <script>
+	  let allData = {{{.}}}
+  </script>
+
+</html>

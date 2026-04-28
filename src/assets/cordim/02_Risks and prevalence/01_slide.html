@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<title>Webinar</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+	<!--    css styles starts-->
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/responsive.css" />
+	<link rel="stylesheet" type="text/css" href="css/animate.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:ital,wght@0,100;0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap"
+		rel="stylesheet">
+
+	<!--css styles ends-->
+
+	<!--js starts-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.0/mustache.js"></script>
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="Common.js"></script>
+	<script src="js/main.js"></script>
+
+	<!--js ends-->
+</head>
+
+
+
+<body class="eu actualization_section_main">
+
+	<div class="wrapper">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+			
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization" class=""><img src="images/active_menu.svg" class="menu_active"
+                                                              alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+			</ul>
+			<ul class="menubar2" style="display: flex;">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization" class="active_a"><img src="images/active_menu.svg" class="menu_active"
+                                                                 alt="menu">Risks</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy" class=""><img src="images/menu.svg" class="menu" alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+		</div>
+		<div class="actualization_section body">
+
+			<div class="left_tab1">
+				<div class="btn_main"><img src="images/btn1.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<p class="p1 fadeIn_animation"><span class="span_bold">Hypertension significantly increases
+						the risk</span> of heart disease and stroke, the leading cause of death
+					in the United States.<sup>1</sup>
+				</p>
+				<div class="bar1">
+
+				</div>
+				<div class="bar2">
+
+				</div>
+				<div class="bar3">
+
+				</div>
+				<div class="bar4">
+
+				</div>
+				<div class="bar5">
+
+				</div>
+				<div class="fugures1 animate fadeIn three">670,000</div>
+				<div class="fugures2 animate fadeIn three">380,000</div>
+				<div class="fugures3 animate fadeIn three">273,000</div>
+				<div class="fugures4 animate fadeIn three">248,000</div>
+				<div class="fugures5 animate fadeIn three">234,000</div>
+
+				<div class="info1">AH</div>
+				<div class="info2">COVID-19</div>
+				<div class="info3">COPD</div>
+				<div class="info4">Dementia</div>
+				<div class="info5">Septicemia</div>
+
+				<div class="bottom_txt1">In 2020, hypertension was the primary cause of <br>
+					<span class="span_bold">670,000 deaths in the USA.<sup>2</sup></span>
+				</div>
+				<div class="bottom_txt2">
+					Nearly half of adults<br>
+					in the United States<br>
+					(<span class="span_bold">47%</span> or <span class="span_bold">116 million</span>)
+					have hypertension.<sup>1</sup>
+				</div>
+				<div class="bottom_txt3_img">
+					<img src="images/women.png" alt="women">
+				</div>
+				<div class="bottom_txt3">
+					<span class="span_bold">Only
+						1 in 4 adults</span><br>
+					with hypertension<br>
+					have their condition<br>
+					under control.<sup>1</sup>
+				</div>
+
+			</div>
+			<div class="left_tab2">
+				<div class="btn_main"><img src="images/btn2.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<div class="map1 bounceIn"><img src="images/map1.png" class="" alt="map1"></div>
+				<p class="p1"><span class="span_bold">Prevalence of Hypertension</span>
+					(U.S. Adults Aged 20 and Older)
+				</p>
+				<p class="p2">Hypertension is more common in some areas of the
+					United States<br>
+					than in others.<sup>2</sup>
+				</p>
+				<p class="p3">
+					This map is showing the self-reported rate of hypertension by state in 2011 (using a definition
+					of hypertension<br>
+					as a blood pressure<br> <span>≥ 140/90</span> mmHg).<sup>2</sup>
+				</p>
+				<p class="p4">
+					Age-Adjusted Prevalence (%)
+				</p>
+				<div class="box1 bounceIn two">
+
+				</div>
+				<div class="box2 bounceIn two">
+
+				</div>
+				<div class="box3 bounceIn two">
+
+				</div>
+				<div class="box4 bounceIn two">
+
+				</div>
+				<div class="box5 bounceIn two">
+
+				</div>
+				<div class="dec1 bounceIn two">
+					32.0-38.6
+				</div>
+				<div class="dec2 bounceIn two">
+					30.1-31.9
+				</div>
+				<div class="dec3 bounceIn two">
+					28.3-30.0
+				</div>
+				<div class="dec4 bounceIn two">
+					27.3-28.2
+				</div>
+				<div class="dec5 bounceIn two">
+					24.3-27.2
+				</div>
+
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/slide2_menu1.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2">
+				<img src="images/slide2_en_btn.png" class="sidebar2" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1">
+				<img src="images/drop_down-language_En.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+				<div id="eng_cta"></div>
+				<div id="spanich"></div>
+			</div>
+			<!-- <div class="sidebar2_dropdown2">
+				<img src="images/drop_down_speciality_Cardio.png" class="sidebar2_dropdown2" alt="sidebar2_dropdown2">
+			</div> -->
+			<div class="sidebar2_cardio">
+				<img src="images/slide2_sp_btn.png" class="sidebar2_cardio" alt="sidebar2_cardio">
+			</div>
+			<div class="country_selection_cta"></div>
+			<div class="country_dropdown_usa"><img src="images/drop_down-country-USA.png" class="country_dropdown_usa" alt="country_dropdown_usa"></div>
+			<div id="usa_flag_cta"></div>
+			<div class="usa_cta"></div>
+			<div class="mexcio_cta mexcio_cta_id" ></div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<!-- <div class="gp_cta"></div>
+			<div class="cardio_cta"></div> -->
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn" class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"   class="pi_cta"></a>
+			<!-- <a href="javascript:PresentationPlayer.launchApprovedEmail()" id="email" class="email_cta"></a> -->
+			 
+			<a href="javascript:openEmail();" id="email" class="email_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+	<div class="wrapper4">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+			
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization4" class=""><img src="images/active_menu.svg" class="menu_active"
+                                                               alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish4" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon4"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+			</ul>
+			<ul class="menubar2">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home4"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization4" class="active_a"><img src="images/active_menu.svg" class="menu_active"
+                                                                  alt="menu">Risks</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy4" class=""><img src="images/menu.svg" class="menu" alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA4"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey4"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator4" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage4" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors4" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines4" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish4"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon4"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+		</div>
+		<div class="actualization_section body actualization_section_slide4">
+			<div class="left_tab1">
+				<div class="btn_main"><img src="images/slide3_btn1.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<p class="p1 fadeIn_animation"><span class="span_bold">La hipertensión arterial aumenta
+						significativamente el riesgo</span> de enfermedades cardíacas y accidentes cerebrovasculares,
+					que son las principales causas de muerte en Estados Unidos.<sup>1</sup>
+				</p>
+				<div class="wrapper4_bar1">
+
+				</div>
+				<div class="wrapper4_bar2">
+
+				</div>
+				<div class="wrapper4_bar3">
+
+				</div>
+				<div class="wrapper4_bar4">
+
+				</div>
+				<div class="wrapper4_bar5">
+
+				</div>
+				<div class="fugures1 animate fadeIn three">670,000</div>
+				<div class="fugures2 animate fadeIn three">380,000</div>
+				<div class="fugures3 animate fadeIn three">273,000</div>
+				<div class="fugures4 animate fadeIn three">248,000</div>
+				<div class="fugures5 animate fadeIn three">234,000</div>
+
+				<div class="info1">AH</div>
+				<div class="info2">COVID-19</div>
+				<div class="info3">COPD</div>
+				<div class="info4">Dementia</div>
+				<div class="info5">Septicemia</div>
+
+				<div class="bottom_txt1">En 2020, la hipertensión arterial fue una causa primaria o contribuyente de más
+					de
+					<br><span class="span_bold">670,000 muertes.<sup>2</sup></span>
+				</div>
+				<div class="bottom_txt2">
+					Casi la mitad de los adultos en los Estados Unidos
+					(<span class="span_bold">47%</span>, or <span class="span_bold">
+						116 millones</span>)<br> tienen hipertensión arterial.<sup>1</sup>
+				</div>
+				<div class="bottom_txt3_img">
+					<img src="images/women.png" alt="women">
+				</div>
+				<div class="bottom_txt3">
+					<span class="span_bold">Solo alrededor de<br> 1 de cada 4 adultos</span><br>
+					con hipertensión<br> arterial tiene su<br> condición bajo<br> control.<sup>1</sup>
+				</div>
+
+			</div>
+			<div class="left_tab2">
+				<div class="btn_main"><img src="images/slide3_btn2.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<div class="map1 bounceIn"><img src="images/map1.png" class="" alt="map1"></div>
+				<p class="p1"><span class="span_bold">Prevalencia de hipertensión arterial</span>
+					(EE. UU. Adultos de 20 años y más)
+				</p>
+				<p class="p2">La hipertensión es más común en algunas áreas de Estados Unidos que en otras.<sup>2</sup>
+				</p>
+				<p class="p3">
+					A continuación se presenta un mapa que muestra la tasa de hipertensión autodeclarada por estado en
+					2011 (utilizando una definición de hipertensión como una presión arterial<br> <span>≥ 140/90 </span>
+					mmHg).<sup>2</sup>
+				</p>
+				<p class="p4">
+					Prevalencia ajustada por edad (%)
+				</p>
+				<div class="box1 bounceIn two">
+
+				</div>
+				<div class="box2 bounceIn two">
+
+				</div>
+				<div class="box3 bounceIn two">
+
+				</div>
+				<div class="box4 bounceIn two">
+
+				</div>
+				<div class="box5 bounceIn two">
+
+				</div>
+				<div class="dec1 bounceIn two">
+					32.0-38.6
+				</div>
+				<div class="dec2 bounceIn two">
+					30.1-31.9
+				</div>
+				<div class="dec3 bounceIn two">
+					28.3-30.0
+				</div>
+				<div class="dec4 bounceIn two">
+					27.3-28.2
+				</div>
+				<div class="dec5 bounceIn two">
+					24.3-27.2
+				</div>
+
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/slide2_menu1.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2 sp_sidebar">
+				<img src="images/slide2_sp_btn.png" class="sidebar2 sp_sidebar" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1 sp_dropdown">
+				<img src="images/drop_down-language_sp.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+				<div id="sp_cta"></div>
+				<div id="enlinsh"></div>
+			</div>
+			<!-- <div class="sidebar2_dropdown2">
+				<img src="images/drop_down_speciality_Cardio.png" class="sidebar2_dropdown2" alt="sidebar2_dropdown2">
+			</div> -->
+			<div class="sidebar2_cardio">
+				<img src="images/button_settings-2.png" class="sidebar2_cardio" alt="sidebar2_cardio">
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<!-- <div class="gp_cta"></div>
+			<div class="cardio_cta"></div> -->
+			<div class="country_selection_cta country_selection_cta_wrapper4"></div>
+			<div class="country_dropdown_usa"><img src="images/drop_down-country-USA.png" class="country_dropdown_usa" alt="country_dropdown_usa"></div>
+			<div id="usa_flag_cta2"></div>
+			<div class="usa_cta"></div>
+			<div class="mexcio_cta mexcio_cta_id"></div>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn4" class="home_cta"></a>
+			<div id="myBtn4" class="pi_cta"></div>
+			<!-- <a href="javascript:PresentationPlayer.launchApprovedEmail()" id="email4" class="email_cta"></a> -->
+			<a href="javascript:openEmail();" id="email4" class="email_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+	<div class="wrapper2">
+
+		<div class="head">
+			<!-- <div class="iqvia_logo menu">
+				<a class=""><img src="images/iqvia.png" class="iqvia_logo" alt="iqvia_logo"></a>
+			</div> -->
+			<ul class="menubar" style="display: none;">
+		
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization2" class=""><img src="images/active_menu.svg" class="menu_active"
+                                                               alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish2" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon2"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+			</ul>
+			<ul class="menubar2">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home2"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization2" class="active_a"><img src="images/active_menu.svg" class="menu_active"
+                                                                  alt="menu">Risks</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy2" class=""><img src="images/menu.svg" class="menu" alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA2"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey2"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator2" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage2" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors2" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines2" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish2"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon2"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+		</div>
+		<div class="actualization_section2 body actualization_slide2">
+			<a href="javascript:PresentationPlayer.updateFeedback('POSI');" id="feedposi"></a>
+			<a href="javascript:PresentationPlayer.updateFeedback('NONE');" id="feednone"></a>
+	        <a href="javascript:PresentationPlayer.updateFeedback('NEGA');" id="feednega"></a>
+			<div class="left_tab1">
+				<div class="btn_main"><img src="images/btn1.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<p class="p1 fadeIn_animation"><span class="span_bold">Hypertension significantly increases the risk of
+						heart disease and stroke,</span> which are the leading causes of death in Mexico.<sup>1</sup>
+				</p>
+				<div class="wrapper2_bar1">
+
+				</div>
+				<div class="wrapper2_bar2">
+
+				</div>
+				<div class="wrapper2_bar3">
+
+				</div>
+				<div class="wrapper2_bar4">
+
+				</div>
+				<div class="wrapper2_bar5">
+
+				</div>
+				<div class="fugures1 animate fadeIn three">268,000</div>
+				<div class="fugures2 animate fadeIn three">152,000</div>
+				<div class="fugures3 animate fadeIn three">109,200</div>
+				<div class="fugures4 animate fadeIn three">99,200</div>
+				<div class="fugures5 animate fadeIn three">93,600</div>
+
+				<div class="info1">AH</div>
+				<div class="info2">COVID-19</div>
+				<div class="info3">EPOC</div>
+				<div class="info4">Dementia</div>
+				<div class="info5">Septicemia</div>
+
+				<div class="bottom_txt1">In 2020, hypertension was
+					a primary cause of more than<br>
+					<span class="span_bold">268,000 deaths.<sup>1</sup></span>
+				</div>
+				<div class="bottom_txt2">
+					One in three adults<br>
+					in Mexico<br>
+					<span class="span_bold">(30% or 39 million)</span><br>
+					have hypertension.<sup>1</sup>
+				</div>
+				<div class="slide2_bottom_txt3_img">
+					<img src="images/slide2_women.png" alt="women">
+				</div>
+				<div class="slide2_bottom_txt3">
+					<span class="span_bold">Only about 1 in 5 adults
+					</span><br>
+					with hypertension have their<br>
+					condition under control.<sup>1</sup>
+				</div>
+
+			</div>
+			<div class="left_tab2">
+				<div class="btn_main"><img src="images/btn2.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<div class="map2 bounceIn"><img src="images/map2.png" class="" alt="map2"></div>
+				<p class="p1"><span class="span_bold">Prevalence of Hypertension</span>
+					in Mexico
+				</p>
+				<p class="p2">Hypertension<br> is more common in some areas of Mexico than in others.<sup>2</sup>
+				</p>
+				<p class="p3">
+					This map is showing the self-reported rate of hypertension by state (using a definition of
+					hypertension as a blood pressure <span>≥ 140/90</span> mmHg).<sup>2</sup>
+				</p>
+				<p class="p4">
+					Age-Adjusted Prevalence (%)
+				</p>
+				<div class="box1 bounceIn two">
+
+				</div>
+				<div class="box2 bounceIn two">
+
+				</div>
+				<div class="box3 bounceIn two">
+
+				</div>
+				<div class="box4 bounceIn two">
+
+				</div>
+				<div class="box5 bounceIn two">
+
+				</div>
+				<div class="dec1 bounceIn two">
+					32.0-38.6
+				</div>
+				<div class="dec2 bounceIn two">
+					30.1-31.9
+				</div>
+				<div class="dec3 bounceIn two">
+					28.3-30.0
+				</div>
+				<div class="dec4 bounceIn two">
+					27.3-28.2
+				</div>
+				<div class="dec5 bounceIn two">
+					24.3-27.2
+				</div>
+
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/slide2_menu1.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2">
+				<img src="images/slide2_en_btn2.png" class="sidebar2" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1">
+				<img src="images/drop_down-language_En.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+				<div class="mexcio_eng_cta"></div>
+				<div id="spanich_country"></div>
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<div class="country_selection_cta2"></div>
+			<div class="country_dropdown_mexcio"><img src="images/drop_down-country-Mexico.png" class="country_dropdown_mexcio" alt="country_dropdown_mexcio"></div>
+			<div id="mexcio_flag_cta"></div>
+			<div class="usa_cta2"></div>
+			<div class="mexcio_cta2"></div>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn2" class="home_cta"></a>
+			<div id="myBtn2" class="pi_cta"></div>
+			<!-- <a href="javascript:PresentationPlayer.launchApprovedEmail()" id="email2" class="email_cta"></a> -->
+			<a href="javascript:openEmail();" id="email2" class="email_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+	<div class="wrapper3">
+
+		<div class="head">
+
+			<ul class="menubar" style="display: none;">
+			
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization3" class=""><img src="images/active_menu.svg" class="menu_active"
+                                                               alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish3" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon3"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+			</ul>
+			<ul class="menubar2">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home3"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization3" class="active_a"><img src="images/active_menu.svg" class="menu_active"
+                                                                  alt="menu">Risks</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy3" class=""><img src="images/menu.svg" class="menu" alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA3"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey3"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator3" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage3" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors3" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines3" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish3"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon3"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+		</div>
+		<div class="actualization_section2 body actualization_slide2 actualization_slide3">
+			<div class="left_tab1">
+				<div class="btn_main"><img src="images/slide3_btn1.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<p class="p1 fadeIn_animation"><span class="span_bold">La hipertensión aumenta significativamente el
+						riesgo de enfermedades cardíacas
+					</span><br> y accidentes cerebrovasculares, que son<br>
+					las principales causas de muerte en México.<sup>1</sup>
+				</p>
+				<div class="wrapper3_bar1">
+
+				</div>
+				<div class="wrapper3_bar2">
+
+				</div>
+				<div class="wrapper3_bar3">
+
+				</div>
+				<div class="wrapper3_bar4">
+
+				</div>
+				<div class="wrapper3_bar5">
+
+				</div>
+				<div class="fugures1 animate fadeIn three">268,000</div>
+				<div class="fugures2 animate fadeIn three">152,000</div>
+				<div class="fugures3 animate fadeIn three">109,200</div>
+				<div class="fugures4 animate fadeIn three">99,200</div>
+				<div class="fugures5 animate fadeIn three">93,600</div>
+
+				<div class="info1">AH</div>
+				<div class="info2">COVID-19</div>
+				<div class="info3">EPOC</div>
+				<div class="info4">Dementia</div>
+				<div class="info5">Septicemia</div>
+
+				<div class="bottom_txt1">En 2020, la hipertensión arterial fue la causa principal<br> o secundaria de
+					más de<br>
+					<span class="span_bold">268.000 muertes.<sup>1</sup></span>
+				</div>
+				<div class="bottom_txt2">
+					Cada tercer<br> adulto en México <br>
+					<span class="span_bold">(30% o 39 millones)</span><br>
+					tiene hipertensión.<sup>1</sup>
+				</div>
+				<div class="slide2_bottom_txt3_img">
+					<img src="images/slide2_women.png" alt="women">
+				</div>
+				<div class="slide2_bottom_txt3">
+					<span class="span_bold">Solo 1 de cada 5 adultos
+					</span><br>
+					con hipertensión controla
+					<br>
+					su condición.<sup>1</sup>
+				</div>
+
+			</div>
+			<div class="left_tab2">
+				<div class="btn_main"><img src="images/slide3_btn2.png" class="" alt="btn_main"></div>
+				<div class="btn1_cta"></div>
+				<div class="btn2_cta"></div>
+				<div class="map2 bounceIn"><img src="images/map2.png" class="" alt="map2"></div>
+				<p class="p1"><span class="span_bold">Prevalencia de hipertensión
+					</span>
+					en Mexico
+				</p>
+				<p class="p2">La presión arterial alta es más común en algunas áreas<br> de México que<br> en
+					otras.<sup>2</sup>
+				</p>
+				<p class="p3">
+					A continuación se presenta un mapa que muestra la tasa de hipertensión autodeclarada por estado
+					(utilizando una definición de hipertensión como una presión arterial<br> <span>≥ 140/90</span>
+					mmHg).<sup>2</sup>
+				</p>
+				<p class="p4">
+					Prevalencia ajustada por edad (%)
+				</p>
+				<div class="box1 bounceIn two">
+
+				</div>
+				<div class="box2 bounceIn two">
+
+				</div>
+				<div class="box3 bounceIn two">
+
+				</div>
+				<div class="box4 bounceIn two">
+
+				</div>
+				<div class="box5 bounceIn two">
+
+				</div>
+				<div class="dec1 bounceIn two">
+					32.0-38.6
+				</div>
+				<div class="dec2 bounceIn two">
+					30.1-31.9
+				</div>
+				<div class="dec3 bounceIn two">
+					28.3-30.0
+				</div>
+				<div class="dec4 bounceIn two">
+					27.3-28.2
+				</div>
+				<div class="dec5 bounceIn two">
+					24.3-27.2
+				</div>
+
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/slide2_menu1.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2">
+				<img src="images/slide2_sp2_btn.png" class="sidebar2" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1">
+				<img src="images/drop_down-language_sp.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+				<div class="mexcio_sp_cta"></div>
+				<div id="enlinsh_country"></div>
+			</div>
+
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<div class="country_selection_cta2"></div>
+			<div class="country_dropdown_mexcio"><img src="images/drop_down-country-Mexico.png" class="country_dropdown_mexcio" alt="country_dropdown_mexcio"></div>
+			<div id="mexcio_flag_cta2"></div>
+			<div class="usa_cta2"></div>
+			<div class="mexcio_cta2"></div>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn3" class="home_cta"></a>
+			<div id="myBtn3" class="pi_cta"></div>
+			<!-- <a href="javascript:PresentationPlayer.launchApprovedEmail()" id="email3" class="email_cta"></a> -->
+			<a href="javascript:openEmail();" id="email3" class="email_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+
+</body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px">
+		<!-- <embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px"> -->
+	</div>
+
+</div>
+<script>
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+
+</script>
+<script>
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn4");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+
+</script>
+<script>
+	const counters = document.querySelectorAll('.value');
+	const speed = 200;
+
+	counters.forEach(counter => {
+		const animate = () => {
+			const value = +counter.getAttribute('akhi');
+			const data = +counter.innerText;
+
+			const time = value / speed;
+			if (data < value) {
+				counter.innerText = Math.ceil(data + time);
+				setTimeout(animate, 1);
+			} else {
+				counter.innerText = value;
+			}
+
+		}
+
+		animate();
+	});
+	$(document).ready(function(){
+  $("#spanich").click(function(){
+    setTimeout(function(){
+        $('.wrapper4_bar1').delay(0).animate({'height':213});
+    }, 1000);
+
+    setTimeout(function(){
+        $('.wrapper4_bar2').delay(0).animate({'height':170});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper4_bar3').delay(0).animate({'height':147});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper4_bar4').delay(0).animate({'height':132});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper4_bar5').delay(0).animate({'height':103});
+    }, 1000);
+  });
+  $("#spanich_country").click(function(){
+    setTimeout(function(){
+        $('.wrapper3_bar1').delay(0).animate({'height':213});
+    }, 1000);
+
+    setTimeout(function(){
+        $('.wrapper3_bar2').delay(0).animate({'height':170});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper3_bar3').delay(0).animate({'height':147});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper3_bar4').delay(0).animate({'height':132});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper3_bar5').delay(0).animate({'height':103});
+    }, 1000);
+  });
+
+  $(".mexcio_cta_id").click(function(){
+	setTimeout(function(){
+        $('.actualization_section2 .wrapper2_bar1').delay(0).animate({'height':213});
+    }, 1000);
+
+    setTimeout(function(){
+        $('.wrapper2_bar2').delay(0).animate({'height':170});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper2_bar3').delay(0).animate({'height':147});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper2_bar4').delay(0).animate({'height':132});
+    }, 1000);
+
+	setTimeout(function(){
+        $('.wrapper2_bar5').delay(0).animate({'height':103});
+    }, 1000);
+
+  });
+
+
+});
+</script>
+<script src="https://unpkg.com/mustache@latest"></script>
+<script type="text/javascript">
+
+
+
+
+	function openEmail(){
+		PresentationPlayer.launchEmails(["Hypertension study"]);
+	}
+
+
+
+  </script>
+  <script>
+	  let allData = {{{.}}}
+  </script>
+
+
+</html>

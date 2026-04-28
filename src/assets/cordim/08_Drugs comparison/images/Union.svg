@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 854 508">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        filter: url(#drop-shadow-1);
+      }
+
+      .cls-2 {
+        mask: url(#mask);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-4 {
+        fill: none;
+        stroke: #50dee9;
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="7"/>
+      <feGaussianBlur result="blur" stdDeviation="10"/>
+      <feFlood flood-color="#00bfb3" flood-opacity=".25"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <mask id="mask" x="29.75" y="22.5" width="795" height="449" maskUnits="userSpaceOnUse"/>
+    <linearGradient id="linear-gradient" x1="427" y1="387.14" x2="427" y2="142.04" gradientTransform="translate(0 494) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7ce2f7"/>
+      <stop offset="1" stop-color="#c9f7ec"/>
+    </linearGradient>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <path class="cls-1" d="M823.25,470.5H57.41l-26.66-27.12v-125.76l27.35-27.31V23.5H795.9l27.35,27.81V470.5Z"/>
+        <g class="cls-2">
+          <path class="cls-3" d="M823.25,470.5v1h1v-1h-1Zm-765.84,0l-.71,.7,.29,.3h.42v-1Zm.7-447v-1h-1v1h1Zm737.8,0l.71-.7-.29-.3h-.42v1ZM58.1,290.32l.71,.71,.29-.29v-.42h-1Zm-27.35,27.31l-.71-.71-.29,.29v.42h1ZM823.25,51.31h1v-.41l-.29-.29-.71,.7ZM30.75,443.38h-1v.41l.29,.29,.71-.7Zm792.5,26.12H57.41v2H823.25v-2ZM58.1,24.5H795.9v-2H58.1v2Zm1,265.82V23.5h-2V290.32h2Zm-27.65,28.01l27.35-27.31-1.41-1.42-27.35,27.31,1.41,1.42ZM795.18,24.2l27.35,27.81,1.43-1.4-27.35-27.81-1.43,1.4Zm27.07,27.11V399.27h2V51.31h-2Zm0,347.96v71.23h2v-71.23h-2ZM58.12,469.8l-26.66-27.12-1.43,1.4,26.66,27.12,1.43-1.4Zm-26.37-26.42v-125.76h-2v125.76h2Z"/>
+        </g>
+      </g>
+      <path class="cls-4" d="M48.01,426.25l-11.61,11.6"/>
+      <path class="cls-4" d="M47.79,419.07l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,411.71l-11.61,11.6"/>
+      <path class="cls-4" d="M47.79,404.53l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,397.16l-11.61,11.61"/>
+      <path class="cls-4" d="M47.79,389.98l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,382.62l-11.61,11.61"/>
+      <path class="cls-4" d="M47.79,375.44l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,367.31l-11.61,11.6"/>
+      <path class="cls-4" d="M47.79,360.13l-11.6,11.6"/>
+      <path class="cls-4" d="M48.01,352.77l-11.61,11.61"/>
+      <path class="cls-4" d="M47.79,345.59l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,338.22l-11.61,11.61"/>
+      <path class="cls-4" d="M47.79,331.04l-11.6,11.61"/>
+      <path class="cls-4" d="M48.01,323.68l-11.61,11.6"/>
+      <path class="cls-4" d="M47.79,316.5l-11.6,11.6"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+/* #Media Queries
+================================================== */
+@media all and (min-width:1440px) { 
+ 
+}
+@media all and (max-width:1440px) { 
+ 
+}
+@media all and (max-width:1366px) { 
+
+ 
+}
+ 
+@media all and (max-width:1280px) {
+
+  
+}
+@media all and (max-width:1200px) {
+
+}
+
+@media (min-width:1025px) and (max-width:1132px) {
+
+}
+
+@media all and (max-width:1024px) {
+
+}
+@media all and (max-width:992px) {
+
+}
+ 
+
+@media all and (max-width:600px) {
+	 
+}
+ @media all and (max-width:480px) {
+
+ }

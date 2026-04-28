@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<title>Webinar</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+	<!--    css styles starts-->
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/responsive.css" />
+	<link rel="stylesheet" type="text/css" href="css/animate.css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:ital,wght@0,100;0,400;0,500;0,600;0,700;0,800;1,500;1,600;1,700&display=swap"
+		rel="stylesheet">
+
+	<!--css styles ends-->
+
+	<!--js starts-->
+
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/Common.js"></script>
+	<script src="js/main.js"></script>
+	<script>
+    let allData = {{{.}}}
+  </script>
+	<!--js ends-->
+</head>
+
+
+
+<body class="eu start_section_main">
+
+	<div class="wrapper">
+
+		<divclass="head">
+            <!--
+			<ul class="menubar">
+				<li class="active_li"><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);"
+						id="icon_home" class=""><img src="images/active_menu.svg" class="menu_active" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="icon_actualization" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li class="active_li"><a
+						href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="icon_efficacy" class=""><img src="images/menu.svg" class="menu"
+							alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);"
+						id="icon_MoA" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);"
+						id="icon_survey" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="icon_calculator" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="icon_coverage" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="icon_competitors" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="icon_guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);"
+						id="icon_finish" class=""><img src="images/menu.svg" class="menu" alt="menu"></a></li>
+				<li id="plus_icon"><a class=""><img src="images/plus.svg" class="menu" alt="menu"></a></li>
+					</ul>
+			<ul class="menubar2">
+
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="home"
+						class="active_a"><img src="images/active_menu.svg" class="menu_active" alt="menu">Start</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Risks and prevalence', '01_slide.html', null);"
+						id="actualization" class=""><img src="images/menu.svg" class="menu" alt="menu">Risks</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Graph', '01_slide.html', null);"
+						id="efficacy" class=""><img src="images/menu.svg" class="menu"
+							alt="menu">Graph</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Video', '01_slide.html', null);" id="MoA"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Video</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Survey', '01_slide.html', null);" id="survey"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Survey</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Benefits of Cordim', '01_slide.html', null);"
+						id="calculator" class=""><img src="images/menu.svg" class="menu" alt="menu">Calculator</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Cordim coverage', '01_slide.html', null);"
+						id="coverage" class=""><img src="images/menu.svg" class="menu" alt="menu">Coverage</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Drugs comparison', '01_slide.html', null);"
+						id="competitors" class=""><img src="images/menu.svg" class="menu" alt="menu">Competitors</a>
+				</li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Recommendations', '01_slide.html', null);"
+						id="guidelines" class=""><img src="images/menu.svg" class="menu" alt="menu">Guidelines</a></li>
+				<li><a href="javascript:PresentationPlayer.gotoSlide('Feedback', '01_slide.html', null);" id="finish"
+						class=""><img src="images/menu.svg" class="menu" alt="menu">Feedback</a></li>
+				<li id="arrow_icon"><a class=""><img src="images/Top_Menu_Arrows.svg" class="menu" alt="menu"></a></li>
+			</ul>
+            -->
+		</div>
+		<div id="start_section" class="body">
+
+
+			<div class="left_tab1">
+				<div id="customer1">{{#customers}} <span id="doc_name1" class="template"><h1>{{salutation}} {{ firstname }} {{ lastname }},</h1></span>{{/customers}}</div>
+				<p class="p1">as a <span>general practitioner,</span> you see many patients with <span>arterial
+						hypertension</span> daily.
+				</p>
+				<p class="p2">Only</p>
+				<div class="fourtysix_per bounceIn">46<small>%</small></div>
+				<p class="p3">of them are treated properly.</p>
+
+			</div>
+			<div class="left_tab2">
+				<div id="customer2">{{#customers}} <span id="doc_name2" class="template"><h1>{{salutation}} {{ firstname }} {{ lastname }},</h1></span>{{/customers}}</div>
+				<p class="">as a <span>cardiologist,</span> you know that <span>arterial hypertension</span> is a leading cause of ​
+				</p>
+				<div class="circle c1 bounceIn">
+					<img src="images/Heart_Attacks.svg" alt="icons">
+				</div>
+				<div class="circle c2 bounceIn two">
+					<img src="images/Strokes.svg" alt="icons">
+				</div>
+				<div class="circle c3 bounceIn four">
+					<img src="images/Disability.svg" alt="icons">
+				</div>
+				<div class="circle c4 bounceIn six">
+					<img src="images/Death.svg" alt="icons">
+				</div>
+				<div class="circle_text text1 bounceIn">
+					heart attacks
+				</div>
+				<div class="circle_text text2 bounceIn two">
+					strokes
+				</div>
+				<div class="circle_text text3 bounceIn four">
+					disabilities
+				</div>
+				<div class="circle_text text4 bounceIn six">
+					deaths
+				</div>
+			</div>
+
+			<div class="sidebar1">
+				<img src="images/functional_buttons.png" class="sidebar1" alt="sidebar1">
+			</div>
+			<div class="sidebar2">
+				<img src="images/button_settings.png" class="sidebar2" alt="sidebar2">
+			</div>
+			<div class="sidebar2_dropdown1">
+				<img src="images/drop_down-speciality-GP.png" class="sidebar2_dropdown1" alt="sidebar2_dropdown1">
+			</div>
+			<div class="sidebar2_dropdown2">
+				<img src="images/drop_down_speciality_Cardio.png" class="sidebar2_dropdown2" alt="sidebar2_dropdown2">
+			</div>
+			<div class="sidebar2_cardio">
+				<img src="images/button_settings-2.png" class="sidebar2_cardio" alt="sidebar2_cardio">
+			</div>
+			<div class="pi_active"><img src="images/pi_active_btn.png" class="pi_active" alt="pi_active"></div>
+			<div class="gp_dropdown_cta"></div>
+			<div class="cardio_dropdown_cta"></div>
+			<div class="gp_cta"></div>
+			<div class="cardio_cta"></div>
+			<a href="javascript:PresentationPlayer.gotoSlide('Patients with arterial hypertension', '01_slide.html', null);" id="homeBtn" class="home_cta"></a>
+			<a href="javascript:PresentationPlayer.gotoSlide('isadditionalcontent_Prescribtion_information', null, null);"   class="pi_cta"></a>
+		</div>
+		<div class="footer">
+
+		</div>
+
+	</div>
+
+</body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px">
+		<!-- <embed src="pdf/Prescribtion_information.pdf" frameborder="0" width="100%" height="510px"> -->
+	</div>
+
+</div>
+<script>
+	// Get the modal
+	var modal = document.getElementById("myModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal
+	btn.onclick = function () {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+</script>
+<script>
+    let allData = {{{.}}}
+  </script>
+  <script>
+
+
+
+
+	setTimeout(() => {
+
+		let xyz = configArray = allData.customers[0].specialty
+	let validation = xyz.indexOf('ardi')
+	if(validation >= 0){
+
+
+			$(".left_tab2").show();
+			$(".left_tab1").hide();
+			$(".sidebar2_cardio, .gp_cta").show();
+			$(".sidebar2").hide();
+			$(".sidebar2_dropdown2").hide();
+			$(".sidebar2_dropdown1").hide();
+
+	}else {
+
+			 $(".left_tab1").show();
+			$(".left_tab2").hide();
+			$(".sidebar2_cardio, .gp_cta").hide();
+			$(".sidebar2").show();
+			$(".sidebar2_dropdown1").hide();
+			$(".sidebar2_dropdown2").hide();
+
+
+	}
+
+		let tokens = document.getElementById('customer2').innerHTML;
+	document.getElementById('customer1').innerHTML = tokens;
+	}, 2500);
+
+
+
+// setTimeout(function asa(){
+// console.log('working')
+// },3000)
+
+
+  </script>
+
+</html>
