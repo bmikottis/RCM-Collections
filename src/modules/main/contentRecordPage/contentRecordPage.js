@@ -1,4 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
+import EmbedPDF, { ZoomMode } from '@embedpdf/snippet';
 
 /** Must match collectionHierarchy.js */
 const RCM_VIEW_COLLECTION = 'rcm-view-collection';
@@ -179,7 +180,7 @@ export default class ContentRecordPage extends LightningElement {
         this._embedPdfMountUrl = null;
     }
 
-    async _mountEmbedPdfIfNeeded() {
+    _mountEmbedPdfIfNeeded() {
         if (!this.hasPdfPreview) {
             this._teardownEmbedPdf();
             return;
@@ -203,12 +204,6 @@ export default class ContentRecordPage extends LightningElement {
         this._teardownEmbedPdf();
         const generation = ++this._embedPdfInitGeneration;
         try {
-            const mod = await import('@embedpdf/snippet');
-            const EmbedPDF = mod.default;
-            const { ZoomMode } = mod;
-            if (generation !== this._embedPdfInitGeneration) {
-                return;
-            }
             EmbedPDF.init({
                 type: 'container',
                 target: host,
@@ -255,6 +250,12 @@ export default class ContentRecordPage extends LightningElement {
         } catch {
             /* ignore */
         }
+        this._boundDocumentPointerDown = (e) => {
+            this._handleDocumentPointerDownOutsideAnnotationCards(e);
+        };
+        if (typeof document !== 'undefined' && this._boundDocumentPointerDown) {
+            document.addEventListener('pointerdown', this._boundDocumentPointerDown, true);
+        }
     }
 
     disconnectedCallback() {
@@ -269,6 +270,10 @@ export default class ContentRecordPage extends LightningElement {
         }
         this._removeGlobalResizeListeners();
         this._clearResizeCursor();
+        if (typeof document !== 'undefined' && this._boundDocumentPointerDown) {
+            document.removeEventListener('pointerdown', this._boundDocumentPointerDown, true);
+            this._boundDocumentPointerDown = null;
+        }
     }
 
     renderedCallback() {
@@ -760,27 +765,76 @@ export default class ContentRecordPage extends LightningElement {
         return this.annotationItems.length === 0;
     }
 
-    handleAnnotationToggle(event) {
-        event.stopPropagation();
-        const id = event.currentTarget.dataset.id;
-        const next = new Set(this.expandedAnnotationIds);
-        if (next.has(id)) {
-            next.delete(id);
-            const lk = new Set(this.expandedLinkedClaimsIds);
-            lk.delete(id);
-            this.expandedLinkedClaimsIds = lk;
-            const cm = new Set(this.expandedCommentsIds);
-            cm.delete(id);
-            this.expandedCommentsIds = cm;
-        } else {
-            next.add(id);
-            this.selectedAnnotationId = id;
+    /**
+     * Collapse one annotation and its linked-claims / comments sub-panels.
+     * @param {string} id
+     */
+    _collapseAnnotationById(id) {
+        if (!id || !this.expandedAnnotationIds.has(id)) {
+            return;
         }
+        const next = new Set(this.expandedAnnotationIds);
+        next.delete(id);
         this.expandedAnnotationIds = next;
+        const lk = new Set(this.expandedLinkedClaimsIds);
+        lk.delete(id);
+        this.expandedLinkedClaimsIds = lk;
+        const cm = new Set(this.expandedCommentsIds);
+        cm.delete(id);
+        this.expandedCommentsIds = cm;
     }
 
     /**
-     * Card surface: select + expand when collapsed. Skips buttons, links, form controls, and the info icon.
+     * Collapse all expanded annotation cards (e.g. click outside the cards).
+     */
+    _collapseAllExpandedAnnotations() {
+        if (this.expandedAnnotationIds.size === 0) {
+            return;
+        }
+        this.expandedAnnotationIds = new Set();
+        this.expandedLinkedClaimsIds = new Set();
+        this.expandedCommentsIds = new Set();
+        this.selectedAnnotationId = null;
+        this.openMenuAnnotationId = null;
+    }
+
+    /**
+     * Pointer is outside any annotation card — collapse expanded cards.
+     * @param {PointerEvent} event
+     */
+    _handleDocumentPointerDownOutsideAnnotationCards(event) {
+        const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+        for (const node of path) {
+            if (
+                node &&
+                node.classList &&
+                node.classList.contains('content-record-annotation-card')
+            ) {
+                return;
+            }
+        }
+        this._collapseAllExpandedAnnotations();
+    }
+
+    handleAnnotationToggle(event) {
+        event.stopPropagation();
+        const id = event.currentTarget.dataset.id;
+        if (!id) {
+            return;
+        }
+        if (this.expandedAnnotationIds.has(id)) {
+            this._collapseAnnotationById(id);
+        } else {
+            const next = new Set(this.expandedAnnotationIds);
+            next.add(id);
+            this.expandedAnnotationIds = next;
+            this.selectedAnnotationId = id;
+        }
+    }
+
+    /**
+     * Card surface: select + expand when collapsed, or collapse when already expanded.
+     * Skips buttons, links, form controls, and the info icon.
      * @param {MouseEvent} event
      */
     handleAnnotationCardActivate(event) {
@@ -811,12 +865,14 @@ export default class ContentRecordPage extends LightningElement {
         if (!id) {
             return;
         }
-        this.selectedAnnotationId = id;
-        if (!this.expandedAnnotationIds.has(id)) {
-            const next = new Set(this.expandedAnnotationIds);
-            next.add(id);
-            this.expandedAnnotationIds = next;
+        if (this.expandedAnnotationIds.has(id)) {
+            this._collapseAnnotationById(id);
+            return;
         }
+        this.selectedAnnotationId = id;
+        const next = new Set(this.expandedAnnotationIds);
+        next.add(id);
+        this.expandedAnnotationIds = next;
     }
 
     /**

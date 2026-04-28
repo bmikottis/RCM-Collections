@@ -1145,7 +1145,7 @@ lightning-tabset.content-record-scoped-tabset
     flex-direction: column;
     gap: var(--slds-g-spacing-3, 0.75rem);
     border-top: none;
-    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-3, 0.75rem);
+    padding: 0 var(--slds-g-spacing-4, 1rem) 0;
 }
 
 .content-record-annotation-dropdown {
@@ -1542,63 +1542,63 @@ lightning-tabset.content-record-scoped-tabset
     text-decoration: underline;
 }
 
-/* Figma RCM Component Library 276:18379 — Mark as Anchor: label + checkbox, navy info, brand rule */
+/* Figma 276:18379 — Mark as Anchor row: no top rule; rounds with card */
 .content-record-annotation-anchor {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--slds-g-spacing-4, 1rem);
+    display: block;
     box-sizing: border-box;
-    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
     margin: 0;
     background-color: var(--slds-g-color-surface-1, #ffffff);
-    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    border-bottom: 0.25rem solid var(--slds-g-color-border-brand-1, #0176d3);
+    border-top: none;
     border-bottom-left-radius: var(--slds-g-radius-border-3, 0.75rem);
     border-bottom-right-radius: var(--slds-g-radius-border-3, 0.75rem);
 }
 
-/* Layout: Figma “Mark as Anchor” (label) then checkbox, left cluster */
+/* Checkbox left, then label + info (4px apart) */
 .content-record-anchor-row {
     display: flex;
-    flex: 1;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--slds-g-spacing-3, 0.75rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
     min-width: 0;
 }
 
-/* Figma: on-surface-1 gray label (~#5c5c5c), 14px / 1.25 */
+.content-record-anchor-label-cluster {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem); /* 4px to info icon (Figma) */
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+/* Field label: 13px / 18px (Figma) */
 .content-record-anchor-text {
     margin: 0;
-    font-size: var(--slds-g-font-scale-2, 0.875rem);
-    line-height: 1.25rem;
+    font-size: 0.8125rem; /* 13px — form field label */
+    line-height: 1.125rem; /* 18px */
     font-weight: var(--slds-g-font-weight-4, 400);
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
 .content-record-anchor-input {
-    --slds-c-input-line-height: 1.25rem;
+    --slds-c-input-line-height: 1.125rem;
     flex-shrink: 0;
 }
 
+/* 12×12 blue utility info (no filled circle) */
 .content-record-annotation-info-icon {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    min-width: 2rem;
-    height: 2rem;
-    min-height: 2rem;
-    border-radius: var(--slds-g-radius-border-circle, 50%);
-    /* Figma: deep navy circle, white “i” (palette-blue-15 / header navy) */
-    background-color: var(--slds-g-color-palette-blue-15, #03234d);
-    color: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    width: 0.75rem; /* 12px */
+    height: 0.75rem;
+    line-height: 0;
 }
 
 .content-record-annotation-info-icon lightning-icon {
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    --slds-c-icon-sizing: 0.75rem; /* 12px glyph box */
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-brand-base-50, #066afe);
     --slds-c-icon-color-background: transparent;
 }
 

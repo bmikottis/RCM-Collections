@@ -691,11 +691,6 @@
                                                                 </div>
                                                                 <div class="content-record-annotation-anchor">
                                                                     <div class="content-record-anchor-row">
-                                                                        <span
-                                                                            class="content-record-anchor-text"
-                                                                            aria-hidden="true"
-                                                                            >Mark as Anchor</span
-                                                                        >
                                                                         <lightning-input
                                                                             type="checkbox"
                                                                             label="Mark as Anchor"
@@ -705,16 +700,23 @@
                                                                             checked={ann.anchorChecked}
                                                                             onchange={handleAnchorChange}>
                                                                         </lightning-input>
+                                                                        <div class="content-record-anchor-label-cluster">
+                                                                            <span
+                                                                                class="content-record-anchor-text"
+                                                                                aria-hidden="true"
+                                                                                >Mark as Anchor</span
+                                                                            >
+                                                                            <span
+                                                                                class="content-record-annotation-info-icon"
+                                                                                title="Mark this annotation as an anchor for reference in the document.">
+                                                                                <lightning-icon
+                                                                                    icon-name="utility:info"
+                                                                                    size="xx-small"
+                                                                                    alternative-text="About anchor">
+                                                                                </lightning-icon>
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
-                                                                    <span
-                                                                        class="content-record-annotation-info-icon"
-                                                                        title="Mark this annotation as an anchor for reference in the document.">
-                                                                        <lightning-icon
-                                                                            icon-name="utility:info"
-                                                                            size="x-small"
-                                                                            alternative-text="About anchor">
-                                                                        </lightning-icon>
-                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </template>
