@@ -11,9 +11,14 @@
                 </div>
             </div>
             <div class="global-header-center">
-                <div class="global-search">
-                    <lightning-icon icon-name="utility:search" size="x-small" class="global-search-icon" alternative-text="Search"></lightning-icon>
-                    <input type="text" class="global-search-input" placeholder="Search..." />
+                <div class="global-search rcm-pill-search" role="search">
+                    <lightning-icon
+                        icon-name="utility:search"
+                        size="x-small"
+                        class="rcm-pill-search__icon"
+                        alternative-text=""
+                    ></lightning-icon>
+                    <input type="search" class="rcm-pill-search__input" placeholder="Search..." aria-label="Search" />
                 </div>
             </div>
             <div class="global-header-right">
@@ -41,8 +46,13 @@
                         <div class="nav-dropdown-backdrop" onclick={handleNavDropdownClose} role="presentation"></div>
                         <div class="nav-dropdown" role="menu" aria-label="Regulated Content menu">
                             <a href="/" class="nav-dropdown-item" role="menuitem" onclick={handleCollectionsClick}>
-                                <span class="nav-dropdown-item-icon">
-                                    <lightning-icon icon-name="utility:open_folder" size="x-small" alternative-text=""></lightning-icon>
+                                <span class="nav-dropdown-item-icon nav-dropdown-folder-tile">
+                                    <lightning-icon
+                                        icon-name="utility:open_folder"
+                                        size="x-small"
+                                        variant="inverse"
+                                        alternative-text=""
+                                    ></lightning-icon>
                                 </span>
                                 <span class="nav-dropdown-item-label">Regulated Content Collections</span>
                             </a>

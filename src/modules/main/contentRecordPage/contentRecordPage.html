@@ -324,16 +324,50 @@
                             </div>
                             <aside class="content-record-doc-sidebar" aria-label="Document tools and annotations">
                                 <div class="content-record-scoped-shell">
-                                <lightning-tabset
-                                    variant="scoped"
-                                    active-tab-value={scopedPanelTab}
-                                    class="content-record-scoped-tabset">
-                                    <lightning-tab
-                                        class="content-record-scoped-tab"
-                                        label={annotationsTabLabel}
-                                        value="annotations"
-                                        onactive={handleScopedTabActive}>
-                                        <div class="content-record-scoped-tab-body">
+                                <div
+                                    class="slds-tabs_scoped content-record-scoped-tabs"
+                                    role="region"
+                                    aria-label="Document tools">
+                                    <ul class="slds-tabs_scoped__nav" role="tablist" aria-label="Panel sections">
+                                        <li class={annotationScopedTabItemClass} role="presentation" title="Annotations">
+                                            <a
+                                                class="slds-tabs_scoped__link"
+                                                href="#"
+                                                role="tab"
+                                                id="content-record-scoped-tab-annotations"
+                                                aria-selected={isScopedAnnotations}
+                                                aria-controls="content-record-scoped-panel-annotations"
+                                                data-tab="annotations"
+                                                tabindex={annotationScopedTabTabindex}
+                                                onclick={handleScopedTabClick}
+                                                onkeydown={handleScopedTabKeydown}>
+                                                {annotationsTabLabel}
+                                            </a>
+                                        </li>
+                                        <li class={workItemsScopedTabItemClass} role="presentation" title="Content Work items">
+                                            <a
+                                                class="slds-tabs_scoped__link"
+                                                href="#"
+                                                role="tab"
+                                                id="content-record-scoped-tab-work"
+                                                aria-selected={isScopedWorkItems}
+                                                aria-controls="content-record-scoped-panel-work"
+                                                data-tab="contentWorkItems"
+                                                tabindex={workItemsScopedTabTabindex}
+                                                onclick={handleScopedTabClick}
+                                                onkeydown={handleScopedTabKeydown}>
+                                                {contentWorkItemsTabLabel}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="content-record-scoped-panels">
+                                    <template lwc:if={isScopedAnnotations}>
+                                        <div
+                                            class="slds-tabs_scoped__content content-record-scoped-tab-body"
+                                            id="content-record-scoped-panel-annotations"
+                                            role="tabpanel"
+                                            aria-labelledby="content-record-scoped-tab-annotations"
+                                            tabindex="0">
                                         <div class="content-record-annotations-panel">
                                             <h2 class="content-record-annotations-heading slds-assistive-text">Annotations</h2>
                                             <div lwc:if={showAnnotationListTools} class="content-record-annotations-controls">
@@ -823,13 +857,14 @@
                                             </div>
                                         </div>
                                         </div>
-                                    </lightning-tab>
-                                    <lightning-tab
-                                        class="content-record-scoped-tab"
-                                        label={contentWorkItemsTabLabel}
-                                        value="contentWorkItems"
-                                        onactive={handleScopedTabActive}>
-                                        <div class="content-record-scoped-tab-body">
+                                    </template>
+                                    <template lwc:elseif={isScopedWorkItems}>
+                                        <div
+                                            class="slds-tabs_scoped__content content-record-scoped-tab-body"
+                                            id="content-record-scoped-panel-work"
+                                            role="tabpanel"
+                                            aria-labelledby="content-record-scoped-tab-work"
+                                            tabindex="0">
                                         <div class="content-record-work-items-panel">
                                             <h2 class="content-record-work-items-heading slds-assistive-text">Content Work items</h2>
                                             <div class="content-record-work-items-toolbar">
@@ -873,8 +908,9 @@
                                             </ul>
                                         </div>
                                         </div>
-                                    </lightning-tab>
-                                </lightning-tabset>
+                                    </template>
+                                    </div>
+                                </div>
                                 </div>
                             </aside>
                         </div>

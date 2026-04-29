@@ -141,6 +141,37 @@ const ANNOTATION_DEMO_ITEMS = [
     }
 ];
 
+/** @see PdfAnnotationSubtype in @embedpdf/models (square + text highlight) */
+const PDF_ANNOTATION_LINKABLE_SUBTYPES = new Set([5, 9]);
+
+/**
+ * Normalized top/left/width/height for EmbedPDF annotation bounds (rect may be origin+size or LTRB).
+ * @param {object} [r]
+ * @returns {{ left: number, top: number, width: number, height: number }|null}
+ */
+function _embedPdfRectToBox(r) {
+    if (!r) {
+        return null;
+    }
+    if (typeof r.left === 'number' && typeof r.top === 'number') {
+        return {
+            left: r.left,
+            top: r.top,
+            width: typeof r.width === 'number' ? r.width : 0,
+            height: typeof r.height === 'number' ? r.height : 0
+        };
+    }
+    if (r.origin && r.size) {
+        return {
+            left: r.origin.x,
+            top: r.origin.y,
+            width: r.size.width,
+            height: r.size.height
+        };
+    }
+    return null;
+}
+
 /**
  * Regulated Content record — layout aligned with Figma (page header, workflow path,
  * document viewer + scoped annotation panel).
@@ -230,6 +261,24 @@ export default class ContentRecordPage extends LightningElement {
 
     _contentRecordKey = null;
 
+    /** Registry from the embed PDF container; used to scroll + select. */
+    _embedPdfRegistry = null;
+
+    /** Root element returned by EmbedPDF.init (web component). */
+    _embedPdfContainer = null;
+
+    _embedPdfBridgeUnsubs = null;
+
+    /** Public annotation API from @embedpdf/snippet. */
+    _embedPdfAnnotationCapability = null;
+
+    _pdfIdToCardId = null;
+
+    _cardIdToPdfTarget = null;
+
+    /** When true, PDF selection from the panel is applied; do not re-sync panel from viewer. */
+    _ignoreNextPdfStateForPanel = false;
+
     _teardownHtmlPreviewOverlays() {
         this._htmlPreviewOverlays = [];
         if (this._htmlOverlayRaf != null && typeof cancelAnimationFrame === 'function') {
@@ -243,6 +292,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     _teardownEmbedPdf() {
+        this._teardownEmbedPdfBridge();
         const host = this.template && this.template.querySelector('.content-record-pdf-host');
         if (host) {
             while (host.firstChild) {
@@ -250,6 +300,24 @@ export default class ContentRecordPage extends LightningElement {
             }
         }
         this._embedPdfMountUrl = null;
+    }
+
+    _teardownEmbedPdfBridge() {
+        if (this._embedPdfBridgeUnsubs && this._embedPdfBridgeUnsubs.length) {
+            for (let i = 0; i < this._embedPdfBridgeUnsubs.length; i++) {
+                try {
+                    this._embedPdfBridgeUnsubs[i]();
+                } catch {
+                    /* ignore */
+                }
+            }
+        }
+        this._embedPdfBridgeUnsubs = null;
+        this._embedPdfRegistry = null;
+        this._embedPdfContainer = null;
+        this._embedPdfAnnotationCapability = null;
+        this._pdfIdToCardId = null;
+        this._cardIdToPdfTarget = null;
     }
 
     _mountEmbedPdfIfNeeded() {
@@ -292,7 +360,7 @@ export default class ContentRecordPage extends LightningElement {
                 if (!hostNode) {
                     return;
                 }
-                EmbedPDF.init({
+                const viewer = EmbedPDF.init({
                     type: 'container',
                     target: hostNode,
                     src: url,
@@ -302,6 +370,10 @@ export default class ContentRecordPage extends LightningElement {
                         defaultZoomLevel: ZoomMode.FitWidth
                     }
                 });
+                this._embedPdfContainer = viewer || null;
+                if (viewer) {
+                    void this._initEmbedPdfAnnotationBridge(viewer, generation);
+                }
                 if (generation !== this._embedPdfInitGeneration) {
                     this._teardownEmbedPdf();
                     return;
@@ -315,6 +387,164 @@ export default class ContentRecordPage extends LightningElement {
                 this._teardownEmbedPdf();
             }
         })();
+    }
+
+    _rebuildPdfAnnotationIdMap(annCap, generation) {
+        if (generation !== this._embedPdfInitGeneration || !this.usePdfEmbedHost) {
+            return;
+        }
+        const rectTop = (r) => {
+            const b = _embedPdfRectToBox(r);
+            return b ? b.top : 0;
+        };
+        const rectLeft = (r) => {
+            const b = _embedPdfRectToBox(r);
+            return b ? b.left : 0;
+        };
+        let all = [];
+        try {
+            all = annCap.getAnnotations() || [];
+        } catch (e) {
+            all = [];
+        }
+        const linkable = all.filter(
+            (ta) => ta && ta.object && PDF_ANNOTATION_LINKABLE_SUBTYPES.has(ta.object.type)
+        );
+        const sorted = linkable.sort((a, b) => {
+            const ap = a.object && typeof a.object.pageIndex === 'number' ? a.object.pageIndex : 0;
+            const bp = b.object && typeof b.object.pageIndex === 'number' ? b.object.pageIndex : 0;
+            if (ap !== bp) {
+                return ap - bp;
+            }
+            const r1 = a.object && a.object.rect;
+            const r2 = b.object && b.object.rect;
+            const tDiff = rectTop(r1) - rectTop(r2);
+            if (tDiff !== 0) {
+                return tDiff;
+            }
+            return rectLeft(r1) - rectLeft(r2);
+        });
+        const byPdf = Object.create(null);
+        const toCard = Object.create(null);
+        const n = Math.min(ANNOTATION_DEMO_ITEMS.length, sorted.length);
+        for (let i = 0; i < n; i += 1) {
+            const ta = sorted[i];
+            const o = ta.object;
+            if (!o || !o.id) {
+                continue;
+            }
+            const cardId = ANNOTATION_DEMO_ITEMS[i].id;
+            byPdf[o.id] = cardId;
+            toCard[cardId] = {
+                pageIndex: typeof o.pageIndex === 'number' ? o.pageIndex : 0,
+                annotationId: o.id,
+                rect: _embedPdfRectToBox(o.rect)
+            };
+        }
+        this._pdfIdToCardId = byPdf;
+        this._cardIdToPdfTarget = toCard;
+    }
+
+    _onEmbedPdfAnnotationStateChange(annCap, event, activeDocumentId, generation) {
+        if (generation !== this._embedPdfInitGeneration || this._ignoreNextPdfStateForPanel) {
+            return;
+        }
+        if (!this.usePdfEmbedHost || !event) {
+            return;
+        }
+        if (activeDocumentId && event.documentId && event.documentId !== activeDocumentId) {
+            return;
+        }
+        const state = event.state;
+        if (!state) {
+            return;
+        }
+        if (!state.selectedUids || !state.selectedUids.length) {
+            this.selectedAnnotationId = null;
+            return;
+        }
+        const uid = state.selectedUids[0];
+        let ta;
+        try {
+            ta = annCap.getAnnotationById(uid);
+        } catch (e) {
+            ta = null;
+        }
+        if (!ta || !ta.object || !ta.object.id) {
+            return;
+        }
+        const cardId = this._pdfIdToCardId && this._pdfIdToCardId[ta.object.id];
+        if (!cardId) {
+            return;
+        }
+        this._focusAnnotationInPanel(cardId);
+    }
+
+    /**
+     * @param {HTMLElement} viewer
+     * @param {number} generation
+     */
+    async _initEmbedPdfAnnotationBridge(viewer, generation) {
+        if (!viewer) {
+            return;
+        }
+        let registry;
+        try {
+            registry = await viewer.registry;
+        } catch (e) {
+            return;
+        }
+        if (generation !== this._embedPdfInitGeneration || this.pdfViewerMode !== 'embed') {
+            return;
+        }
+        this._embedPdfRegistry = registry;
+        try {
+            await registry.pluginsReady();
+        } catch (e) {
+            return;
+        }
+        if (generation !== this._embedPdfInitGeneration) {
+            return;
+        }
+        const annP = registry.getPlugin('annotation');
+        const cap = annP && typeof annP.provides === 'function' ? annP.provides() : null;
+        if (!cap) {
+            return;
+        }
+        this._embedPdfAnnotationCapability = cap;
+        const getActive = () => {
+            const dmp = registry.getPlugin('document-manager');
+            if (!dmp || typeof dmp.provides !== 'function') {
+                return null;
+            }
+            return dmp.provides().getActiveDocumentId();
+        };
+        const unsubs = [];
+        unsubs.push(
+            cap.onStateChange((e) => {
+                this._onEmbedPdfAnnotationStateChange(cap, e, getActive(), generation);
+            })
+        );
+        unsubs.push(
+            cap.onAnnotationEvent((ev) => {
+                if (generation !== this._embedPdfInitGeneration) {
+                    return;
+                }
+                if (ev && ev.type === 'loaded') {
+                    this._rebuildPdfAnnotationIdMap(cap, generation);
+                }
+            })
+        );
+        this._embedPdfBridgeUnsubs = unsubs;
+        this._rebuildPdfAnnotationIdMap(cap, generation);
+        if (typeof window !== 'undefined' && typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                if (generation !== this._embedPdfInitGeneration) {
+                    return;
+                }
+                this._rebuildPdfAnnotationIdMap(cap, generation);
+            });
+        }
     }
 
     connectedCallback() {
@@ -818,6 +1048,36 @@ export default class ContentRecordPage extends LightningElement {
         const v = event.target && event.target.value;
         if (v) {
             this.scopedPanelTab = v;
+        }
+    }
+
+    /**
+     * Native SLDS scoped tabs (right panel): click tab link
+     * @param {Event} event
+     */
+    handleScopedTabClick(event) {
+        event.preventDefault();
+        const el = event.currentTarget;
+        const v = el && el.dataset && el.dataset.tab;
+        if (v === 'annotations' || v === 'contentWorkItems') {
+            this.scopedPanelTab = v;
+        }
+    }
+
+    /**
+     * Left / right arrow between scoped tabs
+     * @param {KeyboardEvent} event
+     */
+    handleScopedTabKeydown(event) {
+        const k = event.key;
+        if (k !== 'ArrowLeft' && k !== 'ArrowRight') {
+            return;
+        }
+        event.preventDefault();
+        if (k === 'ArrowLeft' && this.scopedPanelTab === 'contentWorkItems') {
+            this.scopedPanelTab = 'annotations';
+        } else if (k === 'ArrowRight' && this.scopedPanelTab === 'annotations') {
+            this.scopedPanelTab = 'contentWorkItems';
         }
     }
 
@@ -1567,6 +1827,71 @@ export default class ContentRecordPage extends LightningElement {
         }
     }
 
+    /**
+     * Scroll HTML iframe or EmbedPDF to the annotation matching the right-panel card.
+     * @param {string} annId
+     */
+    _alignPreviewToAnnotation(annId) {
+        if (!annId) {
+            return;
+        }
+        if (this.hasHtmlPreview) {
+            this._scrollHtmlAnnotationIntoView(annId);
+        } else if (this.usePdfEmbedHost) {
+            this._scrollEmbedPdfToAnnotation(annId);
+        }
+    }
+
+    /**
+     * Center the embed viewer on the PDF region and select the annotation (card id must be mapped).
+     * @param {string} annId
+     */
+    _scrollEmbedPdfToAnnotation(annId) {
+        if (!this.usePdfEmbedHost || !annId) {
+            return;
+        }
+        const t = this._cardIdToPdfTarget && this._cardIdToPdfTarget[annId];
+        if (!t || t.annotationId == null || t.pageIndex == null) {
+            return;
+        }
+        const reg = this._embedPdfRegistry;
+        const cap = this._embedPdfAnnotationCapability;
+        if (!reg || !cap) {
+            return;
+        }
+        this._ignoreNextPdfStateForPanel = true;
+        const scrollP = reg.getPlugin('scroll');
+        const docP = reg.getPlugin('document-manager');
+        const documentId = docP && typeof docP.provides === 'function' ? docP.provides().getActiveDocumentId() : null;
+        const sc = scrollP && typeof scrollP.provides === 'function' ? scrollP.provides() : null;
+        const { pageIndex, annotationId, rect } = t;
+        if (sc && documentId && sc.forDocument) {
+            const cx = rect && typeof rect.left === 'number' ? rect.left + (rect.width || 0) / 2 : 200;
+            const cy = rect && typeof rect.top === 'number' ? rect.top + (rect.height || 0) / 2 : 200;
+            sc.forDocument(documentId).scrollToPage({
+                pageNumber: pageIndex + 1,
+                pageCoordinates: { x: cx, y: cy },
+                behavior: 'smooth',
+                alignX: 50,
+                alignY: 50
+            });
+        }
+        try {
+            cap.selectAnnotation(pageIndex, annotationId);
+        } catch (e) {
+            /* ignore */
+        }
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this._ignoreNextPdfStateForPanel = false;
+                });
+            });
+        } else {
+            this._ignoreNextPdfStateForPanel = false;
+        }
+    }
+
     get annotationItems() {
         return this._annotationBaseRows.map((item, index) => {
             const expanded = this.expandedAnnotationIds.has(item.id);
@@ -1679,6 +2004,32 @@ export default class ContentRecordPage extends LightningElement {
         return this.contentWorkItems.length;
     }
 
+    get isScopedAnnotations() {
+        return this.scopedPanelTab === 'annotations';
+    }
+
+    get isScopedWorkItems() {
+        return this.scopedPanelTab === 'contentWorkItems';
+    }
+
+    get annotationScopedTabItemClass() {
+        const base = 'slds-tabs_scoped__item';
+        return this.scopedPanelTab === 'annotations' ? `${base} slds-is-active` : base;
+    }
+
+    get workItemsScopedTabItemClass() {
+        const base = 'slds-tabs_scoped__item';
+        return this.scopedPanelTab === 'contentWorkItems' ? `${base} slds-is-active` : base;
+    }
+
+    get annotationScopedTabTabindex() {
+        return this.scopedPanelTab === 'annotations' ? 0 : -1;
+    }
+
+    get workItemsScopedTabTabindex() {
+        return this.scopedPanelTab === 'contentWorkItems' ? 0 : -1;
+    }
+
     get hasNoAnnotations() {
         return this.annotationItems.length === 0;
     }
@@ -1760,7 +2111,7 @@ export default class ContentRecordPage extends LightningElement {
             next.add(id);
             this.expandedAnnotationIds = next;
             this.selectedAnnotationId = id;
-            this._scrollHtmlAnnotationIntoView(id);
+            this._alignPreviewToAnnotation(id);
         }
     }
 
@@ -1805,7 +2156,7 @@ export default class ContentRecordPage extends LightningElement {
         const next = new Set(this.expandedAnnotationIds);
         next.add(id);
         this.expandedAnnotationIds = next;
-        this._scrollHtmlAnnotationIntoView(id);
+        this._alignPreviewToAnnotation(id);
     }
 
     /**
@@ -1832,7 +2183,7 @@ export default class ContentRecordPage extends LightningElement {
             this.expandedCommentsIds = n;
         }
         if (id) {
-            this._scrollHtmlAnnotationIntoView(id);
+            this._alignPreviewToAnnotation(id);
         }
     }
 

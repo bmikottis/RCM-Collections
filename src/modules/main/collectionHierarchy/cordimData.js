@@ -109,7 +109,12 @@ export function getCordimCollection() {
                 status: 'In Review',
                 effectiveDates: '01/01/2025 - 12/31/2026',
                 previewUrl: `${CORDIM_ASSET_BASE}/cordim-master.html`,
-                thumbnailUrl: `${CORDIM_ASSET_BASE}/01_Patients with arterial hypertension/01_thumbnail.jpg`
+                thumbnailUrl: `${CORDIM_ASSET_BASE}/01_Patients with arterial hypertension/01_thumbnail.jpg`,
+                /**
+                 * When true, collection list shows a preview (not file) icon and opens full-screen
+                 * deck preview instead of a content record tab. See collectionDetail.
+                 */
+                useDeckPreviewOverlay: true
             }
         ],
         completedTasks: [],

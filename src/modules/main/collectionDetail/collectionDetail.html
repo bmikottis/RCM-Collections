@@ -5,12 +5,13 @@
         <!-- Record Page Header -->
         <div class="record-header">
             <div class="record-header-top">
-                <div class="record-header-icon">
-                    <lightning-icon 
-                        icon-name="standard:folder" 
-                        size="medium"
-                        alternative-text="Collection">
-                    </lightning-icon>
+                <div class="record-header-icon rcm-folder-entity-icon">
+                    <lightning-icon
+                        icon-name="utility:open_folder"
+                        size="small"
+                        variant="inverse"
+                        alternative-text="Collection"
+                    ></lightning-icon>
                 </div>
                 <div class="record-header-info">
                     <div class="record-name-row">
@@ -68,45 +69,37 @@
             </div>
         </div>
         
-        <!-- Completeness Indicator (for template-based collections) -->
         <template lwc:if={isFromTemplate}>
-            <!-- Workflow path (Draft → Review → Approve → Archive) above Collection Readiness -->
-            <div class="workflow-path-section">
-                <div class="workflow-path" role="list" aria-label="Collection workflow">
-                    <div class={workflowStepDraftClass} role="listitem">
-                        <template lwc:if={isDraftStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Draft</span>
-                        </template>
+            <div class="content-record-path-actions collection-workflow-path">
+                <div class="content-record-path-figma">
+                    <div class="content-record-path-rail" role="group" aria-label="Collection workflow stages">
+                        <div class="content-record-path-stages" role="presentation">
+                            <template for:each={pathStepItems} for:item="st">
+                                <div key={st.key} class="content-path-seg-wrap" data-step={st.key} style={st.wrapStyle}>
+                                    <div class={st.segClass} role="presentation">
+                                        <div class="content-path-seg__stage">
+                                            <span class="content-path-seg-label" aria-current={st.ariaCurrent}>
+                                                {st.label}
+                                            </span>
+                                        </div>
+                                        <template lwc:if={st.showRightCap}>
+                                            <div
+                                                class="content-path-seg__end content-path-seg__end_right"
+                                                aria-hidden="true"
+                                            ></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <div class={workflowStepReviewClass} role="listitem">
-                        <template lwc:if={isReviewStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Review</span>
-                        </template>
-                    </div>
-                    <div class={workflowStepApproveClass} role="listitem">
-                        <template lwc:if={isApproveStepCompleted}>
-                            <lightning-icon icon-name="utility:check" size="x-small" alternative-text="Complete" class="workflow-step-check"></lightning-icon>
-                        </template>
-                        <template lwc:else>
-                            <span class="workflow-step-label">Approve</span>
-                        </template>
-                    </div>
-                    <div class={workflowStepArchiveClass} role="listitem">
-                        <span class="workflow-step-label">Archive</span>
-                    </div>
-                </div>
-                <div class="workflow-path-actions">
-                    <lightning-button-menu label={workflowActionLabel} variant="neutral" alternative-text={workflowActionLabel} icon-name="utility:down" icon-position="right" menu-alignment="right">
-                        <template lwc:for-each={workflowActionMenuItems} lwc:for-item="item" lwc:key={item.value}>
-                            <lightning-menu-item value={item.value} label={item.label}></lightning-menu-item>
-                        </template>
-                    </lightning-button-menu>
+                    <lightning-button
+                        label={workflowActionLabel}
+                        variant="neutral"
+                        class="content-record-btn-send-review collection-workflow-primary-btn"
+                        title={workflowActionLabel}
+                        onclick={handleWorkflowPrimaryAction}
+                    ></lightning-button>
                 </div>
             </div>
 
@@ -488,7 +481,18 @@
                                                         <div
                                                             class="content-item-thumb"
                                                             aria-hidden="true">
-                                                            <template lwc:if={content.hasPreview}>
+                                                            <template lwc:if={content.usePreviewThumbIcon}>
+                                                                <div class="content-item-thumb__placeholder content-item-thumb__placeholder_preview">
+                                                                    <lightning-icon
+                                                                        class="content-item-thumb__icon"
+                                                                        icon-name="utility:preview"
+                                                                        size="x-small"
+                                                                        alternative-text="Open preview"
+                                                                    >
+                                                                    </lightning-icon>
+                                                                </div>
+                                                            </template>
+                                                            <template lwc:elseif={content.hasPreview}>
                                                                 <img
                                                                     class="content-item-thumb__img"
                                                                     src={content.previewSrc}
@@ -521,6 +525,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="content-actions">
+                                                        <template lwc:if={content.showRowPreviewAction}>
                                                         <lightning-button-icon 
                                                             icon-name="utility:preview" 
                                                             alternative-text="Preview"
@@ -529,6 +534,7 @@
                                                             data-id={content.id}
                                                             onclick={handlePreviewContent}>
                                                         </lightning-button-icon>
+                                                        </template>
                                                         <div class="content-menu-wrapper">
                                                             <lightning-button-icon 
                                                                 icon-name="utility:threedots" 
@@ -711,7 +717,18 @@
                                                         <div
                                                             class="content-item-thumb"
                                                             aria-hidden="true">
-                                                            <template lwc:if={content.hasPreview}>
+                                                            <template lwc:if={content.usePreviewThumbIcon}>
+                                                                <div class="content-item-thumb__placeholder content-item-thumb__placeholder_preview">
+                                                                    <lightning-icon
+                                                                        class="content-item-thumb__icon"
+                                                                        icon-name="utility:preview"
+                                                                        size="x-small"
+                                                                        alternative-text="Open preview"
+                                                                    >
+                                                                    </lightning-icon>
+                                                                </div>
+                                                            </template>
+                                                            <template lwc:elseif={content.hasPreview}>
                                                                 <img
                                                                     class="content-item-thumb__img"
                                                                     src={content.previewSrc}
@@ -744,6 +761,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="content-actions">
+                                                        <template lwc:if={content.showRowPreviewAction}>
                                                         <lightning-button-icon 
                                                             icon-name="utility:preview" 
                                                             alternative-text="Preview"
@@ -752,6 +770,7 @@
                                                             data-id={content.id}
                                                             onclick={handlePreviewContent}>
                                                         </lightning-button-icon>
+                                                        </template>
                                                         <div class="content-menu-wrapper">
                                                             <lightning-button-icon 
                                                                 icon-name="utility:threedots" 
@@ -961,8 +980,48 @@
         </div>
     </template>
 
-    <!-- Preview Modal -->
+    <!-- Preview Modal: Cordim deck = full-viewport dim + centered iframe; other = placeholder + Go to record -->
     <template lwc:if={showPreviewModal}>
+        <template lwc:if={isCordimDeckPreview}>
+            <div
+                class="preview-deck-root"
+                role="dialog"
+                aria-modal="true"
+                aria-label={previewContentLabel}
+            >
+                <div
+                    class="preview-deck-dismiss-area"
+                    role="button"
+                    tabindex="0"
+                    title="Close preview"
+                    onclick={handleClosePreview}
+                    onkeydown={handleDeckDimKeydown}
+                ></div>
+                <div class="preview-modal preview-modal--deck">
+                    <div class="preview-modal-deck-header">
+                        <span class="preview-deck-title slds-truncate" title={previewContentLabel}>
+                            {previewContentLabel}
+                        </span>
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close preview"
+                            size="medium"
+                            variant="bare"
+                            class="preview-modal-deck-close"
+                            onclick={handleClosePreview}
+                        >
+                        </lightning-button-icon>
+                    </div>
+                    <iframe
+                        class="preview-modal-deck-frame"
+                        src={deckPreviewFrameSrc}
+                        title={previewContentLabel}
+                        sandbox="allow-scripts allow-same-origin allow-popups"
+                    ></iframe>
+                </div>
+            </div>
+        </template>
+        <template lwc:else>
         <div class="preview-modal-backdrop" onclick={handleModalClick}>
             <div class="preview-modal">
                 <div class="preview-modal-header">
@@ -1027,6 +1086,7 @@
                 </div>
             </div>
         </div>
+        </template>
     </template>
     </div>
 </template>

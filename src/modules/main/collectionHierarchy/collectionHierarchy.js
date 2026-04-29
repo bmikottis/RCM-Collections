@@ -17,6 +17,24 @@ const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
 const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
 const RCM_VIEW_COLLECTION = 'rcm-view-collection';
 
+/** Figma SLDS empty (node 147106:5409) — noresults / medium; see src/assets/collection-hierarchy/noresults-unknown.svg */
+const EMPTY_STATE_NO_COLLECTION_ILLUSTRATION = '/public/assets/collection-hierarchy/noresults-unknown.svg';
+
+/**
+ * Global header nav — exported Salesforce UI SVGs (lwr `localAssets` → `/public/assets/global-nav/`).
+ * @type {Readonly<Record<'einstein'|'favorites'|'newCreate'|'trailhead'|'help'|'setup'|'notifications'|'profile', string>>}
+ */
+const GLOBAL_HEADER_NAV_SVG = Object.freeze({
+    einstein: '/public/assets/global-nav/global-nav-einstein.svg',
+    favorites: '/public/assets/global-nav/global-nav-favorites.svg',
+    newCreate: '/public/assets/global-nav/global-nav-new.svg',
+    trailhead: '/public/assets/global-nav/global-nav-trailhead.svg',
+    help: '/public/assets/global-nav/global-nav-question.svg',
+    setup: '/public/assets/global-nav/global-nav-setup.svg',
+    notifications: '/public/assets/global-nav/global-nav-notification.svg',
+    profile: '/public/assets/global-nav/global-nav-avatar.svg'
+});
+
 /** Current mounted hierarchy — global listeners delegate here so HMR/old instances never handle nav. */
 let rcmHierarchyTarget = null;
 
@@ -87,6 +105,11 @@ export default class CollectionHierarchy extends LightningElement {
     @track selectedCollectionId = null;
     /** When a content-record tab is active, the tree highlights this content id; otherwise the tree uses selectedCollectionId. */
     @track selectedContentId = null;
+    /**
+     * When the Cordim deck overlay is open from the tree (no content-record tab), which content file to highlight in the tree.
+     * @type {string|null}
+     */
+    @track deckTreeHighlightId = null;
     @track selectedCollectionIds = [];
     @track collectionsData = sampleCollections;
     @track expandedIds = new Set();
@@ -135,6 +158,9 @@ export default class CollectionHierarchy extends LightningElement {
     /** @type {((e: MessageEvent) => void) | null} */
     _boundCordimWindowMessage = null;
 
+    /** @type {(() => void) | null} */
+    _boundDeckPreviewClosed = null;
+
     connectedCallback() {
         this._boundOpenContentRecordHost = (e) => {
             this.handleOpenContentRecord(e);
@@ -155,6 +181,12 @@ export default class CollectionHierarchy extends LightningElement {
         };
         if (typeof window !== 'undefined') {
             window.addEventListener('message', this._boundCordimWindowMessage);
+        }
+        this._boundDeckPreviewClosed = () => {
+            this.deckTreeHighlightId = null;
+        };
+        if (typeof document !== 'undefined') {
+            document.addEventListener('rcm-deck-preview-closed', this._boundDeckPreviewClosed, false);
         }
     }
 
@@ -181,6 +213,10 @@ export default class CollectionHierarchy extends LightningElement {
             window.removeEventListener('message', this._boundCordimWindowMessage);
             this._boundCordimWindowMessage = null;
         }
+        if (this._boundDeckPreviewClosed && typeof document !== 'undefined') {
+            document.removeEventListener('rcm-deck-preview-closed', this._boundDeckPreviewClosed, false);
+            this._boundDeckPreviewClosed = null;
+        }
     }
 
     /**
@@ -205,6 +241,19 @@ export default class CollectionHierarchy extends LightningElement {
      */
     get showTreeContent() {
         return !this.showFilter;
+    }
+
+    /**
+     * Illustration for the "no collection selected" empty state (Figma 147106:5409).
+     * @returns {string}
+     */
+    get emptyStateNoCollectionIllustrationSrc() {
+        return EMPTY_STATE_NO_COLLECTION_ILLUSTRATION;
+    }
+
+    /** @returns {Readonly<typeof GLOBAL_HEADER_NAV_SVG>} */
+    get globalHeaderNav() {
+        return GLOBAL_HEADER_NAV_SVG;
     }
 
     get treeRailWrapperClass() {
@@ -484,7 +533,7 @@ export default class CollectionHierarchy extends LightningElement {
      * @returns {string|null|undefined}
      */
     get treeSelectedId() {
-        return this.selectedContentId || this.selectedCollectionId;
+        return this.deckTreeHighlightId || this.selectedContentId || this.selectedCollectionId;
     }
 
     /**
@@ -1420,6 +1469,34 @@ export default class CollectionHierarchy extends LightningElement {
     handleOpenContentRecord(event) {
         const { content, parentCollectionId, parentCollectionName } = event.detail || {};
         if (!content?.id) return;
+
+        if (content.useDeckPreviewOverlay === true) {
+            if (parentCollectionId) {
+                this.expandPathToCollection(parentCollectionId);
+                this.selectedCollectionId = parentCollectionId;
+            }
+            this.deckTreeHighlightId = content.id;
+            if (typeof document !== 'undefined') {
+                const deckOpenDetail = {
+                    content: { ...content },
+                    parentCollectionId: parentCollectionId || null,
+                    parentCollectionName: parentCollectionName || ''
+                };
+                // The deck listener lives on main-collection-detail, which mounts only after a
+                // collection is selected. Dispatch on the next task so LWC can create that child first.
+                setTimeout(() => {
+                    document.dispatchEvent(
+                        new CustomEvent('rcm-open-deck-preview', {
+                            bubbles: true,
+                            composed: true,
+                            detail: deckOpenDetail
+                        })
+                    );
+                }, 0);
+            }
+            return;
+        }
+        this.deckTreeHighlightId = null;
 
         if (parentCollectionId) {
             this.expandPathToCollection(parentCollectionId);

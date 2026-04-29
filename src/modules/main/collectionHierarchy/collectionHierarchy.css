@@ -21,23 +21,26 @@
 /* ========================================
    Global Header Bar
    ======================================== */
-/* Figma: org global header (RCM CORS; Makana mark + wordmark) */
+/* Figma: RCM CORS 10-62326; SLDS slds-global-header + item_search + global-actions */
 .global-header {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
-    min-height: 3rem;
-    height: 3rem;
-    padding: 0 1.5rem;
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-    border-bottom: 1px solid #e5e5e5;
+    gap: var(--slds-g-spacing-4, 0.75rem);
+    min-height: 3.125rem;
+    height: 3.125rem;
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 0.75rem);
+    background-color: var(--slds-g-color-surface-container-1, #ffffff);
+    border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+    box-shadow: var(--slds-g-shadow-1, 0 1px 2px -1px rgba(24, 24, 24, 0.12));
     box-sizing: border-box;
 }
 
 .global-header-left {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--slds-g-spacing-3, 0.5rem);
     min-width: 0;
 }
 
@@ -48,82 +51,198 @@
     line-height: 0;
 }
 
+/* slds-global-header__logo: 12.5rem × 2.5rem */
 .app-brand__img {
     display: block;
-    height: 2rem;
+    height: 2.5rem;
     width: auto;
-    max-width: 13rem;
+    max-width: 12.5rem;
     object-fit: contain;
     object-position: left center;
 }
 
+/* Center column grows; search is centered in the space between logo and actions */
 .global-header-center {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
-    max-width: 32rem;
-    margin: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
 }
 
-.global-search {
+/* Match SLDS search item max width; min width on large viewports */
+.global-header-center .global-search {
+    width: 100%;
+    max-width: 33.5rem;
+    min-width: 0;
+}
+
+@media (min-width: 64rem) {
+    .global-header-center .global-search {
+        min-width: 27.5rem;
+    }
+}
+
+/* Figma: RCM CORS 10-62419 — pill search (global header, left rail, list-view picker) */
+.global-search,
+.rcm-pill-search {
     position: relative;
     display: flex;
     align-items: center;
-}
-
-.global-search-icon {
-    position: absolute;
-    left: 0.75rem;
-    --slds-c-icon-color-foreground-default: #5a6a7a;
-}
-
-.global-search-input {
     width: 100%;
-    min-height: 2rem;
+    min-width: 0;
+}
+
+/* Shared pill search — RCM CORS; icon offset matches slds-plus global search */
+
+.rcm-pill-search__icon {
+    position: absolute;
+    z-index: 1;
+    left: calc(var(--slds-g-spacing-4, 0.75rem) + var(--slds-g-spacing-1, 0.25rem));
+    top: 50%;
+    transform: translateY(-50%);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #3e3e3c);
+    pointer-events: none;
+}
+
+.rcm-pill-search__input {
+    width: 100%;
     box-sizing: border-box;
-    padding: 0.375rem 0.75rem 0.375rem 2.25rem;
-    font-size: 0.875rem;
-    line-height: 1.25;
-    color: var(--slds-g-color-on-surface-3, #3e3e3c);
-    border: 1px solid #e5e5e5;
-    border-radius: 0.25rem;
-    background-color: #ffffff;
+    min-height: 2rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0 var(--slds-g-spacing-3, 0.75rem) 0
+        calc(var(--slds-g-spacing-5, 1rem) * 2);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.2;
+    color: var(--slds-g-color-on-surface-1, #181818);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-4, 15rem);
+    background-color: var(--slds-g-color-surface-container-1, #f3f3f3);
     outline: none;
+    appearance: textfield;
+    -webkit-appearance: textfield;
+    transition:
+        background-color 0.12s ease,
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
 }
 
-.global-search-input::placeholder {
-    color: #706e6b;
+.rcm-pill-search__input:hover {
+    background-color: var(--slds-g-color-surface-2, #e5e5e5);
+    border-color: var(--slds-g-color-border-1, #c9c9c9);
 }
 
-.global-search-input:focus {
-    background-color: #ffffff;
+.rcm-pill-search__input::placeholder {
+    color: var(--slds-g-color-on-surface-2, #706e6b);
+}
+
+.rcm-pill-search__input:focus {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
     border-color: var(--slds-g-color-border-accent-1, #1b96ff);
     box-shadow: 0 0 0 1px var(--slds-g-color-border-accent-1, #1b96ff);
 }
 
-.global-header-right {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    gap: 0.5rem;
+.rcm-pill-search__input:focus-visible {
+    box-shadow:
+        0 0 0 1px var(--slds-g-color-border-accent-1, #1b96ff),
+        0 0 0 3px rgba(27, 150, 255, 0.3);
 }
 
-.global-header-right lightning-button-icon {
-    --slds-c-button-icon-color-foreground: #5a6a7a;
+/* On grey rail: white field for contrast (same control, alternate surface) */
+.rcm-pill-search--on-muted .rcm-pill-search__input {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border-color: var(--slds-g-color-border-1, #c9c9c9);
+}
+
+.rcm-pill-search--on-muted .rcm-pill-search__input:hover {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border-color: var(--slds-g-color-border-1, #aeaeae);
+}
+
+.global-header-right {
+    display: flex;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.global-header-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    margin: 0;
+    padding: var(--slds-g-spacing-1, 0.25rem);
+    line-height: 0;
+    background: none;
+    border: none;
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    cursor: pointer;
+    color: inherit;
+}
+
+.global-header-icon-btn:hover {
+    background-color: var(--slds-g-color-surface-container-1, #f3f3f3);
+}
+
+.global-header-icon-btn:focus {
+    outline: none;
+}
+
+.global-header-icon-btn:focus-visible {
+    box-shadow: 0 0 0 2px var(--slds-g-color-border-accent-1, #1b96ff) inset, 0 0 0 1px #ffffff;
+}
+
+/* slds-global-actions: icons use --slds-g-sizing-6 (1.25rem) */
+.global-header-icon-img {
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
+    width: var(--slds-g-sizing-6, 1.25rem);
+    height: var(--slds-g-sizing-6, 1.25rem);
+    max-width: var(--slds-g-sizing-6, 1.25rem);
+    max-height: var(--slds-g-sizing-6, 1.25rem);
+}
+
+.global-header-icon-img_einstein {
+    width: var(--slds-g-sizing-6, 1.25rem);
+    height: var(--slds-g-sizing-6, 1.25rem);
+    max-width: var(--slds-g-sizing-6, 1.25rem);
+    max-height: var(--slds-g-sizing-6, 1.25rem);
+}
+
+/* Favorites / star: slightly smaller glyph */
+.global-header-icon-img_favorites {
+    width: 0.75rem;
+    height: 0.75rem;
+    max-width: 0.75rem;
+    max-height: 0.75rem;
 }
 
 .user-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    margin-left: 0.5rem;
+    min-width: 2rem;
+    min-height: 2rem;
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0;
+    padding: 0;
+    background-color: var(--slds-g-color-surface-container-1, #f3f3f3);
+    border: none;
     border-radius: 50%;
-    background-color: #f3f3f3;
+    overflow: hidden;
 }
 
-.user-avatar lightning-icon {
-    --slds-c-icon-color-foreground-default: #706e6b;
+.user-avatar-img {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 /* ========================================
@@ -294,8 +413,26 @@
     flex-shrink: 0;
 }
 
-.nav-dropdown-item-icon lightning-icon {
+.nav-dropdown-folder-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    min-height: 1.25rem;
+    box-sizing: border-box;
+    border-radius: var(--slds-g-radius-border-circle, 50%);
+    background-color: var(--slds-g-color-palette-indigo-50, #5867e8);
+}
+
+.nav-dropdown-item-icon:not(.nav-dropdown-folder-tile) lightning-icon {
     --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #3e3e3c);
+}
+
+.nav-dropdown-folder-tile lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-inverse-1, #ffffff);
 }
 
 .nav-dropdown-item-label {
@@ -730,7 +867,7 @@
 
 .rail-header-wrap {
     flex-shrink: 0;
-    background-color: var(--slds-g-color-surface-3, #f3f3f3);
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 
 /* Wrapper for first row only – list view dropdown positions below this */
@@ -741,7 +878,7 @@
 .rail-header {
     padding: 0 1rem 0.75rem;
     border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
-    background-color: var(--slds-g-color-surface-3, #f3f3f3);
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
     flex-shrink: 0;
 }
 
@@ -750,8 +887,10 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 0.5rem;
-    padding: 0.75rem 1rem 0 1rem;
-    background-color: var(--slds-g-color-surface-3, #f3f3f3);
+    padding: 1rem 1rem 0 1rem;
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    /* List title: Figma/SLDS uses 1.125rem; global --slds-g-font-scale-4 in slds-plus is 1.5rem */
+    --slds-g-font-scale-4: 1.125rem;
 }
 
 .rail-header-left {
@@ -761,9 +900,23 @@
     min-width: 0;
 }
 
-.rail-header-icon {
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #3e3e3c);
+.rcm-folder-entity-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    min-height: 2rem;
+    box-sizing: border-box;
+    border-radius: var(--slds-g-radius-border-circle, 50%);
+    background-color: var(--slds-g-color-palette-indigo-50, #5867e8);
     flex-shrink: 0;
+}
+
+.rcm-folder-entity-icon lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-inverse-1, #ffffff);
 }
 
 .rail-list-view-trigger {
@@ -774,10 +927,10 @@
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--slds-g-font-scale-4, 1.125rem);
     font-weight: 600;
     color: var(--slds-g-color-neutral-base-10, #181818);
-    line-height: 1.375rem;
+    line-height: 1.25;
     text-align: left;
     min-width: 0;
 }
@@ -899,34 +1052,14 @@
     --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-30, #3e3e3c);
 }
 
-/* Rail search row (inside grey header, "Search this list...") */
+/* Search row: no extra horizontal padding — .rail-header already uses 0 1rem; matches metadata row edges */
 .rail-search-row {
-    display: flex;
-    align-items: center;
     position: relative;
-    padding: 12px 0 0 0;
-    background-color: var(--slds-g-color-surface-3, #f3f3f3);
-}
-
-.rail-search-icon {
-    position: absolute;
-    left: 1rem;
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-50, #706e6b);
-    pointer-events: none;
-}
-
-.rail-search-input {
+    box-sizing: border-box;
     width: 100%;
-    padding: 0.375rem 0.5rem 0.375rem 2.25rem;
-    font-size: 0.8125rem;
-    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-    color: var(--slds-g-color-neutral-base-10, #181818);
-}
-
-.rail-search-input::placeholder {
-    color: var(--slds-g-color-neutral-base-50, #706e6b);
+    margin: 0;
+    padding: 0.5rem 0 0.25rem;
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 
 /* Rail dropdown backdrop */
@@ -956,25 +1089,9 @@
 
 .rail-list-views-search-wrap {
     position: relative;
-    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
-}
-
-.rail-list-views-search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    --slds-c-icon-color-foreground-default: #706e6b;
-}
-
-.rail-list-views-search {
-    width: 100%;
-    padding: 0.375rem 0.5rem 0.375rem 1.75rem;
-    font-size: 0.8125rem;
-    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-    border-radius: 0.25rem;
-    background: var(--slds-g-color-surface-1, #ffffff);
 }
 
 .rail-list-views-heading {
@@ -1308,19 +1425,53 @@
     font-weight: 600;
 }
 
-/* Empty State */
+/* Empty State — Figma SLDS 147106:5409 (noresults medium) */
 .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     flex: 1;
-    padding: 3rem;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.5rem) var(--slds-g-spacing-6, 2rem);
     text-align: center;
 }
 
-.empty-state-icon {
-    --slds-c-icon-color-foreground-default: #c9c9c9;
+.empty-state-illustration-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 19rem;
+}
+
+.empty-state-illustration {
+    display: block;
+    width: 100%;
+    max-width: 19rem;
+    height: auto;
+    object-fit: contain;
+}
+
+.empty-state-title {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--slds-g-color-on-surface-1, #181818);
+    font-size: var(--slds-g-font-scale-5, 1.25rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: var(--slds-g-line-height-4, 1.25);
+    letter-spacing: var(--slds-g-letter-spacing-0, 0);
+}
+
+.empty-state-body {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--slds-g-color-on-surface-2, #3e3e3c);
+    font-size: var(--slds-g-font-scale-3, 0.875rem);
+    line-height: var(--slds-g-line-height-3, 1.5);
+    letter-spacing: var(--slds-g-letter-spacing-0, 0);
 }
 
 /* ========================================

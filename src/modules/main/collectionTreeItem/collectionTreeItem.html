@@ -29,17 +29,34 @@
             </template>
             
             <!-- Collection/Content Icon -->
-            <div class="icon-container">
+            <div
+                class="icon-container"
+                title={templateSourceTitle}
+            >
+                <lightning-icon
+                    icon-name={itemIcon}
+                    size="x-small"
+                    class="folder-icon"
+                    alternative-text={item.name}
+                ></lightning-icon>
                 <template lwc:if={isFromTemplate}>
-                    <img src="/public/assets/folder-shield.svg" alt="Template Collection" class="folder-shield-icon" />
-                </template>
-                <template lwc:else>
-                    <lightning-icon 
-                        icon-name={itemIcon} 
-                        size="x-small"
-                        class="folder-icon"
-                        alternative-text={item.name}>
-                    </lightning-icon>
+                    <div class="template-source-badge" aria-hidden="true">
+                        <svg
+                            class="template-source-badge__svg"
+                            width="10"
+                            height="10"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                            focusable="false"
+                        >
+                            <path
+                                class="template-source-badge__path"
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M2.95373 8.61543H29.046C29.6614 8.61543 30.1537 8.00004 29.9691 7.38465C29.3537 5.35388 28.4922 3.50771 27.323 1.84617C26.9537 1.35386 26.2768 1.29232 25.9076 1.72309C24.7384 2.83079 23.0768 3.44618 21.3537 3.44618C19.5076 3.44618 17.846 2.70771 16.6153 1.47694C16.246 1.1077 15.6307 1.1077 15.2614 1.47694C14.0307 2.70771 12.3691 3.44618 10.523 3.44618C8.79989 3.44618 7.19989 2.83079 5.96912 1.72309C5.53835 1.35386 4.86143 1.4154 4.55373 1.84617C3.3845 3.44617 2.46143 5.35388 1.90758 7.38465C1.84604 8.00004 2.33835 8.61543 2.95373 8.61543V8.61543V8.61543ZM30.7692 12.5539C30.7692 12 30.3384 11.6923 29.7846 11.6923H2.21533C1.66148 11.6923 1.23071 12 1.23071 12.5539V12.7385C1.23071 21.9693 7.63071 29.6001 15.9999 30.7693C24.3692 29.6001 30.7692 21.9693 30.7692 12.8V12.5539V12.5539Z"
+                            ></path>
+                        </svg>
+                    </div>
                 </template>
             </div>
             

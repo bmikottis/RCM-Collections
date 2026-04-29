@@ -1,6 +1,8 @@
 /* Collection Detail Component Styling */
 
 .collection-detail-wrapper {
+    position: relative;
+    isolation: isolate;
     height: 100%;
 }
 
@@ -40,8 +42,23 @@
     font-weight: 400;
 }
 
-.record-header-icon {
+.record-header-icon.rcm-folder-entity-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+    min-height: 2rem;
+    box-sizing: border-box;
+    border-radius: var(--slds-g-radius-border-circle, 50%);
+    background-color: var(--slds-g-color-palette-indigo-50, #5867e8);
     flex-shrink: 0;
+}
+
+.record-header-icon.rcm-folder-entity-icon lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-inverse-1, #ffffff);
 }
 
 .record-header-info {
@@ -488,83 +505,178 @@
 }
 
 /* ========================================
-   Workflow Path (below completeness)
+   Collection workflow path (Figma 457:75281 — same as content record; no Extract & Match)
    ======================================== */
-.workflow-path-section {
+.collection-workflow-path.content-record-path-actions {
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.collection-workflow-path .content-record-path-figma {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    background-color: var(--slds-g-color-surface-2, #fafaf9);
-    border-bottom: 1px solid #e5e5e5;
-}
-
-.workflow-path {
-    display: flex;
-    align-items: stretch;
-    flex: 1;
-    min-width: 0;
-    margin-right: 1rem;
-}
-
-.workflow-step {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    flex: 1;
-    min-width: 4.5rem;
-    padding: 0.375rem 0.75rem;
-    background-color: var(--slds-g-color-neutral-base-95, #e5e5e5);
-    color: var(--slds-g-color-neutral-base-50, #706e6b);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%, 8px 50%);
-    margin-left: -6px;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    width: 100%;
 }
 
-.workflow-step:first-child {
-    margin-left: 0;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+.collection-workflow-path .content-record-path-rail {
+    display: flex;
+    flex: 1 1 16rem;
+    min-width: 12rem;
+    min-height: 2rem;
+    border-radius: var(--slds-g-radius-border-4, 1.25rem);
+    overflow: hidden;
+    background-color: var(--slds-g-color-surface-container-3, #e5e5e5);
+    box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
+    box-sizing: border-box;
 }
 
-.workflow-step:last-child {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 50%);
+.collection-workflow-path .content-record-path-stages {
+    --path-stroke: var(--slds-g-color-surface-1, #ffffff);
+    display: flex;
+    flex: 1 1 auto;
+    align-items: stretch;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 2rem;
+    width: 100%;
+    gap: 0;
+    box-sizing: border-box;
 }
 
-/* Completed: light turquoise with white checkmark */
-.workflow-step-completed {
-    background-color: #84d2c5;
-    color: #ffffff;
+.collection-workflow-path .content-path-seg-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 2rem;
+    box-sizing: border-box;
+}
+
+.collection-workflow-path .content-path-seg-wrap:not(:first-child) {
+    margin-left: -0.9375rem;
+}
+
+.collection-workflow-path .content-path-seg {
+    --path-seg-bg: var(--slds-g-color-surface-container-3, #e5e5e5);
+    --path-seg-fg: var(--slds-g-color-on-surface-2, #2e2e2e);
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 2rem;
+    isolation: isolate;
+    filter: drop-shadow(0.4px 0 0 var(--path-stroke)) drop-shadow(-0.4px 0 0 var(--path-stroke))
+        drop-shadow(0 0.4px 0 var(--path-stroke)) drop-shadow(0 -0.4px 0 var(--path-stroke))
+        drop-shadow(0.3px 0.3px 0 var(--path-stroke)) drop-shadow(0.3px -0.3px 0 var(--path-stroke))
+        drop-shadow(-0.3px 0.3px 0 var(--path-stroke)) drop-shadow(-0.3px -0.3px 0 var(--path-stroke));
+}
+
+.collection-workflow-path .content-path-seg_is-active {
+    --path-seg-bg: var(--slds-g-color-surface-container-inverse-1, #032d60);
+    --path-seg-fg: var(--slds-g-color-on-surface-inverse-1, #ffffff);
+}
+
+.collection-workflow-path .content-path-seg__end_right {
+    flex: 0 0 auto;
     z-index: 1;
+    align-self: stretch;
+    width: 1.25rem;
+    min-width: 1.25rem;
+    height: 2rem;
+    min-height: 2rem;
+    margin-right: -0.125rem;
+    background-color: var(--path-seg-bg);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    box-sizing: border-box;
+    pointer-events: none;
 }
 
-.workflow-step-completed .workflow-step-check {
-    --slds-c-icon-color-foreground-default: #ffffff;
+.collection-workflow-path .content-path-seg__stage {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    justify-content: center;
+    min-width: 0;
+    min-height: 2rem;
+    box-sizing: border-box;
+    background-color: var(--path-seg-bg);
 }
 
-/* Active: dark blue with white text */
-.workflow-step-active {
-    background-color: #0f3563;
-    color: #ffffff;
-    z-index: 2;
+.collection-workflow-path .content-path-seg_first .content-path-seg__stage {
+    padding: 0 var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-4, 1rem);
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
-/* Default: light gray (base .workflow-step already has neutral-base-95) */
+.collection-workflow-path .content-path-seg_middle .content-path-seg__stage {
+    padding: 0 var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-1, 0.25rem);
+    border-radius: 0;
+}
 
-.workflow-step-label {
+.collection-workflow-path .content-path-seg_last .content-path-seg__stage {
+    flex: 1 1 4.625rem;
+    min-width: 4.625rem;
+    padding: 0 var(--slds-g-spacing-3, 0.75rem) 0 0.25rem;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.collection-workflow-path .content-path-seg-label {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+    font-size: var(--slds-g-font-scale-2, 0.8125rem);
+    line-height: 1.125rem;
+    color: var(--path-seg-fg, var(--slds-g-color-on-surface-2, #2e2e2e));
+    text-align: center;
+    text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    pointer-events: none;
+    box-sizing: border-box;
 }
 
-.workflow-path-actions {
+.collection-workflow-path .content-record-btn-send-review.collection-workflow-primary-btn {
+    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-container-1, #ffffff);
+    --slds-c-button-neutral-color-background-hover: var(--slds-g-color-surface-container-1, #ffffff);
+    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-button-neutral-color-border-hover: var(--slds-g-color-border-2, #5c5c5c);
+    --slds-c-button-text-color: var(--slds-g-color-accent-2, #0250d9);
+    --slds-c-button-text-color-hover: var(--slds-g-color-accent-2, #0250d9);
+    min-height: 2rem;
+    padding-left: var(--slds-g-spacing-4, 1rem);
+    padding-right: var(--slds-g-spacing-4, 1rem);
+    border-radius: 9999px;
+    font-weight: var(--slds-g-font-weight-6, 600);
+    font-size: var(--slds-g-font-scale-1, 0.875rem);
+    line-height: 1.1875rem;
     flex-shrink: 0;
+    --slds-c-button-line-height: 2rem;
 }
 
-.workflow-path-actions lightning-button-menu {
-    --slds-c-button-neutral-color-border: var(--slds-g-color-border-2, #c9c9c9);
-    --slds-c-button-neutral-color-background: var(--slds-g-color-surface-1, #ffffff);
-    --slds-c-button-neutral-text-color: var(--slds-g-color-accent-3, #1a4f89);
+@media (max-width: 1024px) {
+    .collection-workflow-path .content-record-path-figma {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .collection-workflow-path .content-record-path-rail {
+        flex-basis: auto;
+    }
 }
 
 .completeness-ring-container {
@@ -1231,6 +1343,118 @@
     justify-content: center;
     padding: 2rem;
     overflow: auto;
+}
+
+/* Cordim deck: full-viewport dim (scrim) + preview centered in the browser */
+.preview-deck-root {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--slds-g-spacing-4, 0.75rem) var(--slds-g-spacing-5, 1rem);
+    box-sizing: border-box;
+    pointer-events: auto;
+}
+
+.preview-deck-dismiss-area {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border: none;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.preview-deck-dismiss-area:hover,
+.preview-deck-dismiss-area:focus {
+    background-color: rgba(0, 0, 0, 0.48);
+    outline: none;
+}
+
+.preview-deck-dismiss-area:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--slds-g-color-border-brand-1, #0176d3);
+}
+
+.preview-modal--deck {
+    position: relative;
+    z-index: 1;
+    flex: 0 1 auto;
+    width: min(64rem, 100%);
+    max-width: 100%;
+    max-height: min(90vh, calc(100% - 2rem));
+    min-width: 18rem;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    box-shadow: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.2);
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    overflow: hidden;
+}
+
+@media (max-width: 48rem) {
+    .preview-deck-root {
+        padding: var(--slds-g-spacing-2, 0.5rem);
+    }
+
+    .preview-modal--deck {
+        width: 100%;
+        min-width: 0;
+        max-height: min(92vh, calc(100% - 1rem));
+    }
+}
+
+.preview-modal-deck-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: var(--slds-g-spacing-small, 0.75rem);
+    min-height: 2.5rem;
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    padding-left: var(--slds-g-spacing-4, 1rem);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.preview-deck-title {
+    font-size: var(--slds-g-font-scale-1, 0.875rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.25rem;
+    color: var(--slds-g-color-on-surface-1, #181818);
+    flex: 1;
+    min-width: 0;
+    text-align: start;
+}
+
+.preview-modal-deck-close {
+    color: var(--slds-g-color-on-surface-1, #181818);
+    flex-shrink: 0;
+}
+
+.preview-modal-deck-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    border: none;
+    display: block;
+    background-color: var(--slds-g-color-surface-1, #f3f3f3);
+}
+
+/* Deck hub row: preview utility icon in 40x32 slot (replaces doctype) */
+.content-item-thumb__placeholder_preview {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.content-item-thumb__placeholder_preview .content-item-thumb__icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #1b96ff);
 }
 
 .preview-document-placeholder {

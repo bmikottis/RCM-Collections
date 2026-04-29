@@ -73,22 +73,37 @@ function buildCollectionContentRowViewModel(item, openMenuId) {
     const doctypeIcon = getContentTypeIcon(t || 'unknown');
     const thumb = item.thumbnailUrl;
     const pre = item.previewUrl;
-    const previewSrc = isRasterImageUrl(thumb) ? thumb : isRasterImageUrl(pre) ? pre : '';
+    const useDeckPreviewOverlay = item.useDeckPreviewOverlay === true;
+    const previewSrc =
+        useDeckPreviewOverlay
+            ? ''
+            : isRasterImageUrl(thumb)
+              ? thumb
+              : isRasterImageUrl(pre)
+                ? pre
+                : '';
     const hasPreview = Boolean(previewSrc);
     const { label: statusLabel, badgeClass: statusBadgeClass } = getContentStatusBadgeUi(
         /** @type {string|undefined} */ (item.status)
     );
     const namePart = item.name || 'document';
+    const usePreviewThumbIcon = useDeckPreviewOverlay;
     return {
         ...item,
         doctypeIcon,
         icon: doctypeIcon,
         hasPreview,
         previewSrc,
+        usePreviewThumbIcon,
+        useDeckPreviewOverlay,
         statusLabel,
         statusBadgeClass,
         showMenu: openMenuId === item.id,
-        openRecordAriaLabel: `Open regulated content record for ${namePart}, ${statusLabel}`
+        openRecordAriaLabel: useDeckPreviewOverlay
+            ? `Open full-screen interactive preview of ${namePart}, ${statusLabel}`
+            : `Open regulated content record for ${namePart}, ${statusLabel}`,
+        /** When false, the extra row "Preview" icon is hidden (deck row uses the thumb to open). */
+        showRowPreviewAction: !useDeckPreviewOverlay
     };
 }
 
@@ -208,6 +223,44 @@ export default class CollectionDetail extends LightningElement {
     @track shareLinkAllowDownload = true;
     @track shareLinkTemplateId = 'standard';
     @track shareLinkCustomMessage = '';
+
+    /** @type {((e: Event) => void) | null} */
+    _boundRcmOpenDeckPreview = null;
+
+    connectedCallback() {
+        this._boundRcmOpenDeckPreview = (e) => this._handleRcmOpenDeckPreview(e);
+        if (typeof document !== 'undefined' && this._boundRcmOpenDeckPreview) {
+            document.addEventListener('rcm-open-deck-preview', this._boundRcmOpenDeckPreview, false);
+        }
+    }
+
+    disconnectedCallback() {
+        if (typeof document !== 'undefined' && this._boundRcmOpenDeckPreview) {
+            document.removeEventListener('rcm-open-deck-preview', this._boundRcmOpenDeckPreview, false);
+        }
+        this._boundRcmOpenDeckPreview = null;
+    }
+
+    /**
+     * @param {CustomEvent} e
+     */
+    _handleRcmOpenDeckPreview(e) {
+        if (!e?.detail?.content) {
+            return;
+        }
+        this._openDeckPreviewModal(/** @type {Record<string, unknown>} */ (e.detail.content));
+    }
+
+    /**
+     * Dismiss left scrim: keyboard
+     * @param {KeyboardEvent} event
+     */
+    handleDeckDimKeydown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.handleClosePreview();
+        }
+    }
 
     /**
      * Check if Content tab is active
@@ -515,85 +568,58 @@ export default class CollectionDetail extends LightningElement {
     }
 
     /**
-     * Index of current workflow stage (0=draft, 1=review, 2=approve, 3=archive)
-     * @returns {number}
+     * Figma 457:75281-style path (same as content record): chevron segments + z-stack; active = inverse-1.
+     * @returns {Array<{key: string, label: string, segClass: string, showRightCap: boolean, ariaCurrent: string|null, wrapStyle: string}>}
      */
-    get _workflowStageIndex() {
-        return WORKFLOW_STAGES.findIndex(s => s.key === this.currentWorkflowStage);
+    get pathStepItems() {
+        const order = [
+            { stage: 'draft', label: 'Draft' },
+            { stage: 'review', label: 'Review' },
+            { stage: 'approve', label: 'Approve' },
+            { stage: 'archive', label: 'Archive' }
+        ];
+        return order.map((s, i) => {
+            const isFirst = i === 0;
+            const isLast = i === order.length - 1;
+            const active = this.currentWorkflowStage === s.stage;
+            const mod = isFirst ? 'content-path-seg_first' : isLast ? 'content-path-seg_last' : 'content-path-seg_middle';
+            return {
+                key: s.stage,
+                label: s.label,
+                showRightCap: !isLast,
+                segClass: [ 'content-path-seg', mod, active ? 'content-path-seg_is-active' : '' ]
+                    .filter(Boolean)
+                    .join(' '),
+                ariaCurrent: active ? 'step' : null,
+                wrapStyle: `z-index: ${order.length - i};`
+            };
+        });
     }
-
-    /** Step class for Draft (completed | active | default) */
-    get workflowStepDraftClass() {
-        const i = this._workflowStageIndex;
-        const base = 'workflow-step';
-        if (i > 0) return `${base} workflow-step-completed`;
-        if (i === 0) return `${base} workflow-step-active`;
-        return base;
-    }
-
-    /** Step class for Review */
-    get workflowStepReviewClass() {
-        const i = this._workflowStageIndex;
-        const base = 'workflow-step';
-        if (i > 1) return `${base} workflow-step-completed`;
-        if (i === 1) return `${base} workflow-step-active`;
-        return base;
-    }
-
-    /** Step class for Approve */
-    get workflowStepApproveClass() {
-        const i = this._workflowStageIndex;
-        const base = 'workflow-step';
-        if (i > 2) return `${base} workflow-step-completed`;
-        if (i === 2) return `${base} workflow-step-active`;
-        return base;
-    }
-
-    /** Step class for Archive */
-    get workflowStepArchiveClass() {
-        const i = this._workflowStageIndex;
-        const base = 'workflow-step';
-        if (i === 3) return `${base} workflow-step-active`;
-        return base;
-    }
-
-    /** Show check icon for Draft (completed) */
-    get isDraftStepCompleted() { return this._workflowStageIndex > 0; }
-    /** Show check icon for Review (completed) */
-    get isReviewStepCompleted() { return this._workflowStageIndex > 1; }
-    /** Show check icon for Approve (completed) */
-    get isApproveStepCompleted() { return this._workflowStageIndex > 2; }
-    /** Archive never shows check (it's last or active) */
-    get isArchiveStepCompleted() { return false; }
 
     /**
-     * Label for the workflow action button (e.g. "Archive Collection" when stage is archive)
+     * Primary workflow CTA (e.g. send for review); parent may listen on main-collection-detail.
+     */
+    handleWorkflowPrimaryAction() {
+        this.dispatchEvent(
+            new CustomEvent('collectionworkflowaction', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    collectionId: this.collection?.id || null,
+                    stage: this.currentWorkflowStage,
+                    action: 'primary'
+                }
+            })
+        );
+    }
+
+    /**
+     * Label for the single workflow CTA (stages: send for review, submit for approval, etc.)
      * @returns {string}
      */
     get workflowActionLabel() {
         const stage = WORKFLOW_STAGES.find(s => s.key === this.currentWorkflowStage);
         return stage?.actionLabel || 'Send for review';
-    }
-
-    /**
-     * Menu items for the workflow action dropdown
-     * @returns {Array<{ value: string, label: string }>}
-     */
-    get workflowActionMenuItems() {
-        const stage = this.currentWorkflowStage;
-        if (stage === 'draft') {
-            return [{ value: 'review', label: 'Send for review' }, { value: 'approve', label: 'Submit for approval' }];
-        }
-        if (stage === 'review') {
-            return [{ value: 'approve', label: 'Submit for approval' }];
-        }
-        if (stage === 'approve') {
-            return [{ value: 'complete', label: 'Complete Approval' }];
-        }
-        if (stage === 'archive') {
-            return [{ value: 'archive', label: 'Archive Collection' }];
-        }
-        return [{ value: 'review', label: 'Send for review' }];
     }
 
     /**
@@ -1215,9 +1241,14 @@ export default class CollectionDetail extends LightningElement {
     handleContentRowClick(event) {
         const contentId = event.currentTarget.dataset.id;
         const content = this.collectionContent.find(c => c.id === contentId);
-        if (content) {
-            this.dispatchOpenContentRecord(content);
+        if (!content) {
+            return;
         }
+        if (content.useDeckPreviewOverlay) {
+            this._openDeckPreviewModal(content);
+            return;
+        }
+        this.dispatchOpenContentRecord(content);
     }
 
     /**
@@ -1255,17 +1286,35 @@ export default class CollectionDetail extends LightningElement {
         const contentId = event.currentTarget.dataset.id;
         const content = this.collectionContent.find(c => c.id === contentId);
         if (content) {
-            this.previewContent = content;
-            this.showPreviewModal = true;
+            if (content.useDeckPreviewOverlay) {
+                this._openDeckPreviewModal(content);
+            } else {
+                this.previewContent = content;
+                this.showPreviewModal = true;
+            }
         }
+    }
+
+    /**
+     * @param {Record<string, unknown>} content
+     */
+    _openDeckPreviewModal(content) {
+        this.previewContent = { ...content };
+        this.showPreviewModal = true;
     }
 
     /**
      * Handle close preview modal
      */
     handleClosePreview() {
+        const wasDeck = this.previewContent && this.previewContent.useDeckPreviewOverlay === true;
         this.showPreviewModal = false;
         this.previewContent = null;
+        if (wasDeck && typeof document !== 'undefined') {
+            document.dispatchEvent(
+                new CustomEvent('rcm-deck-preview-closed', { bubbles: true, composed: true })
+            );
+        }
     }
 
     /**
@@ -1273,9 +1322,16 @@ export default class CollectionDetail extends LightningElement {
      * @param {Event} event
      */
     handleModalClick(event) {
-        if (event.target.classList.contains('preview-modal-backdrop')) {
-            this.handleClosePreview();
+        if (!event?.target || !event.target.classList) {
+            return;
         }
+        if (!event.target.classList.contains('preview-modal-backdrop')) {
+            return;
+        }
+        if (this.previewContent?.useDeckPreviewOverlay) {
+            return;
+        }
+        this.handleClosePreview();
     }
 
     /**
@@ -1294,6 +1350,42 @@ export default class CollectionDetail extends LightningElement {
         return this.findRequiredSuggestions.length > 0;
     }
 
+    /**
+     * When true, preview modal shows the Cordim deck iframe (full screen) instead of a placeholder.
+     * @returns {boolean}
+     */
+    get isCordimDeckPreview() {
+        return this.previewContent?.useDeckPreviewOverlay === true;
+    }
+
+    /**
+     * Absolute URL for the deck iframe.
+     * @returns {string}
+     */
+    get deckPreviewFrameSrc() {
+        if (!this.previewContent?.previewUrl) {
+            return '';
+        }
+        const raw = String(this.previewContent.previewUrl);
+        if (raw.startsWith('http://') || raw.startsWith('https://')) {
+            return raw;
+        }
+        if (typeof window === 'undefined' || !window.location?.origin) {
+            return raw;
+        }
+        const path = raw.startsWith('/') ? raw : `/${raw}`;
+        return `${window.location.origin}${path}`;
+    }
+
+    /**
+     * @returns {string}
+     */
+    get previewContentLabel() {
+        if (!this.previewContent) {
+            return '';
+        }
+        return this.previewContent.title || this.previewContent.name || 'Preview';
+    }
 
     /**
      * Handle go to record from preview – open content record in a new console tab and close modal

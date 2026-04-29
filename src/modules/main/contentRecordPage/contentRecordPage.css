@@ -448,6 +448,16 @@
     width: 100%;
 }
 
+/* LBC: active “Document” tab — flex column so the document row gets a full-height flex chain. */
+lightning-tabset.content-record-main-tabset > lightning-tab.slds-show {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
 .content-record-main-tabset .slds-tabs_default__nav {
     padding-left: var(--slds-g-spacing-medium, 1rem);
     padding-right: var(--slds-g-spacing-medium, 1rem);
@@ -474,9 +484,10 @@
     display: flex;
     flex: 1 1 auto;
     align-items: stretch;
-    min-height: 0;
+    align-content: stretch;
     min-width: 0;
     max-height: 100%;
+    min-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
     overflow: hidden;
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
@@ -527,9 +538,9 @@
     align-self: stretch;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    height: 100%;
-    max-height: 100%;
+    /* Match document column height so the scoped tab card + bottom border fill the right panel */
+    min-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
+    max-height: var(--cr-doc-viewport-max, min(75dvh, 52rem));
     overflow: hidden;
     background-color: var(--slds-g-color-surface-1, #ffffff);
     box-sizing: border-box;
@@ -553,43 +564,61 @@
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
 
-.content-record-scoped-tabset {
-    /* Chrome + active / inactive tab tokens (Figma 457:76056) */
-    --slds-c-tabs-item-color-border-active: var(--slds-g-color-accent-2, #0176d3);
-    --slds-c-tabs-item-text-color-active: var(--slds-g-color-accent-2, #0176d3);
-    /* Do not override list sizing — 0.25rem was a hairline/underline token here and broke default nav & separator borders. */
-    /* Flatten LBC default panel padding; we use .content-record-scoped-tab-body */
-    --slds-c-tabs-panel-spacing-block: 0;
-    --slds-c-tabs-panel-spacing-blockstart: 0;
-    --slds-c-tabs-panel-spacing-blockend: 0;
-    --slds-c-tabs-panel-spacing-inline: 0;
-    --slds-c-tabs-panel-spacing-inlineend: 0;
-    --slds-c-tabs-panel-spacing-inlinestart: 0;
-    /* Grid on the LBC host: single shadow child (.slds-tabs_scoped) fills the row, giving slotted
-       panels a definite % height. Flex does not work here because the inner root is not flex. */
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+/* Native SLDS scoped tabs: full-height flex column (replaces LBC tabset so panel fills the sidebar) */
+.content-record-scoped-tabs {
+    display: flex;
+    flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
     min-width: 0;
     width: 100%;
     height: 100%;
-    max-height: 100%;
+    box-sizing: border-box;
+}
+
+.content-record-scoped-tabs .slds-tabs_scoped__nav {
+    flex-shrink: 0;
+}
+
+/* Match Figma: active scoped tab label uses accent (same as prior LBC tokens) */
+.content-record-scoped-tabs .slds-is-active .slds-tabs_scoped__link {
+    color: var(--slds-g-color-accent-2, #0176d3);
+    font-weight: var(--slds-g-font-weight-5, 500);
+}
+
+/* Panel stack: grow below tab list; only one slotted block visible via lwc:if/elseif */
+.content-record-scoped-panels {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     overflow: hidden;
 }
 
-/* LBC: :host(.slds-show) { display: block } — we need a panel flex column; beat specificity. */
-/* Slotted .slds-tabs_scoped is block: active tab is below nav; fill remaining panel height. */
-lightning-tabset.content-record-scoped-tabset
-    > lightning-tab.content-record-scoped-tab.slds-show {
+.content-record-scoped-panels .slds-tabs_scoped__content,
+.content-record-scoped-panels .content-record-scoped-tab-body {
+    /* 16px left/right (Figma) for annotation cards + work items; vertical handled by list/tools */
+    padding-block: 0;
+    padding-inline: var(--slds-g-spacing-4, 1rem);
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: calc(100% - var(--slds-c-tabs-item-sizing-height, 2.5rem));
-    width: 100%;
     overflow: hidden;
+    /* Match prior LBC: flat token panel spacing was zeroed in host */
+    border-block-start: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: none;
+    background-clip: padding-box;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border: var(--slds-g-sizing-border-1) solid var(--slds-s-navigation-color-border, var(--slds-g-color-border-1));
+    border-top: 0;
+    border-bottom-left-radius: var(--slds-s-navigation-radius-border, var(--slds-g-radius-border-2, 0.25rem));
+    border-bottom-right-radius: var(--slds-s-navigation-radius-border, var(--slds-g-radius-border-2, 0.25rem));
 }
 
 .content-record-scoped-tab-body {
@@ -599,8 +628,10 @@ lightning-tabset.content-record-scoped-tabset
     min-height: 0;
     min-width: 0;
     width: 100%;
+    height: 100%;
     box-sizing: border-box;
-    padding: 0;
+    padding-block: 0;
+    padding-inline: var(--slds-g-spacing-4, 1rem);
     background-color: var(--slds-g-color-surface-1, #ffffff);
     overflow: hidden;
 }
@@ -1337,14 +1368,19 @@ lightning-tabset.content-record-scoped-tabset
     line-height: 1.125rem;
 }
 
+/* Comments empty (no list items) — no fill; message centered to match linked claims empty */
 .content-record-annotation-section-body {
-    margin: 0 var(--slds-g-spacing-small, 0.75rem) var(--slds-g-spacing-xx-small, 0.25rem);
-    padding: var(--slds-g-spacing-x-small, 0.5rem);
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 var(--slds-g-spacing-xx-small, 0.25rem);
+    padding: var(--slds-g-spacing-x-small, 0.5rem) var(--slds-g-spacing-small, 0.75rem);
     font-size: var(--slds-g-font-size-2, 0.75rem);
     line-height: 1.25rem;
+    text-align: center;
     color: var(--slds-g-color-on-surface-2, #706e6b);
-    background-color: var(--slds-g-color-surface-2, #f3f3f3);
-    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    background-color: transparent;
+    border-radius: 0;
 }
 
 /* AnnotationHighlightText — Figma: warning-base-95 fill, warning-base-70 4px left */
@@ -1660,8 +1696,8 @@ lightning-tabset.content-record-scoped-tabset
     margin: 0;
     padding: var(--slds-g-spacing-large, 1.5rem) var(--slds-g-spacing-medium, 1rem);
     text-align: center;
-    background-color: var(--slds-g-color-surface-2, #f3f3f3);
-    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .content-record-linked-claims-empty-message {
@@ -1746,9 +1782,13 @@ lightning-tabset.content-record-scoped-tabset
 .content-record-annotations-empty {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
     align-items: center;
+    justify-content: center;
+    min-height: 0;
     text-align: center;
     box-sizing: border-box;
+    width: 100%;
     padding: var(--slds-g-spacing-x-large, 2rem) var(--slds-g-spacing-large, 1.5rem);
     max-width: 20rem;
     margin-left: auto;
@@ -1797,6 +1837,8 @@ lightning-tabset.content-record-scoped-tabset
         width: 100%;
         max-width: none;
         min-width: 0;
+        min-height: 0;
+        max-height: none;
     }
 
     .content-record-path-figma {

@@ -11,6 +11,7 @@
     "dev": "lwr dev",
     "dev:fresh": "node -e \"try{require('fs').rmSync('__lwr_cache__',{recursive:true,force:true})}catch(e){}\" && lwr dev",
     "dev:port": "lwr dev -p 3001",
+    "dev:port:fresh": "node -e \"try{require('fs').rmSync('__lwr_cache__',{recursive:true,force:true})}catch(e){}\" && lwr dev -p 3001",
     "dev:compat": "lwr dev --mode compat",
     "build": "node scripts/copy-embedpdf-assets.mjs && lwr build --clean",
     "build:prod-compat": "node scripts/copy-embedpdf-assets.mjs && lwr build --clean --mode prod-compat",

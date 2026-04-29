@@ -7,7 +7,7 @@ const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
 /**
  * Generic document icon for all content items
  */
-const GENERIC_DOCUMENT_ICON = 'doctype:unknown';
+const DECK_TREE_PREVIEW_ICON = 'utility:preview';
 
 /**
  * Recursive tree item component for displaying collection hierarchy.
@@ -110,7 +110,7 @@ export default class CollectionTreeItem extends LightningElement {
         const selectedId = this.selectedId;
         return this.item.content.map(content => ({
             ...content,
-            icon: GENERIC_DOCUMENT_ICON,
+            icon: content.useDeckPreviewOverlay ? DECK_TREE_PREVIEW_ICON : GENERIC_DOCUMENT_ICON,
             rowClass:
                 selectedId && content.id === selectedId
                     ? 'content-item-row slds-is-selected'
@@ -164,6 +164,17 @@ export default class CollectionTreeItem extends LightningElement {
      */
     get isFromTemplate() {
         return this.item?.isFromTemplate === true;
+    }
+
+    /**
+     * Tooltip for icon area when the collection is template-based (enforced structure).
+     * @returns {string|undefined}
+     */
+    get templateSourceTitle() {
+        if (!this.isFromTemplate) {
+            return undefined;
+        }
+        return 'From a collection template. Structure and requirements are enforced from the template.';
     }
 
     /**

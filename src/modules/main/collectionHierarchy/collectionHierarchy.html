@@ -8,31 +8,99 @@
                     <img
                         class="app-brand__img"
                         src="/public/assets/brand/makana-pharma-nav-logo.png"
-                        alt="Makana Pharma" />
+                        alt="Makana Pharma"
+                    />
                 </div>
             </div>
             <div class="global-header-center">
-                <div class="global-search">
-                    <lightning-icon 
-                        icon-name="utility:search" 
+                <div class="global-search rcm-pill-search" role="search">
+                    <lightning-icon
+                        icon-name="utility:search"
                         size="x-small"
-                        class="global-search-icon"
-                        alternative-text="Search">
-                    </lightning-icon>
-                    <input type="text" class="global-search-input" placeholder="Search..." />
+                        class="rcm-pill-search__icon"
+                        alternative-text=""
+                    ></lightning-icon>
+                    <input
+                        type="search"
+                        class="rcm-pill-search__input"
+                        placeholder="Search..."
+                        aria-label="Search"
+                    />
                 </div>
             </div>
             <div class="global-header-right">
-                <lightning-button-icon icon-name="utility:emoji" variant="bare" alternative-text="Emoji" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:favorite" variant="bare" alternative-text="Favorites" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:add" variant="bare" alternative-text="Add" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:salesforce1" variant="bare" alternative-text="Salesforce" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:help" variant="bare" alternative-text="Help" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:settings" variant="bare" alternative-text="Settings" size="medium"></lightning-button-icon>
-                <lightning-button-icon icon-name="utility:notification" variant="bare" alternative-text="Notifications" size="medium"></lightning-button-icon>
-                <div class="user-avatar">
-                    <lightning-icon icon-name="utility:user" size="x-small" alternative-text="User profile"></lightning-icon>
-                </div>
+                <button type="button" class="global-header-icon-btn" title="Agentforce" aria-label="Agentforce">
+                    <img
+                        class="global-header-icon-img global-header-icon-img_einstein"
+                        src={globalHeaderNav.einstein}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="Favorites" aria-label="Favorites">
+                    <img
+                        class="global-header-icon-img global-header-icon-img_favorites"
+                        src={globalHeaderNav.favorites}
+                        width="12"
+                        height="12"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="New" aria-label="New">
+                    <img
+                        class="global-header-icon-img"
+                        src={globalHeaderNav.newCreate}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="Trailhead" aria-label="Trailhead">
+                    <img
+                        class="global-header-icon-img"
+                        src={globalHeaderNav.trailhead}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="Help" aria-label="Help">
+                    <img
+                        class="global-header-icon-img"
+                        src={globalHeaderNav.help}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="Setup" aria-label="Setup">
+                    <img
+                        class="global-header-icon-img"
+                        src={globalHeaderNav.setup}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="global-header-icon-btn" title="Notifications" aria-label="Notifications">
+                    <img
+                        class="global-header-icon-img"
+                        src={globalHeaderNav.notifications}
+                        width="20"
+                        height="20"
+                        alt=""
+                    />
+                </button>
+                <button type="button" class="user-avatar global-header-icon-btn" title="User" aria-label="User profile">
+                    <img
+                        class="user-avatar-img"
+                        src={globalHeaderNav.profile}
+                        width="32"
+                        height="32"
+                        alt=""
+                    />
+                </button>
             </div>
         </header>
 
@@ -64,8 +132,13 @@
                                 <div class="nav-dropdown-backdrop" onclick={handleNavDropdownClose} role="presentation"></div>
                                 <div class="nav-dropdown" role="menu" aria-label="Regulated Content menu">
                                     <a href="/" class="nav-dropdown-item" role="menuitem" onclick={handleCollectionsClick}>
-                                        <span class="nav-dropdown-item-icon">
-                                            <lightning-icon icon-name="utility:open_folder" size="x-small" alternative-text=""></lightning-icon>
+                                        <span class="nav-dropdown-item-icon nav-dropdown-folder-tile">
+                                            <lightning-icon
+                                                icon-name="utility:open_folder"
+                                                size="x-small"
+                                                variant="inverse"
+                                                alternative-text=""
+                                            ></lightning-icon>
                                         </span>
                                         <span class="nav-dropdown-item-label">Regulated Content Collections</span>
                                     </a>
@@ -99,7 +172,14 @@
                 <div class="rail-header-top-wrap">
                     <div class="rail-header-top">
                         <div class="rail-header-left">
-                            <lightning-icon icon-name="standard:folder" size="medium" class="rail-header-icon" alternative-text="Collections"></lightning-icon>
+                            <div class="rcm-folder-entity-icon" aria-hidden="true">
+                                <lightning-icon
+                                    icon-name="utility:open_folder"
+                                    size="small"
+                                    variant="inverse"
+                                    alternative-text=""
+                                ></lightning-icon>
+                            </div>
                             <button type="button" class="rail-list-view-trigger" onclick={handleRailListViewToggle} aria-haspopup="true" aria-expanded={showListViewsDropdown} aria-label="Select list view">
                                 <span class="rail-list-view-name">{currentListViewName}</span>
                                 <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="rail-chevron" alternative-text=""></lightning-icon>
@@ -130,8 +210,21 @@
                         <div class="rail-dropdown-backdrop" onclick={handleRailListViewsBackdrop} role="presentation"></div>
                         <div class="rail-list-views-dropdown" role="dialog" aria-label="List views">
                             <div class="rail-list-views-search-wrap">
-                                <lightning-icon icon-name="utility:search" size="x-small" class="rail-list-views-search-icon" alternative-text=""></lightning-icon>
-                                <input type="search" class="rail-list-views-search" placeholder="Search lists..." oninput={handleListViewsSearchInput} aria-label="Search list views" />
+                                <div class="rcm-pill-search">
+                                    <lightning-icon
+                                        icon-name="utility:search"
+                                        size="x-small"
+                                        class="rcm-pill-search__icon"
+                                        alternative-text=""
+                                    ></lightning-icon>
+                                    <input
+                                        type="search"
+                                        class="rcm-pill-search__input"
+                                        placeholder="Search lists..."
+                                        oninput={handleListViewsSearchInput}
+                                        aria-label="Search list views"
+                                    />
+                                </div>
                             </div>
                             <div class="rail-list-views-heading">List Views</div>
                             <ul class="rail-list-views-list" role="listbox">
@@ -170,10 +263,24 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Search bar inside grey header -->
+                    <!-- Search bar (matches global pill search — Figma RCM CORS 10-62419) -->
                     <div class="rail-search-row">
-                        <lightning-icon icon-name="utility:search" size="x-small" class="rail-search-icon" alternative-text=""></lightning-icon>
-                        <input type="search" class="rail-search-input" placeholder="Search this list..." value={searchTerm} oninput={handleSearchChange} aria-label="Search this list" />
+                        <div class="rcm-pill-search rcm-pill-search--on-muted">
+                            <lightning-icon
+                                icon-name="utility:search"
+                                size="x-small"
+                                class="rcm-pill-search__icon"
+                                alternative-text=""
+                            ></lightning-icon>
+                            <input
+                                type="search"
+                                class="rcm-pill-search__input"
+                                placeholder="Search this list..."
+                                value={searchTerm}
+                                oninput={handleSearchChange}
+                                aria-label="Search this list"
+                            />
+                        </div>
                     </div>
                 </div>
                 </div>
@@ -361,16 +468,24 @@
                 </template>
                 <template lwc:else>
                     <!-- Empty State -->
-                    <div class="empty-state">
-                        <lightning-icon 
-                            icon-name="utility:touch_action" 
-                            size="large"
-                            class="empty-state-icon">
-                        </lightning-icon>
-                        <h3 class="slds-text-heading_medium slds-m-top_medium slds-m-bottom_small">
+                    <div
+                        class="empty-state"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <div class="empty-state-illustration-wrap" aria-hidden="true">
+                            <img
+                                class="empty-state-illustration"
+                                src={emptyStateNoCollectionIllustrationSrc}
+                                width="304"
+                                height="192"
+                                alt=""
+                            />
+                        </div>
+                        <h2 class="empty-state-title slds-m-top_medium slds-m-bottom_x-small slds-align_absolute-center">
                             Select a Collection
-                        </h3>
-                        <p class="slds-text-body_regular slds-text-color_weak">
+                        </h2>
+                        <p class="empty-state-body slds-align_absolute-center">
                             Choose a collection from the tree to view its details, content, and subcollections.
                         </p>
                     </div>
