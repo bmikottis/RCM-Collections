@@ -12,49 +12,47 @@
     background-color: #f3f3f3;
 }
 
-/* Global Header (match app) */
+/* Figma: org global header (match main app) */
 .global-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 48px;
-    padding: 0 1rem;
-    background-color: #ffffff;
+    min-height: 3rem;
+    height: 3rem;
+    padding: 0 1.5rem;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
     border-bottom: 1px solid #e5e5e5;
+    box-sizing: border-box;
 }
 
 .global-header-left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
 }
 
-.app-logo {
-    width: 28px;
-    height: 28px;
-    border-radius: 4px;
-    background-color: #7e57c2;
+.app-brand {
     display: flex;
     align-items: center;
-    justify-content: center;
+    flex-shrink: 0;
+    line-height: 0;
 }
 
-.logo-icon {
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-.app-name {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: #181818;
+.app-brand__img {
+    display: block;
+    height: 2rem;
+    width: auto;
+    max-width: 13rem;
+    object-fit: contain;
+    object-position: left center;
 }
 
 .global-header-center {
     flex: 1;
-    max-width: 480px;
-    margin: 0 2rem;
+    min-width: 0;
+    max-width: 32rem;
+    margin: 0 1.5rem;
 }
 
 .global-search {
@@ -66,21 +64,35 @@
 .global-search-icon {
     position: absolute;
     left: 0.75rem;
-    --slds-c-icon-color-foreground-default: #706e6b;
+    --slds-c-icon-color-foreground-default: #5a6a7a;
 }
 
 .global-search-input {
     width: 100%;
+    min-height: 2rem;
+    box-sizing: border-box;
     padding: 0.375rem 0.75rem 0.375rem 2.25rem;
     font-size: 0.875rem;
-    border: 1px solid #c9c9c9;
-    border-radius: 4px;
-    background-color: #f3f3f3;
+    line-height: 1.25;
+    color: var(--slds-g-color-on-surface-3, #3e3e3c);
+    border: 1px solid #e5e5e5;
+    border-radius: 0.25rem;
+    background-color: #ffffff;
     outline: none;
 }
 
+.global-search-input::placeholder {
+    color: #706e6b;
+}
+
+.global-search-input:focus {
+    background-color: #ffffff;
+    border-color: var(--slds-g-color-border-accent-1, #1b96ff);
+    box-shadow: 0 0 0 1px var(--slds-g-color-border-accent-1, #1b96ff);
+}
+
 .global-header-right lightning-button-icon {
-    --slds-c-button-icon-color-foreground: #706e6b;
+    --slds-c-button-icon-color-foreground: #5a6a7a;
 }
 
 /* Console Nav */

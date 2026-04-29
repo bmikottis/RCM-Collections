@@ -712,11 +712,11 @@ lightning-tabset.content-record-scoped-tabset
     padding-bottom: var(--slds-g-spacing-small, 0.75rem);
 }
 
-/* HTML preview: block + text highlight tools (injected script in same-origin iframe) */
+/* HTML preview: Annotate action + icon tools (injected script in same-origin iframe) */
 .content-record-html-annotate-row {
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: var(--slds-g-spacing-small, 0.75rem);
     border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
@@ -724,10 +724,28 @@ lightning-tabset.content-record-scoped-tabset
     padding-bottom: var(--slds-g-spacing-x-small, 0.5rem);
 }
 
-.content-record-html-annotate-hint {
-    flex: 1 1 12rem;
+.content-record-html-annotate-start {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--slds-g-spacing-x-small, 0.5rem);
     min-width: 0;
-    max-width: 44rem;
+}
+
+.content-record-html-annotate-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding-left: var(--slds-g-spacing-x-small, 0.5rem);
+    border-left: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.content-record-html-annotate-hint {
+    flex: 1 1 8rem;
+    min-width: 0;
+    max-width: 22rem;
+    margin: 0;
+    text-align: end;
 }
 
 .content-record-file-title {
@@ -824,10 +842,19 @@ lightning-tabset.content-record-scoped-tabset
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 
-.content-record-html-preview-scroll .content-record-html-preview-frame {
+/* Stack: iframe (anchors) + absolute overlay for yellow highlights + click to jump to annotation */
+.content-record-html-iframe-stack {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: min(75dvh, 52rem);
+}
+
+.content-record-html-iframe-stack .content-record-html-preview-frame {
+    position: relative;
+    z-index: 0;
     display: block;
     box-sizing: border-box;
-    flex: 0 0 auto;
     width: 100%;
     min-width: 0;
     min-height: min(75dvh, 52rem);
@@ -837,6 +864,34 @@ lightning-tabset.content-record-scoped-tabset
     border-radius: 0;
     background-color: var(--slds-g-color-surface-1, #ffffff);
     box-shadow: inset 0 0 0 1px var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.content-record-html-ann-overlays {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.content-record-html-ann-overlay {
+    position: absolute;
+    /* Must not capture events — the iframe must receive text selection and clicks (activation uses postMessage). */
+    pointer-events: none;
+    background: rgba(255, 240, 120, 0.5);
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(200, 175, 60, 0.35);
+    box-sizing: border-box;
+    min-width: 2px;
+    min-height: 2px;
+}
+
+.content-record-html-ann-overlay:focus-visible {
+    outline: 2px solid var(--slds-g-color-border-brand-1, #1b96ff);
+    outline-offset: 1px;
 }
 
 .content-record-pdf-host > * {
@@ -1030,8 +1085,12 @@ lightning-tabset.content-record-scoped-tabset
     flex-shrink: 0;
 }
 
-.content-record-annotation-icon-tint_anchor {
-    --slds-c-icon-color-foreground-default: #06a59a;
+/* Figma anchor badge (14×14 SVG) — immediately after ANN-XXXX */
+.content-record-annotation-anchor-badge__img {
+    flex-shrink: 0;
+    display: block;
+    width: 0.875rem;
+    height: 0.875rem;
 }
 
 .content-record-annotation-icon-tint_flag {
@@ -1590,6 +1649,40 @@ lightning-tabset.content-record-scoped-tabset
     text-decoration: underline;
 }
 
+/* Linked Claims empty state — Figma (linked claims / library match) */
+.content-record-linked-claims-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    gap: var(--slds-g-spacing-medium, 1rem);
+    margin: 0;
+    padding: var(--slds-g-spacing-large, 1.5rem) var(--slds-g-spacing-medium, 1rem);
+    text-align: center;
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+
+.content-record-linked-claims-empty-message {
+    margin: 0;
+    max-width: 20rem;
+    color: var(--slds-g-color-on-surface-2, #5c5c5c);
+    line-height: var(--slds-g-line-height-4, 1.4);
+    font-size: var(--slds-g-font-scale-0, 0.8125rem);
+}
+
+.content-record-linked-claims-empty-cta {
+    --slds-c-button-radius-border: 15rem;
+    --slds-c-button-color-border: var(--slds-g-color-border-brand-1, #1b96ff);
+    --slds-c-button-text-color: var(--slds-g-color-brand-base-50, #0176d3);
+    --slds-c-button-color-background: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.content-record-linked-claims-empty-cta:hover {
+    --slds-c-button-color-border: var(--slds-g-color-border-brand-2, #014486);
+}
+
 /* Figma 276:18379 — Mark as Anchor row: no top rule; rounds with card */
 .content-record-annotation-anchor {
     display: block;
@@ -1651,8 +1744,44 @@ lightning-tabset.content-record-scoped-tabset
 }
 
 .content-record-annotations-empty {
-    padding: var(--slds-g-spacing-large, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    box-sizing: border-box;
+    padding: var(--slds-g-spacing-x-large, 2rem) var(--slds-g-spacing-large, 1.5rem);
+    max-width: 20rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content-record-annotations-empty-illustration {
+    display: block;
+    flex-shrink: 0;
+    line-height: 0;
+    width: 100%;
+    max-width: 15rem;
+}
+
+.content-record-annotations-empty-image {
+    display: block;
+    width: 100%;
+    max-width: 15rem;
+    height: auto;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.content-record-annotations-empty-title {
+    color: var(--slds-g-color-on-surface-1, #181818);
+    margin: 0;
+    font-weight: var(--slds-g-font-weight-5, 500);
+}
+
+.content-record-annotations-empty-body {
+    margin: 0;
+    line-height: var(--slds-g-line-height-4, 1.4);
+    max-width: 100%;
 }
 
 @media (max-width: 1024px) {

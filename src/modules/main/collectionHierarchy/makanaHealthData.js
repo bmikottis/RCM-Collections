@@ -8,6 +8,19 @@ const SLIDES_DIR =
     '/public/assets/makana-health/individual-slides/Makana Health - Individual Slides';
 
 /**
+ * Placeholder rasters for PDF list thumbnails (no generated PDF page images in static assets).
+ * Cycles a few real slide-style thumbnails so 40×32 preview slots show imagery.
+ * @type {string[]}
+ */
+const MAKANA_PDF_THUMB_PLACEHOLDERS = [
+    '/public/assets/cordim/01_Patients with arterial hypertension/01_thumbnail.jpg',
+    '/public/assets/cordim/02_Risks and prevalence/01_thumbnail.jpg',
+    '/public/assets/cordim/03_Graph/01_thumbnail.jpg'
+];
+
+const MAKANA_STATUS_CYCLE = ['Approved', 'In Review', 'Draft'];
+
+/**
  * Titles aligned to a typical ONCURA® (oncurimab) HCP / sales deck (cover → references).
  * Index 0 = slide 01, … index 34 = slide 35.
  * @type {string[]}
@@ -78,8 +91,9 @@ export function getMakanaHealthCollection() {
             contentType: 'pdf',
             contentTypeLabel: 'Slide',
             version: '1.0',
-            status: 'Draft',
-            previewUrl: `${SLIDES_DIR}/${num}_makana.pdf`
+            status: MAKANA_STATUS_CYCLE[(n - 1) % MAKANA_STATUS_CYCLE.length],
+            previewUrl: `${SLIDES_DIR}/${num}_makana.pdf`,
+            thumbnailUrl: MAKANA_PDF_THUMB_PLACEHOLDERS[(n - 1) % MAKANA_PDF_THUMB_PLACEHOLDERS.length]
         });
     }
 
@@ -103,10 +117,11 @@ export function getMakanaHealthCollection() {
                 contentType: 'pdf',
                 contentTypeLabel: 'Sales Aid',
                 version: '1.0',
-                status: 'Draft',
+                status: 'Approved',
                 effectiveDates: '01/01/2025 - 12/31/2030',
                 fulfillsRequirement: 'req-061',
-                previewUrl: PREVIEW_SALESAID
+                previewUrl: PREVIEW_SALESAID,
+                thumbnailUrl: MAKANA_PDF_THUMB_PLACEHOLDERS[0]
             }
         ],
         completedTasks: [],

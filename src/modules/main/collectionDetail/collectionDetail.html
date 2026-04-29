@@ -485,14 +485,39 @@
                                                         aria-label={content.openRecordAriaLabel}
                                                         onclick={handleContentRowClick}
                                                         onkeydown={handleContentRowKeyDown}>
-                                                        <lightning-icon
-                                                            class="content-item-icon slds-m-right_x-small"
-                                                            icon-name={content.icon}
-                                                            size="small"
-                                                            alternative-text={content.contentType}>
-                                                        </lightning-icon>
-                                                        <div class="content-item-body slds-truncate">
-                                                            <span class="content-item-link">{content.name}</span>
+                                                        <div
+                                                            class="content-item-thumb"
+                                                            aria-hidden="true">
+                                                            <template lwc:if={content.hasPreview}>
+                                                                <img
+                                                                    class="content-item-thumb__img"
+                                                                    src={content.previewSrc}
+                                                                    alt="" />
+                                                            </template>
+                                                            <template lwc:else>
+                                                                <div class="content-item-thumb__placeholder">
+                                                                    <lightning-icon
+                                                                        class="content-item-thumb__icon"
+                                                                        icon-name={content.doctypeIcon}
+                                                                        size="x-small"
+                                                                        alternative-text={content.contentType}>
+                                                                    </lightning-icon>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <div class="content-item-body">
+                                                            <div class="content-item-title-line">
+                                                                <span
+                                                                    class="content-item-link slds-truncate"
+                                                                    title={content.name}
+                                                                    >{content.name}</span
+                                                                >
+                                                                <span
+                                                                    class={content.statusBadgeClass}
+                                                                    title={content.statusLabel}
+                                                                    >{content.statusLabel}</span
+                                                                >
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="content-actions">
@@ -683,14 +708,39 @@
                                                         aria-label={content.openRecordAriaLabel}
                                                         onclick={handleContentRowClick}
                                                         onkeydown={handleContentRowKeyDown}>
-                                                        <lightning-icon
-                                                            class="content-item-icon slds-m-right_x-small"
-                                                            icon-name={content.icon}
-                                                            size="small"
-                                                            alternative-text={content.contentType}>
-                                                        </lightning-icon>
-                                                        <div class="content-item-body slds-truncate">
-                                                            <span class="content-item-link">{content.name}</span>
+                                                        <div
+                                                            class="content-item-thumb"
+                                                            aria-hidden="true">
+                                                            <template lwc:if={content.hasPreview}>
+                                                                <img
+                                                                    class="content-item-thumb__img"
+                                                                    src={content.previewSrc}
+                                                                    alt="" />
+                                                            </template>
+                                                            <template lwc:else>
+                                                                <div class="content-item-thumb__placeholder">
+                                                                    <lightning-icon
+                                                                        class="content-item-thumb__icon"
+                                                                        icon-name={content.doctypeIcon}
+                                                                        size="x-small"
+                                                                        alternative-text={content.contentType}>
+                                                                    </lightning-icon>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <div class="content-item-body">
+                                                            <div class="content-item-title-line">
+                                                                <span
+                                                                    class="content-item-link slds-truncate"
+                                                                    title={content.name}
+                                                                    >{content.name}</span
+                                                                >
+                                                                <span
+                                                                    class={content.statusBadgeClass}
+                                                                    title={content.statusLabel}
+                                                                    >{content.statusLabel}</span
+                                                                >
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="content-actions">

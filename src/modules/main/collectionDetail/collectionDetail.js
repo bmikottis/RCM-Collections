@@ -33,6 +33,66 @@ function getContentTypeDisplayLabel(contentType) {
 }
 
 /**
+ * True when URL can be used in an <img> for 40×32 list thumbnails (not .pdf / .html).
+ * @param {string|undefined} url
+ * @returns {boolean}
+ */
+function isRasterImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const pathOnly = url.split(/[?#]/)[0].trim();
+    return /\.(png|jpe?g|gif|webp|svg)$/i.test(pathOnly);
+}
+
+/**
+ * Figma RCM — content status pill (e.g. 375-15732 Approved, 375-15769 Draft / In Review)
+ * @param {string|undefined} raw
+ * @returns {{ label: string, badgeClass: string }}
+ */
+function getContentStatusBadgeUi(raw) {
+    const s = (raw == null ? '' : String(raw)).trim().toLowerCase();
+    if (s === 'approved') {
+        return { label: 'Approved', badgeClass: 'content-item-status content-item-status_approved' };
+    }
+    if (s === 'in review' || s === 'in_review' || s === 'under review' || s === 'under_review') {
+        return { label: 'In Review', badgeClass: 'content-item-status content-item-status_neutral' };
+    }
+    if (s === 'draft' || s === '') {
+        return { label: 'Draft', badgeClass: 'content-item-status content-item-status_neutral' };
+    }
+    return { label: 'Draft', badgeClass: 'content-item-status content-item-status_neutral' };
+}
+
+/**
+ * View model for each row in the Collection Content card
+ * @param {Record<string, unknown>} item
+ * @param {string|null|undefined} openMenuId
+ * @returns {Record<string, unknown>}
+ */
+function buildCollectionContentRowViewModel(item, openMenuId) {
+    const t = (item.contentType && String(item.contentType).toLowerCase()) || '';
+    const doctypeIcon = getContentTypeIcon(t || 'unknown');
+    const thumb = item.thumbnailUrl;
+    const pre = item.previewUrl;
+    const previewSrc = isRasterImageUrl(thumb) ? thumb : isRasterImageUrl(pre) ? pre : '';
+    const hasPreview = Boolean(previewSrc);
+    const { label: statusLabel, badgeClass: statusBadgeClass } = getContentStatusBadgeUi(
+        /** @type {string|undefined} */ (item.status)
+    );
+    const namePart = item.name || 'document';
+    return {
+        ...item,
+        doctypeIcon,
+        icon: doctypeIcon,
+        hasPreview,
+        previewSrc,
+        statusLabel,
+        statusBadgeClass,
+        showMenu: openMenuId === item.id,
+        openRecordAriaLabel: `Open regulated content record for ${namePart}, ${statusLabel}`
+    };
+}
+
+/**
  * Sample members data for prototype
  */
 const SAMPLE_MEMBERS = [
@@ -813,12 +873,9 @@ export default class CollectionDetail extends LightningElement {
         if (!this.collection?.content) {
             return [];
         }
-        return this.collection.content.map(item => ({
-            ...item,
-            icon: 'doctype:unknown',
-            showMenu: this.openContentMenuId === item.id,
-            openRecordAriaLabel: `Open regulated content record for ${item.name || 'document'}`
-        }));
+        return this.collection.content.map((item) =>
+            buildCollectionContentRowViewModel(item, this.openContentMenuId)
+        );
     }
 
     /**

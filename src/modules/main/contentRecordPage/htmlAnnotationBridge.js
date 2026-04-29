@@ -1,18 +1,27 @@
 /**
  * IIFE string injected as a script in the same-origin HTML preview iframe.
- * Enables: (1) block / region picking, (2) text selection + in-frame "Add highlight",
- * and (3) apply / clear highlights + outlines for persisted annotation rows.
+ * Enables: (1) block / region click, (2) text selection -> immediate highlight (no confirm UI),
+ * and (3) apply / clear marks for persisted rows.
  * No external dependencies.
  */
 export function getHtmlAnnotationBridgeIife() {
     return `(() => {
   var MODE = 'none';
-  var floatEl = null;
-  var lastRange = null;
+  var lastAutoHighlightKey = '';
+  var lastAutoHighlightAt = 0;
 
   var H_MARK = 'rcm-html-mark';
   var C_BLOCK = 'rcm-html-block-outlined';
+  var C_HOVER = 'rcm-html-block-hover';
+  var hoverBlockEl = null;
   var BLOCK_TAGS = { DIV: 1, SECTION: 1, ARTICLE: 1, MAIN: 1, P: 1, ASIDE: 1, BLOCKQUOTE: 1, LI: 1, TD: 1, TH: 1, HEADER: 1, FOOTER: 1, NAV: 1, FIGURE: 1, H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1 };
+
+  function clearBlockHover() {
+    if (hoverBlockEl) {
+      hoverBlockEl.classList.remove(C_HOVER);
+      hoverBlockEl = null;
+    }
+  }
 
   function findBlockEl(target) {
     if (!target) return null;
@@ -28,55 +37,8 @@ export function getHtmlAnnotationBridgeIife() {
     return null;
   }
 
-  function clearFloat() {
-    if (floatEl && floatEl.parentNode) floatEl.parentNode.removeChild(floatEl);
-    floatEl = null;
-  }
-
-  function showFloat(rect) {
-    clearFloat();
-    if (!rect || (rect.width === 0 && rect.height === 0)) return;
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = 'Add highlight';
-    btn.setAttribute('aria-label', 'Add highlight to selected text');
-    btn.className = 'rcm-html-float-btn';
-    var left = rect.left;
-    var top = rect.top - 40;
-    if (top < 4) {
-      top = rect.bottom + 4;
-    }
-    btn.style.position = 'fixed';
-    btn.style.left = left + 'px';
-    btn.style.top = top + 'px';
-    btn.style.zIndex = '100000';
-    btn.addEventListener('click', onFloatAdd);
-    document.body.appendChild(btn);
-    floatEl = btn;
-  }
-
-  function onFloatAdd(ev) {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (!lastRange) {
-      clearFloat();
-      return;
-    }
-    var t = lastRange.toString() || '';
-    if (!t || !t.trim().length) {
-      clearFloat();
-      return;
-    }
-    try {
-      window.parent.postMessage(
-        { type: 'rcm-html-annotation', kind: 'highlight', text: t, snippet: t.slice(0, 200) },
-        '*'
-      );
-    } catch (e) {}
-    clearFloat();
-  }
-
   function clearAllRcm() {
+    clearBlockHover();
     var marks = document.querySelectorAll('mark.' + H_MARK);
     for (var i = 0; i < marks.length; i++) {
       var el = marks[i];
@@ -93,36 +55,99 @@ export function getHtmlAnnotationBridgeIife() {
     }
   }
 
+  function isTextNodeVisibleForSearch(node) {
+    if (!node || !node.parentNode) return false;
+    if (node.parentNode.tagName === 'SCRIPT' || node.parentNode.tagName === 'STYLE') return false;
+    if (node.parentNode.closest && node.parentNode.closest('mark.' + H_MARK)) return false;
+    return true;
+  }
+
+  function collectTextNodesForSearch(body) {
+    if (!body) return [];
+    var w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node || !node.nodeValue) return NodeFilter.FILTER_REJECT;
+        if (!isTextNodeVisibleForSearch(node)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var out = [];
+    for (var n; (n = w.nextNode());) {
+      out.push(n);
+    }
+    return out;
+  }
+
+  function normWs(s) {
+    return String(s).replace(/\\s+/g, ' ').trim();
+  }
+
+  function wrapTextAcrossNodes(annId, text) {
+    var s = normWs(text);
+    if (!s.length) return;
+    var nodes = collectTextNodesForSearch(document.body);
+    var maxSpan = 36;
+    for (var a = 0; a < nodes.length; a++) {
+      for (var b = a; b < Math.min(nodes.length, a + maxSpan); b++) {
+        var r = document.createRange();
+        try {
+          r.setStart(nodes[a], 0);
+          r.setEnd(nodes[b], (nodes[b].nodeValue || '').length);
+        } catch (e1) {
+          continue;
+        }
+        if (normWs(r.toString() || '') !== s) {
+          continue;
+        }
+        var mark = document.createElement('mark');
+        mark.className = H_MARK;
+        mark.setAttribute('data-rcm-ann', String(annId));
+        try {
+          r.surroundContents(mark);
+        } catch (e2) {
+          continue;
+        }
+        return;
+      }
+    }
+  }
+
   function wrapFirstText(annId, text) {
     if (!text || !text.length) return;
     var body = document.body;
     if (!body) return;
-    var search = String(text);
-    if (!search.trim()) return;
+    var search0 = String(text);
+    if (!search0.trim()) return;
     var w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
       acceptNode: function (node) {
         if (!node || !node.nodeValue) return NodeFilter.FILTER_REJECT;
-        if (!node.parentNode) return NodeFilter.FILTER_REJECT;
-        var t = (node.parentNode).tagName;
-        if (t === 'SCRIPT' || t === 'STYLE') return NodeFilter.FILTER_REJECT;
+        if (!isTextNodeVisibleForSearch(node)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
+    var attempts = [search0, normWs(search0), search0.replace(/\\u00a0/g, ' '), search0.split(/\\s+/).join(' ')];
     var node;
     while ((node = w.nextNode())) {
       var val = node.nodeValue;
       if (!val) continue;
-      var idx = val.indexOf(search);
-      if (idx < 0) continue;
-      var r = document.createRange();
-      r.setStart(node, idx);
-      r.setEnd(node, idx + search.length);
-      var mark = document.createElement('mark');
-      mark.className = H_MARK;
-      mark.setAttribute('data-rcm-ann', String(annId));
-      r.surroundContents(mark);
-      return;
+      for (var ai = 0; ai < attempts.length; ai++) {
+        var search = attempts[ai];
+        if (!search) continue;
+        var idx = val.indexOf(search);
+        if (idx < 0) continue;
+        var r = document.createRange();
+        r.setStart(node, idx);
+        r.setEnd(node, idx + search.length);
+        var mark = document.createElement('mark');
+        mark.className = H_MARK;
+        mark.setAttribute('data-rcm-ann', String(annId));
+        try {
+          r.surroundContents(mark);
+          return;
+        } catch (e) {}
+      }
     }
+    wrapTextAcrossNodes(annId, text);
   }
 
   function outlineBlock(annId, tagName, textPrefix) {
@@ -137,6 +162,7 @@ export function getHtmlAnnotationBridgeIife() {
       if (el.closest('mark.' + H_MARK)) continue;
       var t = (el.textContent || '').replace(/\\s+/g, ' ').trim();
       if (t.indexOf(pre.substring(0, Math.min(40, pre.length))) === 0) {
+        el.classList.remove(C_HOVER);
         el.setAttribute('data-rcm-ann', String(annId));
         el.classList.add(C_BLOCK);
         return;
@@ -146,6 +172,7 @@ export function getHtmlAnnotationBridgeIife() {
       var e2 = list[j];
       var t2 = (e2.textContent || '').replace(/\\s+/g, ' ').trim();
       if (t2.indexOf(head) >= 0 && t2.length > 0) {
+        e2.classList.remove(C_HOVER);
         e2.setAttribute('data-rcm-ann', String(annId));
         e2.classList.add(C_BLOCK);
         return;
@@ -162,13 +189,45 @@ export function getHtmlAnnotationBridgeIife() {
     }
   }
 
+  function onDocMouseMoveBlock(ev) {
+    if (MODE !== 'block') {
+      return;
+    }
+    var t = findBlockEl(ev.target);
+    if (!t) {
+      clearBlockHover();
+      return;
+    }
+    if (t.closest && t.closest('mark.' + H_MARK)) {
+      clearBlockHover();
+      return;
+    }
+    if (t === hoverBlockEl) {
+      return;
+    }
+    clearBlockHover();
+    hoverBlockEl = t;
+    hoverBlockEl.classList.add(C_HOVER);
+  }
+
   function onDocClickBlock(ev) {
     if (MODE !== 'block') return;
+    clearBlockHover();
     var t = findBlockEl(ev.target);
     if (!t) return;
-    if (t.tagName === 'BUTTON' && t.classList && t.className.indexOf('rcm-html-float') >= 0) return;
-    if (t.closest && t.closest('.' + H_MARK)) return;
-    if (t.classList && t.classList.contains('rcm-html-float-btn')) return;
+    if (t.closest && t.closest('mark.' + H_MARK)) return;
+    var blockAnn = t.getAttribute('data-rcm-ann');
+    if (blockAnn) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      try {
+        window.parent.postMessage(
+          { type: 'rcm-html-ann-activate', id: String(blockAnn) },
+          '*'
+        );
+      } catch (e) {}
+      return;
+    }
     ev.preventDefault();
     ev.stopPropagation();
     var pre = (t.textContent || '').replace(/\\s+/g, ' ').trim();
@@ -184,25 +243,75 @@ export function getHtmlAnnotationBridgeIife() {
     );
   }
 
+  function onDocClickJumpToAnnotation(ev) {
+    var el = ev.target && ev.target.closest && ev.target.closest('[data-rcm-ann]');
+    if (el) {
+      var jid = el.getAttribute('data-rcm-ann');
+      if (jid) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        try {
+          window.parent.postMessage(
+            { type: 'rcm-html-ann-activate', id: jid },
+            '*'
+          );
+        } catch (e) {}
+      }
+      return;
+    }
+  }
+
   function onDocMouseUpHighlight() {
     if (MODE !== 'highlight') return;
-    if (floatEl) return;
     setTimeout(function () {
       if (MODE !== 'highlight') return;
       var sel = window.getSelection();
       if (!sel || !sel.rangeCount) return;
       var r0 = sel.getRangeAt(0);
-      if (!r0) return;
-      var txt = r0.toString() || '';
-      if (txt.length < 1) return;
-      if (!txt.trim().length) return;
-      if (r0.startContainer && r0.startContainer.nodeType === 1) {
-        var tn = (r0.startContainer).tagName;
-        if (tn === 'BUTTON' || (r0.startContainer).closest && (r0.startContainer).closest('.rcm-html-float-btn')) return;
+      if (!r0 || r0.collapsed) return;
+      if (r0.startContainer) {
+        var p = r0.startContainer.nodeType === 3 ? r0.startContainer.parentNode : r0.startContainer;
+        if (p && p.closest && p.closest('mark.' + H_MARK)) return;
       }
-      lastRange = r0.cloneRange();
-      var rect = r0.getBoundingClientRect();
-      showFloat(rect);
+      var txt = (r0.toString() || '').trim();
+      if (txt.length < 1) return;
+      var now = Date.now();
+      var key = txt.length > 200 ? txt.substring(0, 200) : txt;
+      if (key === lastAutoHighlightKey && now - lastAutoHighlightAt < 500) {
+        return;
+      }
+      lastAutoHighlightKey = key;
+      lastAutoHighlightAt = now;
+      var rSave = r0.cloneRange();
+      var pendingId = 'p' + now + (Math.random() + '').slice(2, 7);
+      var mark = document.createElement('mark');
+      mark.className = H_MARK;
+      mark.setAttribute('data-rcm-ann', pendingId);
+      var wrapped = false;
+      try {
+        rSave.surroundContents(mark);
+        wrapped = true;
+      } catch (e) {
+        try {
+          var r2 = r0.cloneRange();
+          var extracted = r2.extractContents();
+          mark.appendChild(extracted);
+          r2.insertNode(mark);
+          wrapped = true;
+        } catch (e2) {
+          wrapped = false;
+        }
+      }
+      var payload = {
+        type: 'rcm-html-annotation',
+        kind: 'highlight',
+        text: txt,
+        pendingId: wrapped ? pendingId : null,
+        snippet: txt.length > 200 ? txt.substring(0, 200) : txt
+      };
+      try {
+        window.parent.postMessage(payload, '*');
+      } catch (e2) {}
     }, 0);
   }
 
@@ -212,11 +321,30 @@ export function getHtmlAnnotationBridgeIife() {
     if (!d) return;
     if (d.type === 'rcm-html-set-mode') {
       MODE = d.mode || 'none';
-      clearFloat();
+      if (MODE !== 'block') {
+        clearBlockHover();
+      }
     }
     if (d.type === 'rcm-html-restore' && d.annotations) {
       clearAllRcm();
       for (var i = 0; i < d.annotations.length; i++) applyOne(d.annotations[i]);
+    }
+    if (d.type === 'rcm-html-resolve-pending' && d.pendingId && d.id) {
+      var pending = String(d.pendingId);
+      var newId = String(d.id);
+      var hit = document.querySelector('[data-rcm-ann="' + pending + '"]');
+      if (hit) {
+        hit.setAttribute('data-rcm-ann', newId);
+      }
+    }
+    if (d.type === 'rcm-html-undo-pending' && d.pendingId) {
+      var rem = String(d.pendingId);
+      var mpend = document.querySelector('mark.' + H_MARK + '[data-rcm-ann="' + rem + '"]');
+      if (mpend && mpend.parentNode) {
+        var par2 = mpend.parentNode;
+        while (mpend.firstChild) par2.insertBefore(mpend.firstChild, mpend);
+        par2.removeChild(mpend);
+      }
     }
     if (d.type === 'rcm-html-scroll' && d.id) {
       var el = document.querySelector('[data-rcm-ann="' + String(d.id) + '"]');
@@ -224,8 +352,9 @@ export function getHtmlAnnotationBridgeIife() {
     }
   }, false);
 
+  document.addEventListener('click', onDocClickJumpToAnnotation, true);
   document.addEventListener('click', onDocClickBlock, true);
+  document.addEventListener('mousemove', onDocMouseMoveBlock, true);
   document.addEventListener('mouseup', onDocMouseUpHighlight, false);
-  document.addEventListener('scroll', clearFloat, true);
 })();`;
 }

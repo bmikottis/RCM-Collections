@@ -4,6 +4,11 @@ import { getHtmlAnnotationBridgeIife } from './htmlAnnotationBridge.js';
 /** Vendored from @embedpdf/snippet/dist (copy-embedpdf-assets.mjs). Public URL, not an npm import — avoids LWR3009. */
 const EMBED_PDF_ENTRY_PATH = '/public/assets/vendor/embedpdf-snippet/embedpdf.js';
 
+/** Annotation panel empty state (lwr localAssets → /public/assets) */
+const ANNOTATIONS_EMPTY_STATE_IMAGE = '/public/assets/content-record/annotations-empty-state.png';
+/** Figma RCM Component Library (e.g. node 2-9996) — anchor marker beside ANN-XXXX */
+const ANCHOR_BADGE_SVG = '/public/assets/content-record/anchor-badge.svg';
+
 /**
  * Native ESM import by absolute URL. Built so LWR prod-compat does not register @embedpdf as an AMD "module" bare specifier.
  * @param {string} absUrl
@@ -25,8 +30,8 @@ const SIDEBAR_MIN_PX = 240;
 const MAIN_MIN_PX = 240;
 const SPLITTER_PX = 8;
 const SIDEBAR_DEFAULT_PX = 400;
-/** localStorage: HTML preview annotations (block + text highlight) per Regulated Content id */
-const htmlAnnStorageKey = (contentId) => `rcm-html-ann-${contentId || 'unknown'}`;
+/** localStorage: HTML preview annotations (block + text highlight) per Regulated Content id (v2; v1 not read — clean initial list) */
+const htmlAnnStorageKey = (contentId) => `rcm-html-ann-v2-${contentId || 'unknown'}`;
 
 /** Salesforce Lightning brand blues for EmbedPDF theme (matches SLDS/Figma accents) */
 const EMBED_PDF_SLDS_THEME = {
@@ -163,13 +168,20 @@ export default class ContentRecordPage extends LightningElement {
     @track zoomLevel = '125';
     @track currentPage = 1;
 
-    /** Resizable annotation column width (px); persisted in localStorage */
+    /** URL for Figma anchor badge (14×14) next to ANN-XXXX on the card header */
+    anchorBadgeSrc = ANCHOR_BADGE_SVG;
     @track sidebarWidthPx = SIDEBAR_DEFAULT_PX;
 
     @track _splitterMaxForAria = 1200;
 
     /**
-     * Same-origin HTML preview: Off | pick a block/region | select text and "Add highlight" in the iframe.
+     * HTML preview: primary "Annotate" toggle; when true, user picks text vs block tool.
+     * @type {boolean}
+     */
+    @track htmlAnnotateActive = false;
+
+    /**
+     * Sub-tool when htmlAnnotateActive is true: 'block' = click a div/region, 'highlight' = select text.
      * @type {string}
      */
     @track htmlAnnotateMode = 'none';
@@ -188,6 +200,19 @@ export default class ContentRecordPage extends LightningElement {
      */
     @track _htmlUserAnnotations = [];
 
+    /** Yellow overlay rects in HTML preview (px, relative to the iframe stack). */
+    @track _htmlPreviewOverlays = [];
+
+    /**
+     * Bumped when the preview document may have new [data-rcm-ann] nodes so the list re-sorts by position.
+     * @type {number}
+     */
+    @track _htmlAnnotationListEpoch = 0;
+
+    _htmlOverlayRaf = null;
+
+    _htmlStackResizeObserver = null;
+
     _resizePointerId = null;
 
     _layoutResizeObserver = null;
@@ -204,6 +229,18 @@ export default class ContentRecordPage extends LightningElement {
     _embedPdfMountUrl = null;
 
     _contentRecordKey = null;
+
+    _teardownHtmlPreviewOverlays() {
+        this._htmlPreviewOverlays = [];
+        if (this._htmlOverlayRaf != null && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(this._htmlOverlayRaf);
+        }
+        this._htmlOverlayRaf = null;
+        if (this._htmlStackResizeObserver) {
+            this._htmlStackResizeObserver.disconnect();
+            this._htmlStackResizeObserver = null;
+        }
+    }
 
     _teardownEmbedPdf() {
         const host = this.template && this.template.querySelector('.content-record-pdf-host');
@@ -284,6 +321,9 @@ export default class ContentRecordPage extends LightningElement {
         this._boundWindowResize = () => {
             this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
             this._applySidebarWidth();
+            if (this.hasHtmlPreview) {
+                this._scheduleSyncHtmlOverlays();
+            }
         };
         this._boundLayoutResize = () => {
             this.sidebarWidthPx = this._clampSidebarWidth(this.sidebarWidthPx);
@@ -334,6 +374,7 @@ export default class ContentRecordPage extends LightningElement {
             window.removeEventListener('message', this._boundHtmlMessage, false);
             this._boundHtmlMessage = null;
         }
+        this._teardownHtmlPreviewOverlays();
     }
 
     renderedCallback() {
@@ -347,6 +388,31 @@ export default class ContentRecordPage extends LightningElement {
             this._layoutResizeObserver.observe(layout);
         }
         this._queueEmbedPdfMount();
+        this._attachHtmlStackResizeObserver();
+    }
+
+    _attachHtmlStackResizeObserver() {
+        if (typeof ResizeObserver === 'undefined' || !this.hasHtmlPreview) {
+            return;
+        }
+        if (this._htmlStackResizeObserver) {
+            return;
+        }
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                if (this._htmlStackResizeObserver || !this.hasHtmlPreview) {
+                    return;
+                }
+                const stack = this.template && this.template.querySelector('.content-record-html-iframe-stack');
+                if (!stack) {
+                    return;
+                }
+                this._htmlStackResizeObserver = new ResizeObserver(() => {
+                    this._scheduleSyncHtmlOverlays();
+                });
+                this._htmlStackResizeObserver.observe(stack);
+            });
+        }
     }
 
     _resetAnnotationStateForContentChange() {
@@ -358,6 +424,8 @@ export default class ContentRecordPage extends LightningElement {
         this.commentDrafts = {};
         this.anchorCheckedIds = new Set();
         this.htmlAnnotateMode = 'none';
+        this.htmlAnnotateActive = false;
+        this._teardownHtmlPreviewOverlays();
         this._loadHtmlUserAnnotations();
     }
 
@@ -788,16 +856,70 @@ export default class ContentRecordPage extends LightningElement {
         });
     }
 
+    _bumpHtmlAnnotationListEpoch() {
+        this._htmlAnnotationListEpoch = (this._htmlAnnotationListEpoch || 0) + 1;
+    }
+
     /**
-     * Raw rows for the annotation list: user HTML annotations (when preview is HTML) plus demo rows.
+     * Sort user HTML annotations by the order nodes appear in the document (tree order in the preview iframe).
+     * Falls back to creation time when the iframe is not ready or an id is not found in the DOM.
+     * @param {Array<Object>} rows
+     * @returns {Array<Object>}
+     */
+    _sortHtmlUserAnnotationsByDocumentOrder(rows) {
+        const list = rows && rows.length ? [...rows] : [];
+        if (list.length <= 1) {
+            return list;
+        }
+        const frame = this.template && this.template.querySelector('.content-record-html-preview-frame');
+        if (!frame) {
+            return list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+        let doc;
+        try {
+            doc = frame.contentDocument;
+        } catch (e) {
+            return list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+        if (!doc || !doc.body) {
+            return list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+        const order = new Map();
+        let n = 0;
+        try {
+            doc.querySelectorAll('[data-rcm-ann]').forEach((el) => {
+                const id = el.getAttribute('data-rcm-ann');
+                if (id && !order.has(id)) {
+                    order.set(String(id), n);
+                    n += 1;
+                }
+            });
+        } catch (e) {
+            return list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+        if (order.size === 0) {
+            return list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        }
+        const NOT_FOUND = 9000000000;
+        return list.sort((a, b) => {
+            const oa = order.has(a.id) ? order.get(a.id) : NOT_FOUND;
+            const ob = order.has(b.id) ? order.get(b.id) : NOT_FOUND;
+            if (oa !== ob) {
+                return oa - ob;
+            }
+            return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+    }
+
+    /**
+     * Raw rows for the annotation list: HTML preview shows only user annotations; other previews use demo rows.
      * @returns {Array<Object>}
      */
     get _annotationBaseRows() {
         if (this.hasHtmlPreview) {
-            const user = (this._htmlUserAnnotations || [])
-                .map((r) => this._mapHtmlAnnotationToRow(r))
-                .filter((row) => row != null);
-            return user.concat(ANNOTATION_DEMO_ITEMS);
+            void this._htmlAnnotationListEpoch;
+            const rows = this._sortHtmlUserAnnotationsByDocumentOrder(this._htmlUserAnnotations || []);
+            return rows.map((r) => this._mapHtmlAnnotationToRow(r)).filter((row) => row != null);
         }
         return ANNOTATION_DEMO_ITEMS;
     }
@@ -854,6 +976,67 @@ export default class ContentRecordPage extends LightningElement {
         return `${Math.floor(h / 24)}d ago`;
     }
 
+    /**
+     * Collapse whitespace for de-duplicating highlight text.
+     * @param {string} s
+     * @returns {string}
+     */
+    _normalizeHtmlAnnotationText(s) {
+        return String(s).replace(/\s+/g, ' ').trim();
+    }
+
+    /**
+     * @param {string} key Normalized highlight text
+     * @returns {string|null} Existing annotation id
+     */
+    _findHtmlHighlightDuplicateId(key) {
+        if (!key) {
+            return null;
+        }
+        const rows = this._htmlUserAnnotations || [];
+        for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            if (r.kind === 'highlight' && this._normalizeHtmlAnnotationText(r.text) === key) {
+                return r.id;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {string} tagName
+     * @param {string} textPrefix
+     * @returns {string|null}
+     */
+    _findHtmlBlockDuplicateId(tagName, textPrefix) {
+        const t = this._normalizeHtmlAnnotationText(textPrefix);
+        const tag = String(tagName || 'div').toUpperCase();
+        const rows = this._htmlUserAnnotations || [];
+        for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            if (r.kind !== 'block') {
+                continue;
+            }
+            if (String(r.tagName || 'DIV').toUpperCase() !== tag) {
+                continue;
+            }
+            if (this._normalizeHtmlAnnotationText(r.textPrefix) === t) {
+                return r.id;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Shown on annotation cards: ANN-0001, ANN-0002, … (four digit sequence).
+     * @param {number} oneBasedIndex
+     * @returns {string}
+     */
+    _formatDisplayAnnId(oneBasedIndex) {
+        const n = Math.max(1, Math.floor(Number(oneBasedIndex)) || 1);
+        return `ANN-${String(n).padStart(4, '0')}`;
+    }
+
     _loadHtmlUserAnnotations() {
         this._htmlUserAnnotations = [];
         const id = this.content?.id;
@@ -901,17 +1084,250 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     _getHtmlAnnotationStyleCss() {
+        /* In-doc mark tint keeps highlights visible if parent overlay mis-positions; parent also draws yellow. */
         return (
-            'mark.rcm-html-mark{ background: rgba(254, 220, 102, 0.45) !important; ' +
+            'mark.rcm-html-mark{ background: rgba(255, 240, 120, 0.3) !important; ' +
             'box-decoration-break: clone; } ' +
-            '.rcm-html-block-outlined{ outline: 2px solid #0176d3 !important; ' +
-            'outline-offset: 2px; border-radius: 2px; } ' +
-            '.rcm-html-float-btn{ font-family: "Salesforce Sans", Arial, sans-serif; ' +
-            'font-size: 12px; line-height: 1.5; background: #0176d3; color: #fff; ' +
-            'border: none; border-radius: 4px; padding: 4px 8px; ' +
-            'box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer; } ' +
-            '.rcm-html-float-btn:hover, .rcm-html-float-btn:focus{ background: #014486; }'
+            '.rcm-html-block-outlined{ background: transparent !important; ' +
+            'box-shadow: none !important; border-radius: 3px; }' +
+            ' .rcm-html-block-hover{ outline: 2px solid rgba(116, 116, 116, 0.5) !important; ' +
+            'outline-offset: 2px; }'
         );
+    }
+
+    /**
+     * Remove a user HTML annotation from data, persist, and re-sync the iframe.
+     * @param {string} id
+     */
+    _deleteHtmlUserAnnotationById(id) {
+        if (!id || !this.hasHtmlPreview) {
+            return;
+        }
+        const had = (this._htmlUserAnnotations || []).some((r) => r.id === id);
+        if (!had) {
+            return;
+        }
+        this._htmlUserAnnotations = (this._htmlUserAnnotations || []).filter((r) => r.id !== id);
+        this._persistHtmlUserAnnotations();
+        this._stripAnnotationUiStateForId(id);
+        this._postHtmlFrameRestore();
+        this._postHtmlModeToFrame();
+        this._scheduleSyncHtmlOverlays();
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this._scheduleSyncHtmlOverlays();
+                    this._bumpHtmlAnnotationListEpoch();
+                });
+            });
+        } else {
+            this._bumpHtmlAnnotationListEpoch();
+        }
+    }
+
+    /**
+     * Remove sidebar UI state (selection, menus, …) for one annotation.
+     * @param {string} id
+     */
+    _stripAnnotationUiStateForId(id) {
+        if (!id) {
+            return;
+        }
+        if (this.selectedAnnotationId === id) {
+            this.selectedAnnotationId = null;
+        }
+        if (this.openMenuAnnotationId === id) {
+            this.openMenuAnnotationId = null;
+        }
+        const ex = new Set(this.expandedAnnotationIds);
+        ex.delete(id);
+        this.expandedAnnotationIds = ex;
+        const lk = new Set(this.expandedLinkedClaimsIds);
+        lk.delete(id);
+        this.expandedLinkedClaimsIds = lk;
+        const cm = new Set(this.expandedCommentsIds);
+        cm.delete(id);
+        this.expandedCommentsIds = cm;
+        const ac = new Set(this.anchorCheckedIds);
+        ac.delete(id);
+        this.anchorCheckedIds = ac;
+        if (this.commentDrafts && Object.prototype.hasOwnProperty.call(this.commentDrafts, id)) {
+            const rest = { ...this.commentDrafts };
+            delete rest[id];
+            this.commentDrafts = rest;
+        }
+    }
+
+    /**
+     * Position (px) of a node in the HTML iframe, relative to the top-left of the iframe content
+     * (for overlays stacked on the iframe). Uses only the iframe document to avoid mixing
+     * parent/child getBoundingClientRect() coordinate systems.
+     * @param {HTMLElement} el
+     * @param {HTMLIFrameElement} frame
+     * @returns {{ top: number, left: number, width: number, height: number }|null}
+     */
+    _getHtmlNodeRectInIframeContent(el, frame) {
+        if (!el || !frame) {
+            return null;
+        }
+        const cwin = frame.contentWindow;
+        const cdoc = frame.contentDocument;
+        if (!cwin || !cdoc) {
+            return null;
+        }
+        const dEl = cdoc.documentElement;
+        if (!dEl) {
+            return null;
+        }
+        let r;
+        try {
+            r = el.getBoundingClientRect();
+        } catch (e) {
+            return null;
+        }
+        if (!r || (r.width < 0.5 && r.height < 0.5)) {
+            return null;
+        }
+        const fRect = frame.getBoundingClientRect();
+        const dRect = dEl.getBoundingClientRect();
+        const scX = cwin.pageXOffset || 0;
+        const scY = cwin.pageYOffset || 0;
+        /* (A) Delta to the iframe box — when both rects are in the top-level viewport (e.g. Chrome). */
+        const topA = r.top - fRect.top;
+        const leftA = r.left - fRect.left;
+        /* (B) In-document offset — when the node rect is in the iframe’s own coordinate system. */
+        const topB = r.top - dRect.top + scY;
+        const leftB = r.left - dRect.left + scX;
+        /* Prefer the pair that looks valid; (A) near (0,0) while (B) is not usually means wrong coordinate mix. */
+        let top;
+        let left;
+        if (topA < -0.5 || leftA < -0.5) {
+            top = topB;
+            left = leftB;
+        } else if ((Math.abs(topA) < 0.5 && Math.abs(leftA) < 0.5) && (topB > 2 || leftB > 2)) {
+            top = topB;
+            left = leftB;
+        } else if (Math.abs(topA - topB) > 2 && topB > topA + 0.5) {
+            top = topB;
+            left = leftB;
+        } else {
+            top = topA;
+            left = leftA;
+        }
+        return {
+            top,
+            left,
+            width: r.width,
+            height: r.height
+        };
+    }
+
+    /**
+     * Recompute absolute overlay divs to match [data-rcm-ann] nodes in the HTML iframe.
+     */
+    _syncHtmlAnnotationOverlaysFromFrame() {
+        if (!this.hasHtmlPreview) {
+            this._htmlPreviewOverlays = [];
+            return;
+        }
+        const frame = this.template && this.template.querySelector('.content-record-html-preview-frame');
+        if (!frame) {
+            this._htmlPreviewOverlays = [];
+            return;
+        }
+        let doc;
+        try {
+            doc = frame.contentDocument;
+        } catch (e) {
+            this._htmlPreviewOverlays = [];
+            return;
+        }
+        if (!doc || !doc.body) {
+            this._htmlPreviewOverlays = [];
+            return;
+        }
+        const next = [];
+        const seen = new Set();
+        doc.querySelectorAll('[data-rcm-ann]').forEach((el) => {
+            const id = el.getAttribute('data-rcm-ann');
+            if (!id || seen.has(id)) {
+                return;
+            }
+            seen.add(id);
+            const o = this._getHtmlNodeRectInIframeContent(el, frame);
+            if (!o || o.width < 0.5 || o.height < 0.5) {
+                return;
+            }
+            next.push({
+                id,
+                top: o.top,
+                left: o.left,
+                width: o.width,
+                height: o.height
+            });
+        });
+        this._htmlPreviewOverlays = next;
+    }
+
+    _scheduleSyncHtmlOverlays() {
+        if (!this.hasHtmlPreview) {
+            this._htmlPreviewOverlays = [];
+            return;
+        }
+        if (this._htmlOverlayRaf != null && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(this._htmlOverlayRaf);
+        }
+        this._htmlOverlayRaf = requestAnimationFrame(() => {
+            this._htmlOverlayRaf = null;
+            this._syncHtmlAnnotationOverlaysFromFrame();
+        });
+    }
+
+    get htmlPreviewOverlayItems() {
+        return (this._htmlPreviewOverlays || []).map((o) => {
+            const w = Math.max(2, Math.round(o.width));
+            const h = Math.max(2, Math.round(o.height));
+            const t = Math.round(o.top);
+            const l = Math.round(o.left);
+            return {
+                id: o.id,
+                boxStyle: `top:${t}px;left:${l}px;width:${w}px;height:${h}px;`
+            };
+        });
+    }
+
+    handleHtmlPreviewScroll() {
+        this._scheduleSyncHtmlOverlays();
+    }
+
+    /**
+     * Switch to the annotations tab, select the card, expand it, and scroll it into view.
+     * @param {string} annId
+     */
+    _focusAnnotationInPanel(annId) {
+        if (!annId) {
+            return;
+        }
+        this.scopedPanelTab = 'annotations';
+        this.selectedAnnotationId = annId;
+        const ex = new Set(this.expandedAnnotationIds);
+        ex.add(annId);
+        this.expandedAnnotationIds = ex;
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (typeof this.isConnected === 'boolean' && !this.isConnected) {
+                        return;
+                    }
+                    const sel = this.template?.querySelector(
+                        `div[role="article"].content-record-annotation-card[data-id="${annId}"]`
+                    );
+                    if (sel && typeof sel.scrollIntoView === 'function') {
+                        sel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                });
+            });
+        }
     }
 
     _postToHtmlFrame(data) {
@@ -939,7 +1355,13 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     _postHtmlModeToFrame() {
-        this._postToHtmlFrame({ type: 'rcm-html-set-mode', mode: this.htmlAnnotateMode || 'none' });
+        let mode = 'none';
+        if (this.htmlAnnotateActive) {
+            if (this.htmlAnnotateMode === 'block' || this.htmlAnnotateMode === 'highlight') {
+                mode = this.htmlAnnotateMode;
+            }
+        }
+        this._postToHtmlFrame({ type: 'rcm-html-set-mode', mode });
     }
 
     /**
@@ -956,12 +1378,24 @@ export default class ContentRecordPage extends LightningElement {
         if (!doc || !doc.body) {
             this._postHtmlFrameRestore();
             this._postHtmlModeToFrame();
+            this._htmlPreviewOverlays = [];
             return;
         }
         try {
             if (doc.getElementById('rcm-html-ann-injected-style')) {
                 this._postHtmlFrameRestore();
                 this._postHtmlModeToFrame();
+                this._scheduleSyncHtmlOverlays();
+                if (typeof requestAnimationFrame === 'function') {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            this._scheduleSyncHtmlOverlays();
+                            this._bumpHtmlAnnotationListEpoch();
+                        });
+                    });
+                } else {
+                    this._bumpHtmlAnnotationListEpoch();
+                }
                 return;
             }
             const st = doc.createElement('style');
@@ -984,6 +1418,17 @@ export default class ContentRecordPage extends LightningElement {
         }
         this._postHtmlFrameRestore();
         this._postHtmlModeToFrame();
+        this._scheduleSyncHtmlOverlays();
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this._scheduleSyncHtmlOverlays();
+                    this._bumpHtmlAnnotationListEpoch();
+                });
+            });
+        } else {
+            this._bumpHtmlAnnotationListEpoch();
+        }
     }
 
     /**
@@ -1004,23 +1449,46 @@ export default class ContentRecordPage extends LightningElement {
             return;
         }
         const d = event.data;
-        if (!d || d.type !== 'rcm-html-annotation' || !d.kind) {
+        if (!d || typeof d.type !== 'string') {
+            return;
+        }
+        if (d.type === 'rcm-html-ann-activate' && d.id) {
+            this._focusAnnotationInPanel(String(d.id));
+            return;
+        }
+        if (d.type !== 'rcm-html-annotation' || !d.kind) {
             return;
         }
         const id = `h-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         if (d.kind === 'block' && d.tagName) {
+            const pre = d.textPrefix != null ? String(d.textPrefix) : '';
+            const existingBlock = this._findHtmlBlockDuplicateId(d.tagName, pre);
+            if (existingBlock) {
+                this._focusAnnotationInPanel(existingBlock);
+                return;
+            }
             const next = {
                 id,
                 kind: 'block',
                 tagName: d.tagName,
-                textPrefix: d.textPrefix != null ? String(d.textPrefix) : '',
-                snippet: d.snippet != null ? String(d.snippet) : String(d.textPrefix || ''),
+                textPrefix: pre,
+                snippet: d.snippet != null ? String(d.snippet) : pre,
                 createdAt: Date.now()
             };
             this._htmlUserAnnotations = (this._htmlUserAnnotations || []).concat([next]);
             this._persistHtmlUserAnnotations();
+            this._postHtmlFrameRestore();
         } else if (d.kind === 'highlight' && d.text) {
             const t = String(d.text);
+            const key = this._normalizeHtmlAnnotationText(t);
+            const existingHi = this._findHtmlHighlightDuplicateId(key);
+            if (existingHi) {
+                if (d.pendingId) {
+                    this._postToHtmlFrame({ type: 'rcm-html-undo-pending', pendingId: d.pendingId });
+                }
+                this._focusAnnotationInPanel(existingHi);
+                return;
+            }
             const next = {
                 id,
                 kind: 'highlight',
@@ -1030,38 +1498,61 @@ export default class ContentRecordPage extends LightningElement {
             };
             this._htmlUserAnnotations = (this._htmlUserAnnotations || []).concat([next]);
             this._persistHtmlUserAnnotations();
+            if (d.pendingId) {
+                this._postToHtmlFrame({ type: 'rcm-html-resolve-pending', pendingId: d.pendingId, id: next.id });
+            } else {
+                this._postHtmlFrameRestore();
+            }
         } else {
             return;
         }
-        this._postHtmlFrameRestore();
         this._postHtmlModeToFrame();
+        this._scheduleSyncHtmlOverlays();
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this._scheduleSyncHtmlOverlays();
+                    this._bumpHtmlAnnotationListEpoch();
+                });
+            });
+        } else {
+            this._bumpHtmlAnnotationListEpoch();
+        }
+        if (typeof setTimeout === 'function') {
+            setTimeout(() => {
+                this._scheduleSyncHtmlOverlays();
+            }, 150);
+        }
     }
 
-    handleHtmlAnnotateModeNone() {
+    handleHtmlAnnotateToggle() {
+        this.htmlAnnotateActive = !this.htmlAnnotateActive;
         this.htmlAnnotateMode = 'none';
         this._postHtmlModeToFrame();
     }
 
     handleHtmlAnnotateModeBlock() {
+        this.htmlAnnotateActive = true;
         this.htmlAnnotateMode = 'block';
         this._postHtmlModeToFrame();
     }
 
     handleHtmlAnnotateModeHighlight() {
+        this.htmlAnnotateActive = true;
         this.htmlAnnotateMode = 'highlight';
         this._postHtmlModeToFrame();
     }
 
-    get htmlModeNoneVariant() {
-        return this.htmlAnnotateMode === 'none' ? 'brand' : 'neutral';
+    get htmlAnnotateToggleVariant() {
+        return this.htmlAnnotateActive ? 'brand' : 'neutral';
     }
 
-    get htmlModeBlockVariant() {
-        return this.htmlAnnotateMode === 'block' ? 'brand' : 'neutral';
+    get htmlToolHighlightVariant() {
+        return this.htmlAnnotateActive && this.htmlAnnotateMode === 'highlight' ? 'brand' : 'border-filled';
     }
 
-    get htmlModeHighlightVariant() {
-        return this.htmlAnnotateMode === 'highlight' ? 'brand' : 'neutral';
+    get htmlToolBlockVariant() {
+        return this.htmlAnnotateActive && this.htmlAnnotateMode === 'block' ? 'brand' : 'border-filled';
     }
 
     _scrollHtmlAnnotationIntoView(annotationId) {
@@ -1069,10 +1560,15 @@ export default class ContentRecordPage extends LightningElement {
             return;
         }
         this._postToHtmlFrame({ type: 'rcm-html-scroll', id: String(annotationId) });
+        if (typeof window !== 'undefined' && typeof window.setTimeout === 'function') {
+            window.setTimeout(() => {
+                this._scheduleSyncHtmlOverlays();
+            }, 300);
+        }
     }
 
     get annotationItems() {
-        return this._annotationBaseRows.map((item) => {
+        return this._annotationBaseRows.map((item, index) => {
             const expanded = this.expandedAnnotationIds.has(item.id);
             const linkedClaims = (item.linkedClaims || []).map((lc, i) => ({
                 ...lc,
@@ -1097,7 +1593,7 @@ export default class ContentRecordPage extends LightningElement {
                 comments: commentsWithUi,
                 linkedClaimsCount,
                 commentsCount,
-                displayAnnId: `ANN-${item.id}`,
+                displayAnnId: this._formatDisplayAnnId(index + 1),
                 commentDraftValue: this.commentDrafts[item.id] ?? '',
                 showAnchorIcon: this.anchorCheckedIds.has(item.id),
                 expanded,
@@ -1185,6 +1681,19 @@ export default class ContentRecordPage extends LightningElement {
 
     get hasNoAnnotations() {
         return this.annotationItems.length === 0;
+    }
+
+    /** @returns {string} */
+    get annotationsEmptyStateImageUrl() {
+        return ANNOTATIONS_EMPTY_STATE_IMAGE;
+    }
+
+    /**
+     * Hide search / filter in the Annotations tab on HTML records until there is at least one annotation.
+     * @returns {boolean}
+     */
+    get showAnnotationListTools() {
+        return !this.hasHtmlPreview || this.annotationItems.length > 0;
     }
 
     /**
@@ -1427,7 +1936,7 @@ export default class ContentRecordPage extends LightningElement {
         } else if (action === 'edit') {
             console.log('Edit annotation:', id);
         } else if (action === 'delete') {
-            console.log('Delete annotation:', id);
+            this._deleteHtmlUserAnnotationById(id);
         } else if (action === 'resolve') {
             console.log('Resolve annotation:', id);
         } else if (action === 'unresolve') {

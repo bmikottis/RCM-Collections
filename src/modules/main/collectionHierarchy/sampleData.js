@@ -242,13 +242,21 @@ export const sampleCollections = {
                     contentType: 'pdf',
                     contentTypeLabel: 'Promotional Emailer',
                     version: '0.1',
-                    status: 'Draft',
+                    status: 'In Review',
                     effectiveDates: '01/01/2016 - 12/31/2036',
-                    fulfillsRequirement: 'req-001'
+                    fulfillsRequirement: 'req-001',
+                    thumbnailUrl: '/public/assets/cordim/02_Risks and prevalence/01_thumbnail.jpg'
                 },
-                { id: 'cnt-001', name: 'Submission Cover Letter.pdf', contentType: 'pdf', fulfillsRequirement: 'req-001' },
-                { id: 'cnt-002', name: 'Product Summary.docx', contentType: 'word', fulfillsRequirement: 'req-002' },
-                { id: 'cnt-002b', name: 'Module 2 CTD Summaries.pdf', contentType: 'pdf', fulfillsRequirement: 'req-004' }
+                {
+                    id: 'cnt-001',
+                    name: 'Submission Cover Letter.pdf',
+                    contentType: 'pdf',
+                    fulfillsRequirement: 'req-001',
+                    status: 'Approved',
+                    thumbnailUrl: '/public/assets/cordim/01_Patients with arterial hypertension/01_thumbnail.jpg'
+                },
+                { id: 'cnt-002', name: 'Product Summary.docx', contentType: 'word', fulfillsRequirement: 'req-002', status: 'Draft' },
+                { id: 'cnt-002b', name: 'Module 2 CTD Summaries.pdf', contentType: 'pdf', fulfillsRequirement: 'req-004', status: 'Draft' }
             ],
             completedTasks: ['task-004'],
             children: [

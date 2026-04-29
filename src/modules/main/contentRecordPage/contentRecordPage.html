@@ -148,31 +148,46 @@
                                         <div
                                             class="content-record-viewer-toolbar-row content-record-html-annotate-row"
                                             role="toolbar"
-                                            aria-label="HTML preview annotation tools">
-                                            <span
-                                                class="content-record-html-annotate-hint slds-text-body_small slds-text-color_weak slds-m-right_x-small">
-                                                Same-origin preview: choose Blocks and click a region, or Text then select and use Add highlight.
-                                            </span>
-                                            <lightning-button-group>
+                                            aria-label="HTML preview annotation">
+                                            <div class="content-record-html-annotate-start">
                                                 <lightning-button
-                                                    label="Off"
-                                                    variant={htmlModeNoneVariant}
-                                                    title="Clear annotation tool"
-                                                    onclick={handleHtmlAnnotateModeNone}>
+                                                    label="Annotate"
+                                                    title="Turn on Annotate, pick a tool, then select text or click a block in the preview"
+                                                    variant={htmlAnnotateToggleVariant}
+                                                    onclick={handleHtmlAnnotateToggle}
+                                                    class="content-record-html-annotate-action">
                                                 </lightning-button>
-                                                <lightning-button
-                                                    label="Blocks"
-                                                    variant={htmlModeBlockVariant}
-                                                    title="Click a content block in the page to add a section annotation"
-                                                    onclick={handleHtmlAnnotateModeBlock}>
-                                                </lightning-button>
-                                                <lightning-button
-                                                    label="Text"
-                                                    variant={htmlModeHighlightVariant}
-                                                    title="Select text in the page, then click Add highlight"
-                                                    onclick={handleHtmlAnnotateModeHighlight}>
-                                                </lightning-button>
-                                            </lightning-button-group>
+                                                <template lwc:if={htmlAnnotateActive}>
+                                                    <div
+                                                        class="content-record-html-annotate-tools"
+                                                        role="group"
+                                                        aria-label="Annotation tools">
+                                                        <lightning-button-icon
+                                                            icon-name="utility:highlight"
+                                                            size="small"
+                                                            variant={htmlToolHighlightVariant}
+                                                            alternative-text="Text highlight"
+                                                            title="Drag to select text; the highlight is added when you release the mouse"
+                                                            onclick={handleHtmlAnnotateModeHighlight}
+                                                            class="content-record-html-tool content-record-html-tool_text">
+                                                        </lightning-button-icon>
+                                                        <lightning-button-icon
+                                                            icon-name="utility:screen"
+                                                            size="small"
+                                                            variant={htmlToolBlockVariant}
+                                                            alternative-text="Select page element for block"
+                                                            title="Select an element: hover to preview, click to add a block (yellow) annotation"
+                                                            onclick={handleHtmlAnnotateModeBlock}
+                                                            class="content-record-html-tool content-record-html-tool_block">
+                                                        </lightning-button-icon>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <p
+                                                class="content-record-html-annotate-hint slds-text-body_small slds-text-color_weak slds-m-left_small">
+                                                Text: drag to select. Block: use the page tool&mdash;hover a region for
+                                                a grey preview, then click; yellow shows your saved marks.
+                                            </p>
                                         </div>
                                     </template>
                                     <div
@@ -254,13 +269,28 @@
                                         <div
                                             class="content-record-html-preview-scroll"
                                             role="region"
-                                            aria-label="HTML content preview">
-                                            <iframe
-                                                class="content-record-html-preview-frame"
-                                                title={contentName}
-                                                src={previewDocumentUrl}
-                                                sandbox="allow-same-origin allow-scripts"
-                                                onload={handleHtmlFrameLoad}></iframe>
+                                            aria-label="HTML content preview"
+                                            onscroll={handleHtmlPreviewScroll}>
+                                            <div class="content-record-html-iframe-stack">
+                                                <iframe
+                                                    class="content-record-html-preview-frame"
+                                                    title={contentName}
+                                                    src={previewDocumentUrl}
+                                                    sandbox="allow-same-origin allow-scripts"
+                                                    onload={handleHtmlFrameLoad}></iframe>
+                                                <div
+                                                    class="content-record-html-ann-overlays"
+                                                    data-overlay-root
+                                                    aria-hidden="true">
+                                                    <template for:each={htmlPreviewOverlayItems} for:item="o">
+                                                        <div
+                                                            key={o.id}
+                                                            class="content-record-html-ann-overlay"
+                                                            data-ann-id={o.id}
+                                                            style={o.boxStyle}></div>
+                                                    </template>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
                                     <template lwc:else>
@@ -306,7 +336,7 @@
                                         <div class="content-record-scoped-tab-body">
                                         <div class="content-record-annotations-panel">
                                             <h2 class="content-record-annotations-heading slds-assistive-text">Annotations</h2>
-                                            <div class="content-record-annotations-controls">
+                                            <div lwc:if={showAnnotationListTools} class="content-record-annotations-controls">
                                                 <lightning-input
                                                     type="search"
                                                     label="Search annotations"
@@ -347,18 +377,15 @@
                                                                 </lightning-icon>
                                                             </button>
                                                             <div class="content-record-annotation-title-cluster">
+                                                                <p class="content-record-annotation-ann-code">{ann.displayAnnId}</p>
                                                                 <template lwc:if={ann.showAnchorIcon}>
-                                                                    <span
-                                                                        class="content-record-annotation-status-icon content-record-annotation-status-icon_anchor"
-                                                                        title="Marked as anchor"
-                                                                        aria-label="Marked as anchor">
-                                                                        <lightning-icon
-                                                                            icon-name="utility:pinned"
-                                                                            size="xx-small"
-                                                                            class="content-record-annotation-icon-tint_anchor"
-                                                                            alternative-text="">
-                                                                        </lightning-icon>
-                                                                    </span>
+                                                                    <img
+                                                                        src={anchorBadgeSrc}
+                                                                        class="content-record-annotation-anchor-badge__img"
+                                                                        width="14"
+                                                                        height="14"
+                                                                        alt="Marked as anchor"
+                                                                        title="Marked as anchor" />
                                                                 </template>
                                                                 <template lwc:if={ann.flagged}>
                                                                     <span
@@ -373,7 +400,6 @@
                                                                         </lightning-icon>
                                                                     </span>
                                                                 </template>
-                                                                <p class="content-record-annotation-ann-code">{ann.displayAnnId}</p>
                                                             </div>
                                                             <div class="content-record-annotation-more-wrap">
                                                                 <button
@@ -614,8 +640,23 @@
                                                                                             </div>
                                                                                         </template>
                                                                                         <template lwc:else>
-                                                                                            <div class="content-record-annotation-section-body">
-                                                                                                No linked claims. Use &quot;Link Claim&quot; to add one.
+                                                                                            <div
+                                                                                                class="content-record-linked-claims-empty"
+                                                                                                role="region"
+                                                                                                aria-label="No linked claims">
+                                                                                                <p
+                                                                                                    class="content-record-linked-claims-empty-message slds-text-body_small">
+                                                                                                    No claims have been linked
+                                                                                                </p>
+                                                                                                <lightning-button
+                                                                                                    variant="neutral"
+                                                                                                    label="Match to Claim in Library"
+                                                                                                    icon-name="utility:sparkle"
+                                                                                                    class="content-record-linked-claims-empty-cta"
+                                                                                                    data-id={ann.id}
+                                                                                                    title="Open claim library to match a claim"
+                                                                                                    onclick={handleLinkClaimClick}>
+                                                                                                </lightning-button>
                                                                                             </div>
                                                                                         </template>
                                                                                     </template>
@@ -762,8 +803,21 @@
                                                     </div>
                                                 </template>
                                                 <template lwc:if={hasNoAnnotations}>
-                                                    <div class="content-record-annotations-empty">
-                                                        <p class="slds-text-color_weak">No annotations yet</p>
+                                                    <div class="content-record-annotations-empty" role="status">
+                                                        <div
+                                                            class="content-record-annotations-empty-illustration"
+                                                            aria-hidden="true">
+                                                            <img
+                                                                src={annotationsEmptyStateImageUrl}
+                                                                alt=""
+                                                                class="content-record-annotations-empty-image" />
+                                                        </div>
+                                                        <h3 class="content-record-annotations-empty-title slds-text-heading_small slds-m-top_medium">No annotations yet</h3>
+                                                        <p class="content-record-annotations-empty-body slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                                                            Turn on <strong class="slds-text-color_default">Annotate</strong>, use the
+                                                            text or block tool, then select content in the document preview. Annotations
+                                                            you add will appear in this list.
+                                                        </p>
                                                     </div>
                                                 </template>
                                             </div>
