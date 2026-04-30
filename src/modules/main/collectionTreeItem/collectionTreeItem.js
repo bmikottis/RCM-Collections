@@ -4,11 +4,28 @@ import { LightningElement, api, track } from 'lwc';
 const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
 const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
 
-/**
- * Generic document icon for all content items
- */
-const GENERIC_DOCUMENT_ICON = 'utility:file';
 const DECK_TREE_PREVIEW_ICON = 'utility:preview';
+
+/**
+ * Maps content type to SLDS doctype icon (same mapping as sampleData / collectionDetail).
+ * Kept local — LWR resolves sibling-package imports under collectionTreeItem incorrectly.
+ * @param {string} contentType
+ * @returns {string}
+ */
+function getContentTypeIcon(contentType) {
+    const iconMap = {
+        pdf: 'doctype:pdf',
+        word: 'doctype:word',
+        excel: 'doctype:excel',
+        ppt: 'doctype:ppt',
+        image: 'doctype:image',
+        video: 'doctype:video',
+        html: 'doctype:html',
+        zip: 'doctype:zip',
+        unknown: 'doctype:unknown'
+    };
+    return iconMap[contentType] || iconMap.unknown;
+}
 
 /**
  * Recursive tree item component for displaying collection hierarchy.
@@ -101,7 +118,7 @@ export default class CollectionTreeItem extends LightningElement {
     }
 
     /**
-     * Get content items with generic document icon
+     * Content rows: SLDS doctype icon from content type; Cordim interactive deck keeps preview (eye).
      * @returns {Array}
      */
     get contentItems() {
@@ -109,14 +126,24 @@ export default class CollectionTreeItem extends LightningElement {
             return [];
         }
         const selectedId = this.selectedId;
-        return this.item.content.map(content => ({
-            ...content,
-            icon: content.useDeckPreviewOverlay ? DECK_TREE_PREVIEW_ICON : GENERIC_DOCUMENT_ICON,
-            rowClass:
-                selectedId && content.id === selectedId
-                    ? 'content-item-row slds-is-selected'
-                    : 'content-item-row'
-        }));
+        return this.item.content.map((content) => {
+            const typeKey =
+                typeof content.contentType === 'string' ? content.contentType.toLowerCase() : '';
+            const icon = content.useDeckPreviewOverlay
+                ? DECK_TREE_PREVIEW_ICON
+                : getContentTypeIcon(typeKey || 'unknown');
+            return {
+                ...content,
+                icon,
+                iconAlternativeText: content.useDeckPreviewOverlay
+                    ? 'Preview'
+                    : content.contentTypeLabel || content.contentType || 'Content',
+                rowClass:
+                    selectedId && content.id === selectedId
+                        ? 'content-item-row slds-is-selected'
+                        : 'content-item-row'
+            };
+        });
     }
 
     /**
