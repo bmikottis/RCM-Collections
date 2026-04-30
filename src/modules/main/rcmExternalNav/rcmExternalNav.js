@@ -1,8 +1,16 @@
 /**
- * Palette URL loaded inside the Content AI Studio iframe on the RCM shell route.
- * Empty string = documentation-only mode (no iframe); Collections nav still opens the shell page.
+ * Palette URL for the Content AI Studio iframe / embed.
+ * Set {@link CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH} to match Palette’s address bar when your target project is open
+ * (everything after the host/port, starting with `/projects/`).
+ * Empty EXTERNAL_URL = documentation-only mode (no iframe); Collections nav still opens the shell page.
  */
-export const CONTENT_AI_STUDIO_EXTERNAL_URL = 'http://localhost:3001/projects/proj-8';
+export const CONTENT_AI_STUDIO_PALETTE_ORIGIN = 'http://localhost:3001';
+
+/** E.g. `/projects/proj-pharma-email` — open the canvas in Palette and copy this segment from the URL. */
+export const CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH = '/projects/proj-pharma-email';
+
+export const CONTENT_AI_STUDIO_EXTERNAL_URL =
+    `${CONTENT_AI_STUDIO_PALETTE_ORIGIN}${CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH}`;
 
 /** LWR route for the studio shell (header, console nav, iframe + Save and exit). */
 export const CONTENT_AI_STUDIO_SHELL_PATH = '/lightning/o/Content_AI_Studio__c/home';
