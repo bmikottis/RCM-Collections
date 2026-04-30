@@ -86,11 +86,6 @@ export default class ContentAiStudioPage extends LightningElement {
         navigateToCollectionsHome();
     }
 
-    /** Shell control: return to Collections (Palette should autosave; embed bridge uses the same navigation). */
-    handleSaveAndExit() {
-        navigateToCollectionsHome();
-    }
-
     handleCollectionTemplatesClick(event) {
         event.preventDefault();
         this.showMainTabDropdown = false;

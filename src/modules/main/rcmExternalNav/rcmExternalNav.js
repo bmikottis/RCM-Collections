@@ -12,7 +12,7 @@ export const CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH = '/projects/proj-pharma-ema
 export const CONTENT_AI_STUDIO_EXTERNAL_URL =
     `${CONTENT_AI_STUDIO_PALETTE_ORIGIN}${CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH}`;
 
-/** LWR route for the studio shell (header, console nav, iframe + Save and exit). */
+/** LWR route for the studio shell (header, console nav, Palette iframe). */
 export const CONTENT_AI_STUDIO_SHELL_PATH = '/lightning/o/Content_AI_Studio__c/home';
 
 /**
@@ -64,7 +64,7 @@ export function appendCollectionsReturnParam(targetUrl) {
 }
 
 /**
- * @returns {string} In-app path — always the RCM shell so chrome (Save and exit) stays visible.
+ * @returns {string} In-app path — always the RCM shell so header and console nav stay visible.
  */
 export function getContentAiStudioNavUrl() {
     return CONTENT_AI_STUDIO_SHELL_PATH;

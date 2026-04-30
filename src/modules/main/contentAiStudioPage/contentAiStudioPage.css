@@ -513,14 +513,6 @@
     border: none;
 }
 
-/* Above Palette iframe; does not consume vertical space */
-.studio-exit-fab {
-    position: fixed;
-    right: var(--slds-g-spacing-4, 0.75rem);
-    bottom: var(--slds-g-spacing-4, 0.75rem);
-    z-index: 10001;
-}
-
 /* Content AI Studio card typography (technical values use lightning-input readonly) */
 
 .studio-intro {
