@@ -48,7 +48,7 @@ Constants (mirror src/modules/main/rcmExternalNav/rcmExternalNav.js):
   RCM_PALETTE_POST_SAVE_AND_EXIT = 'saveAndExit'
   RCM_RETURN_QUERY_PARAM      = 'rcm_return'   (Collections URL appended by RCM when launching Palette)
 
-Standalone Palette (e.g. opening localhost:3020 directly, or a bookmark):
+Standalone Palette (e.g. opening your dev URL directly, e.g. localhost:3001, or a bookmark):
   - Read `rcm_return` from the query string (decodeURIComponent).
   - Button handler: await your save/throttled persist if needed, then `window.location.href = rcm_return`.
 

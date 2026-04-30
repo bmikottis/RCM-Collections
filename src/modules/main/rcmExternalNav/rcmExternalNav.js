@@ -2,7 +2,7 @@
  * Palette URL loaded inside the Content AI Studio iframe on the RCM shell route.
  * Empty string = documentation-only mode (no iframe); Collections nav still opens the shell page.
  */
-export const CONTENT_AI_STUDIO_EXTERNAL_URL = 'http://localhost:3020/projects/proj-8';
+export const CONTENT_AI_STUDIO_EXTERNAL_URL = 'http://localhost:3001/projects/proj-8';
 
 /** LWR route for the studio shell (header, console nav, iframe + Save and exit). */
 export const CONTENT_AI_STUDIO_SHELL_PATH = '/lightning/o/Content_AI_Studio__c/home';
@@ -82,7 +82,7 @@ export function navigateToCollectionsHome() {
 }
 
 /**
- * Open Content AI Studio in the RCM shell (iframe loads Palette when EXTERNAL_URL is set).
+ * Open Content AI Studio in the RCM shell (same browser tab; iframe loads Palette when EXTERNAL_URL is set).
  */
 export function navigateToContentAiStudio() {
     const path = getContentAiStudioNavUrl();

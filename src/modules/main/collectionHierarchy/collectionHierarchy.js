@@ -1279,7 +1279,7 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Navigate to Content AI Studio (RCM shell + Palette iframe when configured).
+     * Navigate to Content AI Studio (same tab — in-app shell).
      */
     handleContentAiStudioClick(event) {
         event.preventDefault();
