@@ -153,7 +153,7 @@
     font-weight: 400;
 }
 
-/* Icon container: no tile — folder glyph uses palette indigo-60 only (see .folder-icon) */
+/* Icon container: folder glyph indigo-60; template rows overlay circular indigo badge + white shield */
 .icon-container {
     display: flex;
     align-items: center;
@@ -174,26 +174,32 @@
     --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-indigo-60, #7f8ced);
 }
 
-/* Shield overlay, indigo-40 — no disc (template-sourced collection) */
+/* Template-sourced collection: compact white shield on indigo circle, bottom-right on folder icon */
 .template-source-badge {
     position: absolute;
-    bottom: -1px;
-    right: -1px;
-    display: block;
+    bottom: -3px;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    background-color: var(--slds-g-color-palette-indigo-30, #2f2cb7);
     line-height: 0;
     pointer-events: none;
 }
 
 .template-source-badge__svg {
     display: block;
-    width: 10px;
-    height: 10px;
+    width: 7px;
+    height: 7px;
     flex-shrink: 0;
-    vertical-align: bottom;
 }
 
 .template-source-badge__path {
-    fill: var(--slds-g-color-palette-indigo-40, #3a49da);
+    fill: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
 /* Folder icon styling - 16px size; pointer-events none so row receives click */
@@ -206,7 +212,7 @@
     pointer-events: none;
 }
 
-/* Folder icon (no tile); template rows add .template-source-badge (shield) overlay */
+/* Folder icon; template rows add .template-source-badge (shield in indigo circle) */
 .folder-icon {
     width: 16px;
     height: 16px;

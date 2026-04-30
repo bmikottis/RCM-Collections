@@ -613,22 +613,37 @@ export default class CollectionHierarchy extends LightningElement {
     }
 
     /**
-     * Expand all parent collections in the path to a given collection
-     * Replaces the tracked set (does not merge) so sibling branches from prior
-     * navigation are not left expanded.
+     * Expand all parent collections in the path to a given collection.
+     * Always expands the path from root to {@code collectionId}. Also keeps any
+     * previously expanded collection ids that sit inside that collection's subtree,
+     * so opening content on a parent (e.g. Cordim master on the root Cordim folder)
+     * does not collapse expanded child folders (e.g. Individual Slides). Expanded
+     * branches outside that subtree are not preserved (same as before for unrelated nav).
      * @param {string} collectionId - The target collection ID
      */
     expandPathToCollection(collectionId) {
         const path = getCollectionPath(this.collectionsData, collectionId);
-        if (path) {
-            const newExpandedIds = new Set();
-            path.forEach((item) => {
-                if (!item.isRoot) {
-                    newExpandedIds.add(item.id);
-                }
-            });
-            this.expandedIds = newExpandedIds;
+        if (!path) {
+            return;
         }
+        const pathIds = new Set();
+        path.forEach((item) => {
+            if (!item.isRoot) {
+                pathIds.add(item.id);
+            }
+        });
+
+        const anchor = findCollectionById(this.collectionsData, collectionId);
+        const preserved = new Set();
+        if (anchor) {
+            for (const id of this.expandedIds) {
+                if (findCollectionById(anchor, id)) {
+                    preserved.add(id);
+                }
+            }
+        }
+
+        this.expandedIds = new Set([...pathIds, ...preserved]);
     }
 
     /**
