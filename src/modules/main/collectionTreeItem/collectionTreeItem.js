@@ -7,6 +7,7 @@ const RCM_TREE_OPEN_CONTENT_RECORD = 'rcm-tree-open-content-record';
 /**
  * Generic document icon for all content items
  */
+const GENERIC_DOCUMENT_ICON = 'utility:file';
 const DECK_TREE_PREVIEW_ICON = 'utility:preview';
 
 /**
@@ -296,7 +297,7 @@ export default class CollectionTreeItem extends LightningElement {
                 this.dispatchSelectCollectionWindow();
                 break;
             case 'ArrowRight':
-                if (this.hasChildren && !this.isExpanded) {
+                if (this.canExpand && !this.isExpanded) {
                     event.preventDefault();
                     this.isExpanded = true;
                 }
