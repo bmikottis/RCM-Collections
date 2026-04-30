@@ -1,0 +1,178 @@
+<template>
+    <div class="list-page-container">
+        <header class="global-header">
+            <div class="global-header-left">
+                <div class="app-brand">
+                    <img
+                        class="app-brand__img"
+                        src="/public/assets/brand/makana-pharma-nav-logo.png"
+                        alt="Makana Pharma"
+                    />
+                </div>
+            </div>
+            <div class="global-header-center">
+                <div class="global-search rcm-pill-search" role="search">
+                    <lightning-icon
+                        icon-name="utility:search"
+                        size="x-small"
+                        class="rcm-pill-search__icon"
+                        alternative-text=""
+                    ></lightning-icon>
+                    <input type="search" class="rcm-pill-search__input" placeholder="Search..." aria-label="Search" />
+                </div>
+            </div>
+            <div class="global-header-right">
+                <lightning-button-icon icon-name="utility:user" variant="bare" size="medium" alternative-text="User"></lightning-button-icon>
+            </div>
+        </header>
+
+        <nav class="console-nav">
+            <div class="console-nav-left">
+                <button type="button" class="app-launcher-button" title="App Launcher">
+                    <lightning-icon icon-name="utility:apps" size="x-small" alternative-text="App Launcher"></lightning-icon>
+                </button>
+                <span class="console-app-name">Content Management</span>
+            </div>
+            <div class="console-tabs">
+                <div class="console-tab-wrapper">
+                    <div class="console-tab" onclick={handleNavTabClick} role="button" tabindex="0" onkeydown={handleNavTabKeyDown}>
+                        <span class="tab-label">Regulated Content Col...</span>
+                        <div
+                            class="console-tab-chevron-wrap"
+                            onclick={handleMainTabChevronClick}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={handleNavChevronKeyDown}
+                            title="Open menu"
+                        >
+                            <lightning-icon icon-name="utility:chevrondown" size="x-small" alternative-text="Tab options"></lightning-icon>
+                        </div>
+                    </div>
+                    <template lwc:if={showMainTabDropdown}>
+                        <div class="nav-dropdown-backdrop" onclick={handleNavDropdownClose} role="presentation"></div>
+                        <div class="nav-dropdown" role="menu" aria-label="Regulated Content menu">
+                            <a href="/" class="nav-dropdown-item" role="menuitem" onclick={handleCollectionsClick}>
+                                <span class="nav-dropdown-item-icon nav-dropdown-folder-tile">
+                                    <lightning-icon
+                                        icon-name="utility:open_folder"
+                                        size="x-small"
+                                        variant="inverse"
+                                        alternative-text=""
+                                    ></lightning-icon>
+                                </span>
+                                <span class="nav-dropdown-item-label">Regulated Content Collections</span>
+                            </a>
+                            <a href={collectionTemplatesListUrl} class="nav-dropdown-item" role="menuitem" onclick={handleCollectionTemplatesClick}>
+                                <span class="nav-dropdown-item-icon">
+                                    <lightning-icon icon-name="utility:file" size="x-small" alternative-text=""></lightning-icon>
+                                </span>
+                                <span class="nav-dropdown-item-label">Collection Templates</span>
+                            </a>
+                            <a href={contentAiStudioUrl} class="nav-dropdown-item" role="menuitem" onclick={handleContentAiStudioClick}>
+                                <span class="nav-dropdown-item-icon">
+                                    <lightning-icon icon-name="utility:einstein" size="x-small" alternative-text=""></lightning-icon>
+                                </span>
+                                <span class="nav-dropdown-item-label">Content AI Studio</span>
+                            </a>
+                        </div>
+                    </template>
+                </div>
+                <div class="console-tab is-active">
+                    <span class="tab-label">Content AI Studio</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="studio-page-body">
+            <template lwc:if={showPaletteEmbed}>
+                <main class="studio-main studio-main_embed">
+                    <div class="studio-embed-wrap">
+                        <iframe
+                            src={paletteEmbedUrl}
+                            class="studio-embed"
+                            title="Content AI Studio"
+                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        ></iframe>
+                    </div>
+                    <div class="studio-exit-fab">
+                        <lightning-button
+                            variant="brand"
+                            label="Save and exit"
+                            icon-name="utility:save"
+                            title="Return to Regulated Content Collections"
+                            onclick={handleSaveAndExit}
+                        ></lightning-button>
+                    </div>
+                </main>
+            </template>
+            <template lwc:else>
+                <main class="studio-main">
+                    <lightning-card title="Content AI Studio" icon-name="utility:einstein">
+                        <div class="slds-p-around_small">
+                            <p class="slds-text-body_small slds-m-bottom_medium slds-text-color_weak">
+                                The Palette iframe is hidden until <strong>CONTENT_AI_STUDIO_EXTERNAL_URL</strong> is set in
+                                <strong>rcmExternalNav/rcmExternalNav.js</strong> (empty means documentation-only mode).
+                            </p>
+                            <p class="studio-intro">
+                                Palette (agentic-marketing-studio) uses Next.js and React. It does not run inside this LWR app as copy-paste source.
+                            </p>
+                            <p class="studio-intro studio-intro_tight">
+                                Choose one path: embed a hosted Palette URL in this page, or rebuild specific flows in Lightning Web Components using Palette as a design reference.
+                            </p>
+                            <p class="studio-section-title">Integrate Palette</p>
+                            <div class="studio-subsection slds-m-bottom_medium">
+                                <p class="slds-text-title_caps slds-m-bottom_x-small">Embed</p>
+                                <p class="slds-text-body_regular slds-m-bottom_small">
+                                    Deploy Palette, then set <strong>CONTENT_AI_STUDIO_EXTERNAL_URL</strong> in rcmExternalNav.js. Console nav opens this RCM page; when non-empty, Palette loads in the iframe below.
+                                </p>
+                                <lightning-input
+                                    type="text"
+                                    label="Constant name (nav + iframe)"
+                                    value={studioEmbedConstantName}
+                                    readonly
+                                ></lightning-input>
+                                <lightning-input
+                                    type="text"
+                                    label="Source file"
+                                    value={studioEmbedSourceFile}
+                                    readonly
+                                    class="slds-m-top_small"
+                                ></lightning-input>
+                            </div>
+                            <div class="studio-subsection slds-m-bottom_medium">
+                                <p class="slds-text-title_caps slds-m-bottom_x-small">Rebuild in LWC</p>
+                                <p class="slds-text-body_regular">
+                                    Use Palette for layout and flow reference only. Rebuild in LWC when you need the same console navigation and SLDS patterns as the rest of this prototype.
+                                </p>
+                            </div>
+                            <p class="studio-section-title">Routes in this prototype</p>
+                            <lightning-input
+                                type="text"
+                                label="Primary route"
+                                value={studioRoutePrimary}
+                                readonly
+                            ></lightning-input>
+                            <lightning-input
+                                type="text"
+                                label="Lightning-style route (include trailing slash for static hosting)"
+                                value={studioRouteLightning}
+                                readonly
+                                class="slds-m-top_small"
+                            ></lightning-input>
+                            <p class="studio-muted slds-m-top_medium">
+                                Developer mapping from the Palette repo:
+                            </p>
+                            <lightning-input
+                                type="text"
+                                label="Palette source map file"
+                                value={studioPaletteMapFile}
+                                readonly
+                                class="slds-m-top_x-small"
+                            ></lightning-input>
+                        </div>
+                    </lightning-card>
+                </main>
+            </template>
+        </div>
+    </div>
+</template>

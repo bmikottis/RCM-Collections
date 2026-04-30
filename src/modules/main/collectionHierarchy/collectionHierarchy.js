@@ -11,6 +11,7 @@ import {
     recommendContentForRequired,
     findContentWithParentById
 } from './sampleData';
+import { getContentAiStudioNavUrl, navigateToContentAiStudio } from 'main/rcmExternalNav';
 
 /** App-wide bridge: LWR synthetic shadow blocks normal DOM events from tree → hierarchy. */
 const RCM_TREE_SELECT_COLLECTION = 'rcm-tree-select-collection';
@@ -1210,6 +1211,11 @@ export default class CollectionHierarchy extends LightningElement {
         return '/lightning/o/Regulated_Collection_Template__c/list';
     }
 
+    /** Content AI Studio — RCM shell route; Palette iframe src when EXTERNAL_URL is set (see rcmExternalNav.js). */
+    get contentAiStudioUrl() {
+        return getContentAiStudioNavUrl();
+    }
+
     /**
      * Handle console tab click
      * @param {Event} event
@@ -1270,6 +1276,15 @@ export default class CollectionHierarchy extends LightningElement {
         event.preventDefault();
         this.showMainTabDropdown = false;
         this.showTemplatesList = true;
+    }
+
+    /**
+     * Navigate to Content AI Studio (RCM shell + Palette iframe when configured).
+     */
+    handleContentAiStudioClick(event) {
+        event.preventDefault();
+        this.showMainTabDropdown = false;
+        navigateToContentAiStudio();
     }
 
     handleTemplatesListSearchInput(event) {

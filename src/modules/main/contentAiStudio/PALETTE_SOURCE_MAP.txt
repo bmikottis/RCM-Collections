@@ -1,0 +1,63 @@
+Palette (agentic-marketing-studio) — local clone mapping for RCM-Collections
+================================================================================
+Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind 4, Zustand, Framer Motion, Three.js.
+
+You cannot copy src/**/*.tsx into LWR/LWC and expect it to run. Options:
+  A) Deploy Palette (or run locally) and set PALETTE_EMBED_URL in contentAiStudioPage.js to embed.
+  B) Rebuild selected UX in LWC using Palette only as a visual/IA reference.
+
+Authoring / “studio” surface — start here
+-----------------------------------------
+- src/app/page.tsx              Home → renders WorkspaceMain (main landing workspace).
+- src/app/projects/page.tsx     Projects list grid.
+- src/app/projects/new/page.tsx New project flow.
+- src/app/projects/[id]/page.tsx Canvas / authoring shell for a project (large).
+
+Workspace UI (canvas, agents, sidebars)
+---------------------------------------
+- src/components/workspace/     WorkspaceMain, WorkspaceCanvas, CanvasExplorer, sidebars, toolbars, anchored agent panel, etc.
+- src/components/generation/    GenerationConsole, GenerationLog (generation UX).
+- src/components/composer/      HomeCommandBar, BriefMenu (prompt / brief entry).
+- src/components/planning/      PlanningFlow, prompts, chips (planning before generation).
+- src/components/preview/       PreviewView (channel preview).
+
+State (if porting behavior to LWC, study these for data shape — still rewrite stores)
+------------------------------------------------------------------------------------
+- src/stores/                   Zustand stores (canvas, projects, workspace, conversation, etc.).
+
+Mock data / types
+-----------------
+- src/data/mock-*.ts            Demo payloads.
+- src/types/*.ts                TypeScript contracts.
+
+Shell / layout (Palette chrome — usually omit in RCM; use your global header instead)
+-------------------------------------------------------------------------------------
+- src/components/layout/        Shell, headers.
+- src/app/layout.tsx            Root layout.
+
+When cherry-picking: prefer one vertical slice (e.g. WorkspaceMain + one store + mock data),
+not the whole repo.
+
+
+Save and exit (return to RCM Collections)
+-------------------------------------------
+Your screenshot toolbar (zoom %, fullscreen, share) lives in Palette — add a control there.
+
+Constants (mirror src/modules/main/rcmExternalNav/rcmExternalNav.js):
+  RCM_PALETTE_POST_SOURCE     = 'rcm-palette-bridge'
+  RCM_PALETTE_POST_SAVE_AND_EXIT = 'saveAndExit'
+  RCM_RETURN_QUERY_PARAM      = 'rcm_return'   (Collections URL appended by RCM when launching Palette)
+
+Standalone Palette (e.g. opening localhost:3020 directly, or a bookmark):
+  - Read `rcm_return` from the query string (decodeURIComponent).
+  - Button handler: await your save/throttled persist if needed, then `window.location.href = rcm_return`.
+
+Embedded in RCM (/content-ai-studio iframe):
+  - After save (if applicable): `window.parent.postMessage(
+      { source: 'rcm-palette-bridge', action: 'saveAndExit' },
+      '*'
+    );`
+  - RCM verifies `event.source === iframe.contentWindow` before navigating.
+
+Toolbar placement: add the button beside Share / fullscreen in the project canvas toolbar component under
+src/components/workspace/ (see WorkspaceCanvas / explorer toolbars — exact file varies by fork).

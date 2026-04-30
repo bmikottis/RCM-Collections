@@ -1,4 +1,5 @@
 import { LightningElement, track } from 'lwc';
+import { getContentAiStudioNavUrl, navigateToContentAiStudio } from 'main/rcmExternalNav';
 
 /** Template list for list view (matches collectionTypes in sampleData) */
 const TEMPLATES_LIST = [
@@ -23,6 +24,10 @@ export default class CollectionTemplatesListPage extends LightningElement {
 
     get collectionTemplatesListUrl() {
         return '/lightning/o/Regulated_Collection_Template__c/list';
+    }
+
+    get contentAiStudioUrl() {
+        return getContentAiStudioNavUrl();
     }
 
     /**
@@ -91,6 +96,12 @@ export default class CollectionTemplatesListPage extends LightningElement {
         event.preventDefault();
         this.showMainTabDropdown = false;
         window.top.location.href = new URL(this.collectionTemplatesListUrl, window.location.origin).href;
+    }
+
+    handleContentAiStudioClick(event) {
+        event.preventDefault();
+        this.showMainTabDropdown = false;
+        navigateToContentAiStudio();
     }
 
     handleMainTabChevronClick(event) {
