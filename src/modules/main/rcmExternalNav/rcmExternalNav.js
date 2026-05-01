@@ -4,7 +4,8 @@
  * (everything after the host/port, starting with `/projects/`).
  * Empty EXTERNAL_URL = documentation-only mode (no iframe); Collections nav still opens the shell page.
  */
-export const CONTENT_AI_STUDIO_PALETTE_ORIGIN = 'http://localhost:3001';
+export const CONTENT_AI_STUDIO_PALETTE_ORIGIN =
+    'https://rcm-content-ai-studio-9e9177f190fd.herokuapp.com';
 
 /** E.g. `/projects/proj-pharma-email` — open the canvas in Palette and copy this segment from the URL. */
 export const CONTENT_AI_STUDIO_PALETTE_PROJECT_PATH = '/projects/proj-pharma-email';
