@@ -8,6 +8,10 @@ const EMBED_PDF_ENTRY_PATH = '/public/assets/vendor/embedpdf-snippet/embedpdf.js
 const ANNOTATIONS_EMPTY_STATE_IMAGE = '/public/assets/content-record/annotations-empty-state.png';
 /** Figma RCM Component Library (e.g. node 2-9996) — anchor marker beside ANN-XXXX */
 const ANCHOR_BADGE_SVG = '/public/assets/content-record/anchor-badge.svg';
+const CONTENT_ASSISTANT_KEY_STORAGE = 'rcm-content-assistant-openai-key';
+const CONTENT_ASSISTANT_MODE_STORAGE = 'rcm-content-assistant-mode';
+const CONTENT_ASSISTANT_API_URL = 'https://api.openai.com/v1/responses';
+const CONTENT_ASSISTANT_MODEL = 'gpt-4.1-mini';
 
 /**
  * Native ESM import by absolute URL. Built so LWR prod-compat does not register @embedpdf as an AMD "module" bare specifier.
@@ -184,7 +188,7 @@ export default class ContentRecordPage extends LightningElement {
     @api recordBreadcrumbItems;
 
     @track activeTab = 'document';
-    /** Right sidebar scoped tabs: annotations | contentWorkItems */
+    /** Right sidebar scoped tabs: annotations | contentWorkItems | contentAssistant */
     @track scopedPanelTab = 'annotations';
     @track workflowStage = 'draft'; // draft | review | approve | archive
     @track expandedAnnotationIds = new Set();
@@ -202,6 +206,10 @@ export default class ContentRecordPage extends LightningElement {
     /** URL for Figma anchor badge (14×14) next to ANN-XXXX on the card header */
     anchorBadgeSrc = ANCHOR_BADGE_SVG;
     @track sidebarWidthPx = SIDEBAR_DEFAULT_PX;
+    @track assistantDraft = '';
+    @track assistantMessagesState = [];
+    @track assistantIsLoading = false;
+    @track assistantError = '';
 
     @track _splitterMaxForAria = 1200;
 
@@ -657,6 +665,30 @@ export default class ContentRecordPage extends LightningElement {
         this.htmlAnnotateActive = false;
         this._teardownHtmlPreviewOverlays();
         this._loadHtmlUserAnnotations();
+        this._seedAssistantMessagesForContent();
+    }
+
+    _seedAssistantMessagesForContent() {
+        this.assistantMessagesState = [this._buildSummaryAssistantMessage()];
+        this.assistantDraft = '';
+        this.assistantIsLoading = false;
+        this.assistantError = '';
+    }
+
+    _buildSummaryAssistantMessage() {
+        return {
+            id: `assistant-summary-${Date.now()}`,
+            role: 'assistant',
+            isUser: false,
+            author: 'Document Summary',
+            badgeLabel: 'New',
+            body: this.contentAssistantSummaryText,
+            avatarClass: 'content-record-assistant-avatar content-record-assistant-avatar_summary',
+            avatarIcon: 'utility:summary',
+            badgeClass: 'content-record-assistant-badge',
+            showActions: true,
+            cardClass: 'content-record-assistant-message-card'
+        };
     }
 
     _syncPdfViewerForContent() {
@@ -1059,7 +1091,7 @@ export default class ContentRecordPage extends LightningElement {
         event.preventDefault();
         const el = event.currentTarget;
         const v = el && el.dataset && el.dataset.tab;
-        if (v === 'annotations' || v === 'contentWorkItems') {
+        if (v === 'annotations' || v === 'contentWorkItems' || v === 'contentAssistant') {
             this.scopedPanelTab = v;
         }
     }
@@ -1074,11 +1106,14 @@ export default class ContentRecordPage extends LightningElement {
             return;
         }
         event.preventDefault();
-        if (k === 'ArrowLeft' && this.scopedPanelTab === 'contentWorkItems') {
+        const tabs = ['annotations', 'contentWorkItems', 'contentAssistant'];
+        const current = tabs.indexOf(this.scopedPanelTab);
+        if (current === -1) {
             this.scopedPanelTab = 'annotations';
-        } else if (k === 'ArrowRight' && this.scopedPanelTab === 'annotations') {
-            this.scopedPanelTab = 'contentWorkItems';
+            return;
         }
+        const next = k === 'ArrowRight' ? (current + 1) % tabs.length : (current - 1 + tabs.length) % tabs.length;
+        this.scopedPanelTab = tabs[next];
     }
 
     /**
@@ -1988,7 +2023,7 @@ export default class ContentRecordPage extends LightningElement {
     }
 
     get contentWorkItemsTabLabel() {
-        return `Content Work items (${this.contentWorkItemsCount})`;
+        return `Work items (${this.contentWorkItemsCount})`;
     }
 
     /** Placeholder work items for Content Work items scoped tab (Figma 514:115046) */
@@ -2012,6 +2047,10 @@ export default class ContentRecordPage extends LightningElement {
         return this.scopedPanelTab === 'contentWorkItems';
     }
 
+    get isScopedContentAssistant() {
+        return this.scopedPanelTab === 'contentAssistant';
+    }
+
     get annotationScopedTabItemClass() {
         const base = 'slds-tabs_scoped__item';
         return this.scopedPanelTab === 'annotations' ? `${base} slds-is-active` : base;
@@ -2022,12 +2061,251 @@ export default class ContentRecordPage extends LightningElement {
         return this.scopedPanelTab === 'contentWorkItems' ? `${base} slds-is-active` : base;
     }
 
+    get assistantScopedTabItemClass() {
+        const base = 'slds-tabs_scoped__item';
+        return this.scopedPanelTab === 'contentAssistant' ? `${base} slds-is-active` : base;
+    }
+
     get annotationScopedTabTabindex() {
         return this.scopedPanelTab === 'annotations' ? 0 : -1;
     }
 
     get workItemsScopedTabTabindex() {
         return this.scopedPanelTab === 'contentWorkItems' ? 0 : -1;
+    }
+
+    get assistantScopedTabTabindex() {
+        return this.scopedPanelTab === 'contentAssistant' ? 0 : -1;
+    }
+
+    get contentAssistantMessages() {
+        return this.assistantMessagesState;
+    }
+
+    get contentAssistantSummaryText() {
+        const explicit =
+            this.content?.aiSummary ||
+            this.content?.summary ||
+            this.content?.description ||
+            this.content?.assistantSummary;
+        if (explicit && typeof explicit === 'string' && explicit.trim()) {
+            return explicit.trim();
+        }
+        const title = this.content?.title || this.contentName;
+        const type = this.contentFormatTypeLabel || this.contentTypeDisplay || 'content';
+        const status = this.contentStatus || 'Draft';
+        const version = this.contentVersion || '1.0';
+        return `${title} is a ${type.toLowerCase()} record currently in ${status} status (version ${version}). Add a document summary on this content record to display richer context in Content Assistant.`;
+    }
+
+    get isAssistantSendDisabled() {
+        return this.assistantIsLoading || !this.assistantDraft || !this.assistantDraft.trim();
+    }
+
+    handleAssistantInputChange(event) {
+        this.assistantDraft = event.detail.value || '';
+    }
+
+    handleAssistantInputKeydown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            if (!this.isAssistantSendDisabled) {
+                void this.handleAssistantSendClick();
+            }
+        }
+    }
+
+    _getAssistantApiKey() {
+        if (typeof window === 'undefined') {
+            return '';
+        }
+        try {
+            return window.sessionStorage.getItem(CONTENT_ASSISTANT_KEY_STORAGE) || '';
+        } catch {
+            return '';
+        }
+    }
+
+    _getAssistantMode() {
+        if (typeof window === 'undefined') {
+            return 'live';
+        }
+        try {
+            return window.sessionStorage.getItem(CONTENT_ASSISTANT_MODE_STORAGE) || 'live';
+        } catch {
+            return 'live';
+        }
+    }
+
+    _setAssistantMode(mode) {
+        if (typeof window === 'undefined') {
+            return;
+        }
+        try {
+            window.sessionStorage.setItem(CONTENT_ASSISTANT_MODE_STORAGE, mode);
+        } catch {
+            /* ignore */
+        }
+    }
+
+    handleAssistantSetApiKey() {
+        if (typeof window === 'undefined') {
+            return;
+        }
+        const entered = window.prompt('Paste your OpenAI API key (stored in this browser session only):');
+        if (!entered || !entered.trim()) {
+            return;
+        }
+        try {
+            window.sessionStorage.setItem(CONTENT_ASSISTANT_KEY_STORAGE, entered.trim());
+            this._setAssistantMode('live');
+            this.assistantError = '';
+        } catch {
+            this.assistantError = 'Unable to store API key in this browser session.';
+        }
+    }
+
+    handleAssistantUseMock() {
+        this._setAssistantMode('mock');
+        this.assistantError = '';
+    }
+
+    _toAssistantChatHistory() {
+        return (this.assistantMessagesState || []).map((m) => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: [{ type: 'input_text', text: m.body || '' }]
+        }));
+    }
+
+    _readResponseText(payload) {
+        if (payload && typeof payload.output_text === 'string' && payload.output_text.trim()) {
+            return payload.output_text.trim();
+        }
+        const parts = [];
+        const output = (payload && payload.output) || [];
+        for (let i = 0; i < output.length; i += 1) {
+            const item = output[i];
+            const content = (item && item.content) || [];
+            for (let j = 0; j < content.length; j += 1) {
+                const c = content[j];
+                if (c && typeof c.text === 'string' && c.text.trim()) {
+                    parts.push(c.text.trim());
+                }
+            }
+        }
+        return parts.join('\n\n').trim();
+    }
+
+    _buildMockAssistantReply(userPrompt) {
+        const prompt = String(userPrompt || '').trim();
+        const firstSentence = this.contentAssistantSummaryText.split('. ')[0] || this.contentAssistantSummaryText;
+        if (!prompt) {
+            return `Mock mode: ${firstSentence}.`;
+        }
+        const lower = prompt.toLowerCase();
+        if (lower.includes('isi') || lower.includes('warning') || lower.includes('risk')) {
+            return `Mock mode: Based on this document, I would run an ISI and boxed-warning check first, then flag any risk language without balancing safety context.`;
+        }
+        if (lower.includes('claim') || lower.includes('evidence')) {
+            return `Mock mode: I can help map each promotional claim to supporting evidence and identify statements that may need stronger substantiation.`;
+        }
+        return `Mock mode: For "${prompt}", I would use this document context first: ${firstSentence}. I can draft a concise review response once you specify whether you want medical, legal, or promotional lens.`;
+    }
+
+    async handleAssistantSendClick() {
+        if (this.isAssistantSendDisabled) {
+            return;
+        }
+        const userPrompt = this.assistantDraft.trim();
+        const userMessage = {
+            id: `user-${Date.now()}`,
+            role: 'user',
+            isUser: true,
+            author: 'You',
+            badgeLabel: '',
+            body: userPrompt,
+            avatarClass: '',
+            avatarIcon: '',
+            badgeClass: '',
+            showActions: false,
+            cardClass: 'content-record-assistant-message-card content-record-assistant-message-card_user'
+        };
+        this.assistantMessagesState = [...this.assistantMessagesState, userMessage];
+        this.assistantDraft = '';
+        this.assistantIsLoading = true;
+        this.assistantError = '';
+
+        let apiKey = this._getAssistantApiKey();
+        let mode = this._getAssistantMode();
+        if (!apiKey && mode !== 'mock' && typeof window !== 'undefined') {
+            this.handleAssistantSetApiKey();
+            apiKey = this._getAssistantApiKey();
+            mode = this._getAssistantMode();
+        }
+        if (!apiKey && mode !== 'mock') {
+            this.assistantIsLoading = false;
+            this.assistantError = 'Set an API key or switch to Mock Replies.';
+            return;
+        }
+
+        try {
+            let llmText = '';
+            if (mode === 'mock') {
+                llmText = this._buildMockAssistantReply(userPrompt);
+            } else {
+                const contextTitle = this.content?.title || this.content?.name || 'document';
+                const response = await fetch(CONTENT_ASSISTANT_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: CONTENT_ASSISTANT_MODEL,
+                        input: [
+                            {
+                                role: 'system',
+                                content: [
+                                    {
+                                        type: 'input_text',
+                                        text:
+                                            `You are Content Assistant for regulated content review. ` +
+                                            `Keep answers concise, practical, and grounded in the selected document context. ` +
+                                            `Current record: ${contextTitle}. Summary: ${this.contentAssistantSummaryText}`
+                                    }
+                                ]
+                            },
+                            ...this._toAssistantChatHistory()
+                        ]
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`LLM request failed (${response.status})`);
+                }
+                const payload = await response.json();
+                llmText =
+                    this._readResponseText(payload) ||
+                    'I could not generate a response for that request. Please try rephrasing.';
+            }
+            const assistantMessage = {
+                id: `assistant-${Date.now()}`,
+                role: 'assistant',
+                isUser: false,
+                author: 'Content Assistant',
+                badgeLabel: '',
+                body: llmText,
+                avatarClass: 'content-record-assistant-avatar content-record-assistant-avatar_assistant',
+                avatarIcon: 'utility:chat',
+                badgeClass: '',
+                showActions: false,
+                cardClass: 'content-record-assistant-message-card'
+            };
+            this.assistantMessagesState = [...this.assistantMessagesState, assistantMessage];
+        } catch (e) {
+            this.assistantError = e && e.message ? e.message : 'Unable to fetch response from LLM.';
+        } finally {
+            this.assistantIsLoading = false;
+        }
     }
 
     get hasNoAnnotations() {

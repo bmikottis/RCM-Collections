@@ -15,6 +15,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Patients with arterial hypertension.html',
         title: 'Cordim — Patients with arterial hypertension',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Introduces the arterial hypertension patient population for Cordim, including prevalence context, risk stratification, and foundational treatment framing used across the deck.',
         folder: '01_Patients with arterial hypertension'
     },
     {
@@ -22,6 +24,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Risks and prevalence.html',
         title: 'Cordim — Risks and prevalence',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Highlights disease burden and prevalence trends, with emphasis on high-risk patient segments and why earlier intervention can improve downstream outcomes.',
         folder: '02_Risks and prevalence'
     },
     {
@@ -29,6 +33,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Graph.html',
         title: 'Cordim — Graph',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Presents comparative efficacy data using charted outcomes to show Cordim performance over time versus baseline and benchmark comparators.',
         folder: '03_Graph'
     },
     {
@@ -36,6 +42,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Survey.html',
         title: 'Cordim — Survey',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Summarizes survey-based findings from clinicians and/or patients, surfacing perception of benefit, treatment experience, and key adoption barriers.',
         folder: '05_Survey'
     },
     {
@@ -43,6 +51,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Benefits of Cordim.html',
         title: 'Cordim — Benefits of Cordim',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Consolidates the primary clinical and practical benefits of Cordim, connecting outcome improvements to patient relevance and prescriber decision points.',
         folder: '06_Benefits of Cordim'
     },
     {
@@ -50,6 +60,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Cordim coverage.html',
         title: 'Cordim — Cordim coverage',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Outlines reimbursement and access considerations, including coverage positioning, payer dynamics, and support pathways to improve treatment uptake.',
         folder: '07_Cordim coverage'
     },
     {
@@ -57,6 +69,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Drugs comparison.html',
         title: 'Cordim — Drugs comparison',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Compares Cordim with alternative therapies across efficacy, safety, and use-profile dimensions to support benefit-risk discussion in competitive contexts.',
         folder: '08_Drugs comparison'
     },
     {
@@ -64,6 +78,8 @@ const CORDIM_INDIVIDUAL_SLIDES = [
         file: 'Guidelines.html',
         title: 'Cordim — Guidelines',
         contentTypeLabel: 'Web Page',
+        summary:
+            'Maps Cordim messaging to guideline-aligned practice recommendations, emphasizing where evidence supports positioning in standard-of-care pathways.',
         folder: '09_Guidelines'
     }
 ];
@@ -78,6 +94,7 @@ export function getCordimCollection() {
         title: row.title,
         contentType: 'html',
         contentTypeLabel: row.contentTypeLabel,
+        summary: row.summary,
         version: '1.0',
         status: CORDIM_CONTENT_STATUS[i % CORDIM_CONTENT_STATUS.length],
         effectiveDates: '01/01/2025 - 12/31/2026',
@@ -105,6 +122,8 @@ export function getCordimCollection() {
                 title: 'Cordim — Interactive deck (all sections)',
                 contentType: 'html',
                 contentTypeLabel: 'Web Page',
+                summary:
+                    'Interactive Cordim master experience that links each section of the story, including disease overview, evidence visuals, comparative framing, and guideline context.',
                 version: '1.0',
                 status: 'In Review',
                 effectiveDates: '01/01/2025 - 12/31/2026',

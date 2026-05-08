@@ -88,6 +88,7 @@ export function getMakanaHealthCollection() {
             id: `cnt-makana-slide-${num}`,
             name: toDisplayPdfName(topic),
             title: `Makana Health — ${topic}`,
+            summary: `This slide summarizes ${topic.toLowerCase()} for ONCURA (oncurimab), focusing on core evidence and practical context for field discussions.`,
             contentType: 'pdf',
             contentTypeLabel: 'Slide',
             version: '1.0',
@@ -114,6 +115,8 @@ export function getMakanaHealthCollection() {
                 id: 'cnt-makana-salesaid',
                 name: 'Makana Health - ONCURA® (oncurimab) - SalesAid.pdf',
                 title: 'Makana Health — ONCURA® (oncurimab) Sales Aid',
+                summary:
+                    'Comprehensive ONCURA sales aid that walks through safety, efficacy, dosing, and access considerations, with key claims and supporting evidence for HCP conversations.',
                 contentType: 'pdf',
                 contentTypeLabel: 'Sales Aid',
                 version: '1.0',

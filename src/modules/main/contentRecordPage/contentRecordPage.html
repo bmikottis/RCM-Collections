@@ -359,6 +359,21 @@
                                                 {contentWorkItemsTabLabel}
                                             </a>
                                         </li>
+                                        <li class={assistantScopedTabItemClass} role="presentation" title="Content Assistant">
+                                            <a
+                                                class="slds-tabs_scoped__link"
+                                                href="#"
+                                                role="tab"
+                                                id="content-record-scoped-tab-assistant"
+                                                aria-selected={isScopedContentAssistant}
+                                                aria-controls="content-record-scoped-panel-assistant"
+                                                data-tab="contentAssistant"
+                                                tabindex={assistantScopedTabTabindex}
+                                                onclick={handleScopedTabClick}
+                                                onkeydown={handleScopedTabKeydown}>
+                                                Content Assistant
+                                            </a>
+                                        </li>
                                     </ul>
                                     <div class="content-record-scoped-panels">
                                     <template lwc:if={isScopedAnnotations}>
@@ -907,6 +922,122 @@
                                                 </template>
                                             </ul>
                                         </div>
+                                        </div>
+                                    </template>
+                                    <template lwc:elseif={isScopedContentAssistant}>
+                                        <div
+                                            class="slds-tabs_scoped__content content-record-scoped-tab-body"
+                                            id="content-record-scoped-panel-assistant"
+                                            role="tabpanel"
+                                            aria-labelledby="content-record-scoped-tab-assistant"
+                                            tabindex="0">
+                                            <section class="content-record-assistant-panel" aria-label="Content Assistant">
+                                                <header class="content-record-assistant-header">
+                                                    <div class="content-record-assistant-header-icon" aria-hidden="true">
+                                                        <lightning-icon
+                                                            icon-name="utility:sparkles"
+                                                            size="x-small"
+                                                            alternative-text="">
+                                                        </lightning-icon>
+                                                    </div>
+                                                    <h2 class="content-record-assistant-title">Content Assistant</h2>
+                                                    <span class="content-record-assistant-listening-pill">
+                                                        <lightning-icon icon-name="utility:topic" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Listening
+                                                    </span>
+                                                    <div class="content-record-assistant-header-actions">
+                                                        <lightning-button-icon
+                                                            icon-name="utility:threedots"
+                                                            variant="border-filled"
+                                                            size="small"
+                                                            alternative-text="Assistant options">
+                                                        </lightning-button-icon>
+                                                    </div>
+                                                </header>
+                                                <div class="content-record-assistant-thread">
+                                                    <div class="content-record-assistant-thread-inner">
+                                                        <template for:each={contentAssistantMessages} for:item="msg">
+                                                            <article key={msg.id} class={msg.cardClass}>
+                                                                <div class="content-record-assistant-message-head">
+                                                                    <template lwc:if={msg.avatarIcon}>
+                                                                        <div class={msg.avatarClass} aria-hidden="true">
+                                                                            <lightning-icon
+                                                                                icon-name={msg.avatarIcon}
+                                                                                size="xx-small"
+                                                                                alternative-text="">
+                                                                            </lightning-icon>
+                                                                        </div>
+                                                                    </template>
+                                                                    <div class="content-record-assistant-message-meta">
+                                                                        <p class="content-record-assistant-message-author">{msg.author}</p>
+                                                                        <template lwc:if={msg.badgeLabel}>
+                                                                            <span class={msg.badgeClass}>{msg.badgeLabel}</span>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <p class="content-record-assistant-message-body">{msg.body}</p>
+                                                                <template lwc:if={msg.showActions}>
+                                                                    <div class="content-record-assistant-message-actions">
+                                                                        <button type="button" class="content-record-assistant-chip">Sources (3)</button>
+                                                                        <button type="button" class="content-record-assistant-icon-btn" aria-label="Like">
+                                                                            <lightning-icon icon-name="utility:like" size="xx-small" alternative-text=""></lightning-icon>
+                                                                        </button>
+                                                                        <button type="button" class="content-record-assistant-icon-btn" aria-label="Dislike">
+                                                                            <lightning-icon icon-name="utility:dislike" size="xx-small" alternative-text=""></lightning-icon>
+                                                                        </button>
+                                                                        <button type="button" class="content-record-assistant-icon-btn" aria-label="Copy">
+                                                                            <lightning-icon icon-name="utility:copy" size="xx-small" alternative-text=""></lightning-icon>
+                                                                        </button>
+                                                                    </div>
+                                                                </template>
+                                                            </article>
+                                                        </template>
+                                                        <template lwc:if={assistantIsLoading}>
+                                                            <article class="content-record-assistant-message-card">
+                                                                <p class="content-record-assistant-message-body">Thinking...</p>
+                                                            </article>
+                                                        </template>
+                                                        <template lwc:if={assistantError}>
+                                                            <article class="content-record-assistant-message-card content-record-assistant-message-card_error">
+                                                                <p class="content-record-assistant-message-body">{assistantError}</p>
+                                                            </article>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <footer class="content-record-assistant-composer">
+                                                    <div class="content-record-assistant-composer-shell">
+                                                        <lightning-input
+                                                            type="text"
+                                                            label="Ask Content Assistant"
+                                                            variant="label-hidden"
+                                                            placeholder="Ask me anything about this Service interaction..."
+                                                            value={assistantDraft}
+                                                            onchange={handleAssistantInputChange}
+                                                            onkeydown={handleAssistantInputKeydown}
+                                                            class="content-record-assistant-input">
+                                                        </lightning-input>
+                                                        <div class="content-record-assistant-composer-actions">
+                                                            <lightning-button-icon
+                                                                icon-name="utility:add"
+                                                                variant="border-filled"
+                                                                alternative-text="Add context">
+                                                            </lightning-button-icon>
+                                                            <lightning-button label="Search" variant="neutral" icon-name="utility:chat"></lightning-button>
+                                                            <lightning-button label="Search" variant="neutral" icon-name="utility:table"></lightning-button>
+                                                            <lightning-button label="Pause Agent" variant="neutral" icon-name="utility:pause"></lightning-button>
+                                                            <lightning-button label="Set API Key" variant="neutral" onclick={handleAssistantSetApiKey}></lightning-button>
+                                                            <lightning-button label="Mock Replies" variant="neutral" onclick={handleAssistantUseMock}></lightning-button>
+                                                            <lightning-button-icon
+                                                                icon-name="utility:send"
+                                                                variant="brand"
+                                                                disabled={isAssistantSendDisabled}
+                                                                onclick={handleAssistantSendClick}
+                                                                alternative-text="Send message">
+                                                            </lightning-button-icon>
+                                                        </div>
+                                                    </div>
+                                                </footer>
+                                            </section>
                                         </div>
                                     </template>
                                     </div>

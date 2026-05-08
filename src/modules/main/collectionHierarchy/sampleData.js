@@ -239,6 +239,7 @@ export const sampleCollections = {
                     id: 'cnt-immunexis-demo',
                     name: 'Immunexis Promotional Email.pdf',
                     title: 'Promotional emailer to KOL for Immunexis',
+                    summary: 'This promotional email for Immunexis is a professional-facing piece highlighting clinical outcomes for patients with chronic inflammatory conditions. Key claims include a 70% reduction in joint swelling within 4 weeks and 2x faster pain relief compared to the current market-leading biologic. The document includes a placeholder for the recipient name, a direct link to the Full Prescribing Information (PI), and data regarding 65% symptom relief within 8 weeks.',
                     contentType: 'pdf',
                     contentTypeLabel: 'Promotional Emailer',
                     version: '0.1',
